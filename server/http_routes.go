@@ -15,9 +15,12 @@ func (h *HttpHandler) Register(e *echo.Echo) {
 
 }
 
+// IngestAwsTables run the ingester to receive pricing and store in the database for aws services
+// Params: service (query param), region (query param)
 func (h *HttpHandler) IngestAwsTables(ctx echo.Context) error {
-
-	ingester, err := azurerm.NewIngester(ctx.Request().Context(), "Virtual Machines", "eastus")
+	service := ctx.QueryParam("service")
+	region := ctx.QueryParam("region")
+	ingester, err := azurerm.NewIngester(ctx.Request().Context(), service, region)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -29,9 +32,12 @@ func (h *HttpHandler) IngestAwsTables(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, "Tables successfully ingested")
 }
 
+// IngestAzureTables run the ingester to receive pricing and store in the database for azure services
+// Params: service (query param), region (query param)
 func (h *HttpHandler) IngestAzureTables(ctx echo.Context) error {
-
-	ingester, err := aws.NewIngester("Virtual Machines", "eastus")
+	service := ctx.QueryParam("service")
+	region := ctx.QueryParam("region")
+	ingester, err := aws.NewIngester(service, region)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
