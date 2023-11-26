@@ -6,6 +6,7 @@ require (
 	github.com/brpaz/echozap v1.1.3
 	github.com/cycloidio/sqlr v1.0.0
 	github.com/dmarkham/enumer v1.5.3
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/labstack/echo/v4 v4.11.3
 	github.com/lopezator/migrator v0.3.0
 	github.com/machinebox/progress v0.2.0
@@ -24,7 +25,6 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
