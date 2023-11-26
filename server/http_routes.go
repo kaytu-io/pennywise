@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/kaytu-io/pennywise/server/aws"
 	awsrg "github.com/kaytu-io/pennywise/server/aws/region"
 	awstf "github.com/kaytu-io/pennywise/server/aws/terraform"
@@ -20,7 +21,7 @@ func (h *HttpHandler) Register(e *echo.Echo) {
 	v1.PUT("/ingest/azure", h.IngestAzureTables)
 	v1.PUT("/ingest/aws", h.IngestAwsTables)
 
-	cost := e.Group("/cost")
+	cost := v1.Group("/cost")
 	cost.GET("/resource", h.GetResourceCost)
 }
 
@@ -50,6 +51,7 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 		resources := make(map[string]resource.Resource)
 		resources[req.Address] = req
 		components := provider.ResourceComponents(resources, req)
+		fmt.Println("COMPONENTS", components)
 		qResource = query.Resource{
 			Address:    req.Address,
 			Provider:   req.ProviderName,

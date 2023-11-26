@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"golang.org/x/net/context"
+	"gopkg.in/go-playground/validator.v9"
 	"os"
 )
 
@@ -20,6 +21,14 @@ var (
 
 	HttpAddress = os.Getenv("HTTP_ADDRESS")
 )
+
+type customValidator struct {
+	validate *validator.Validate
+}
+
+func (v customValidator) Validate(i interface{}) error {
+	return v.validate.Struct(i)
+}
 
 func Command() *cobra.Command {
 	return &cobra.Command{
@@ -49,7 +58,9 @@ func registerAndStart(logger *zap.Logger, address string, handler *HttpHandler) 
 
 	e.Use(middleware.Recover())
 	e.Use(echozap.ZapLogger(logger))
-
+	e.Validator = customValidator{
+		validate: validator.New(),
+	}
 	handler.Register(e)
 	return e.Start(address)
 }

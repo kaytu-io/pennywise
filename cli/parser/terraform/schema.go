@@ -1,6 +1,10 @@
 package terraform
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"github.com/kaytu-io/pennywise/server/resource"
+	"strings"
+)
 
 // ProviderConfigExpression is a single configuration variable of a ProviderConfig.
 type ProviderConfigExpression struct {
@@ -80,6 +84,21 @@ type Resource struct {
 	Name         string                 `json:"name"`
 	ProviderName string                 `json:"provider_name"`
 	Values       map[string]interface{} `json:"values"`
+}
+
+func (r *Resource) ToResource(region string) resource.Resource {
+	resource := resource.Resource{
+		Address:      r.Address,
+		Type:         r.Type,
+		Name:         r.Name,
+		RegionCode:   region,
+		ProviderName: r.ProviderName,
+		Values:       r.Values,
+	}
+	if strings.Contains(r.ProviderName, "azurerm") {
+		resource.ProviderName = "azurerm"
+	}
+	return resource
 }
 
 // Module is a collection of resources.

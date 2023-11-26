@@ -2,7 +2,6 @@ package client
 
 import (
 	"bytes"
-	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/cost"
@@ -38,7 +37,6 @@ func (s *serverClient) GetCost(req resource.Resource) (*cost.Cost, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	var cost cost.Cost
 	if statusCode, err := doRequest(http.MethodGet, url, payload, &cost); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
@@ -54,7 +52,7 @@ func doRequest(method, url string, payload []byte, v interface{}) (statusCode in
 	if err != nil {
 		return statusCode, fmt.Errorf("new request: %w", err)
 	}
-
+	req.Header.Set(echo.HeaderContentType, "application/json")
 	t := http.DefaultTransport.(*http.Transport)
 	client := http.Client{
 		Timeout:   3 * time.Minute,
@@ -67,13 +65,6 @@ func doRequest(method, url string, payload []byte, v interface{}) (statusCode in
 	}
 	defer res.Body.Close()
 	body := res.Body
-	if res.Header.Get("Content-Encoding") == "gzip" {
-		body, err = gzip.NewReader(res.Body)
-		if err != nil {
-			return statusCode, fmt.Errorf("gzip new reader: %w", err)
-		}
-		defer body.Close()
-	}
 
 	statusCode = res.StatusCode
 	if res.StatusCode != http.StatusOK {
