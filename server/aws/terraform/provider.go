@@ -8,6 +8,8 @@ import (
 	"github.com/kaytu.io/pennywise/server/query"
 )
 
+const ProviderName = "aws"
+
 // Provider is an implementation of the terraform.Provider, used to extract component queries from
 // terraform resources.
 type Provider struct {

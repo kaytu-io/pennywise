@@ -2,7 +2,13 @@ package main
 
 import (
 	"github.com/kaytu.io/pennywise/server/aws"
+	awsrg "github.com/kaytu.io/pennywise/server/aws/region"
+	awstf "github.com/kaytu.io/pennywise/server/aws/terraform"
 	"github.com/kaytu.io/pennywise/server/azurerm"
+	azuretf "github.com/kaytu.io/pennywise/server/azurerm/terraform"
+	"github.com/kaytu.io/pennywise/server/cost"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/resource"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -13,18 +19,67 @@ func (h *HttpHandler) Register(e *echo.Echo) {
 	v1.PUT("/ingest/azure", h.IngestAzureTables)
 	v1.PUT("/ingest/aws", h.IngestAwsTables)
 
-	//cost := e.Group("/cost")
-	//cost.GET("/azure/resource", h.GetResourceCost)
+	cost := e.Group("/cost")
+	cost.GET("/resource", h.GetResourceCost)
 }
 
-//func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
-//	provider, err := azuretf.NewProvider(azuretf.ProviderName)
-//	if err != nil {
-//		return ctx.JSON(http.StatusInternalServerError, err.Error())
-//	}
-//	provider.ResourceComponents()
-//	return nil
-//}
+func bindValidate(ctx echo.Context, i any) error {
+	if err := ctx.Bind(i); err != nil {
+		return err
+	}
+
+	if err := ctx.Validate(i); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
+	var req resource.Resource
+	var qResource query.Resource
+	if err := bindValidate(ctx, &req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if req.ProviderName == "azurerm" {
+		provider, err := azuretf.NewProvider(azuretf.ProviderName)
+		if err != nil {
+			return ctx.JSON(http.StatusInternalServerError, err.Error())
+		}
+		resources := make(map[string]resource.Resource)
+		resources[req.Address] = req
+		components := provider.ResourceComponents(resources, req)
+		qResource = query.Resource{
+			Address:    req.Address,
+			Provider:   req.ProviderName,
+			Type:       req.Type,
+			Components: components,
+		}
+	} else if req.ProviderName == "aws" {
+		provider, err := awstf.NewProvider(awstf.ProviderName, awsrg.Code(req.RegionCode))
+		if err != nil {
+			return ctx.JSON(http.StatusInternalServerError, err.Error())
+		}
+		resources := make(map[string]resource.Resource)
+		resources[req.Address] = req
+		components := provider.ResourceComponents(resources, req)
+		qResource = query.Resource{
+			Address:    req.Address,
+			Provider:   req.ProviderName,
+			Type:       req.Type,
+			Components: components,
+		}
+	}
+	state, err := cost.NewState(ctx.Request().Context(), h.backend, []query.Resource{qResource})
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+	cost, err := state.Cost()
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return ctx.JSON(http.StatusOK, cost)
+}
 
 // IngestAwsTables run the ingester to receive pricing and store in the database for aws services
 // Params: service (query param), region (query param)
