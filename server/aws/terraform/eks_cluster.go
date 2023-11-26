@@ -2,16 +2,16 @@ package terraform
 
 import (
 	"fmt"
+	"github.com/kaytu.io/pennywise/server/internal/price"
+	"github.com/kaytu.io/pennywise/server/internal/product"
+	"github.com/kaytu.io/pennywise/server/internal/query"
+	"github.com/kaytu.io/pennywise/server/internal/util"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 
 	"github.com/kaytu.io/pennywise/server/aws/region"
-	"github.com/kaytu.io/pennywise/server/price"
-	"github.com/kaytu.io/pennywise/server/product"
-	"github.com/kaytu.io/pennywise/server/query"
-	"github.com/kaytu.io/pennywise/server/util"
 )
 
 // EKSCluster represents an EKSCluster instance definition that can be cost-estimated.

@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/kaytu.io/pennywise/server/internal/price"
+	"github.com/kaytu.io/pennywise/server/internal/product"
 	"strconv"
 	"strings"
 
-	"github.com/kaytu.io/pennywise/server/price"
-	"github.com/kaytu.io/pennywise/server/product"
 	"github.com/shopspring/decimal"
 	"google.golang.org/api/cloudbilling/v1"
 	"google.golang.org/api/compute/v1"

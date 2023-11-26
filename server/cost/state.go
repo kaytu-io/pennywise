@@ -3,10 +3,9 @@ package cost
 import (
 	"context"
 	"fmt"
-
-	"github.com/kaytu.io/pennywise/server/backend"
-	"github.com/kaytu.io/pennywise/server/query"
-	"github.com/kaytu.io/pennywise/server/terraform"
+	"github.com/kaytu.io/pennywise/server/internal/backend"
+	"github.com/kaytu.io/pennywise/server/internal/query"
+	"github.com/kaytu.io/pennywise/server/resource"
 )
 
 // State represents a collection of all the Resource costs (either prior or planned.) It is not tied to any specific
@@ -23,12 +22,12 @@ var (
 )
 
 // NewState returns a new State from a query.Resource slice by using the Backend to fetch the pricing data.
-func NewState(ctx context.Context, backend backend.Backend, queries []query.Resource) (*State, error) {
+func NewState(ctx context.Context, backend backend.Backend, resources []query.Resource) (*State, error) {
 	state := &State{Resources: make(map[string]Resource)}
-	if len(queries) == 0 {
-		return nil, terraform.ErrNoQueries
+	if len(resources) == 0 {
+		return nil, resource.ErrNoResources
 	}
-	for _, res := range queries {
+	for _, res := range resources {
 		// Mark the Resource as skipped if there are no valid Components.
 		state.ensureResource(res.Address, res.Provider, res.Type, len(res.Components) == 0)
 		for _, comp := range res.Components {

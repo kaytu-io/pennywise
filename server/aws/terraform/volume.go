@@ -1,13 +1,13 @@
 package terraform
 
 import (
+	"github.com/kaytu.io/pennywise/server/internal/product"
+	"github.com/kaytu.io/pennywise/server/internal/query"
+	"github.com/kaytu.io/pennywise/server/internal/util"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 
 	"github.com/kaytu.io/pennywise/server/aws/region"
-	"github.com/kaytu.io/pennywise/server/product"
-	"github.com/kaytu.io/pennywise/server/query"
-	"github.com/kaytu.io/pennywise/server/util"
 )
 
 // Volume represents an EBS volume that can be cost-estimated.

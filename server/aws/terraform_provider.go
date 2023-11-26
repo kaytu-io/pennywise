@@ -3,7 +3,7 @@ package aws
 import (
 	"github.com/kaytu.io/pennywise/server/aws/region"
 	awstf "github.com/kaytu.io/pennywise/server/aws/terraform"
-	"github.com/kaytu.io/pennywise/server/terraform"
+	"github.com/kaytu.io/pennywise/server/resource"
 )
 
 const (
@@ -15,9 +15,9 @@ const (
 )
 
 // TerraformProviderInitializer is a terraform.ProviderInitializer that initializes the default AWS provider.
-var TerraformProviderInitializer = terraform.ProviderInitializer{
+var TerraformProviderInitializer = resource.ProviderInitializer{
 	MatchNames: []string{ProviderName, RegistryName},
-	Provider: func(values map[string]interface{}) (terraform.Provider, error) {
+	Provider: func(values map[string]interface{}) (resource.Provider, error) {
 		r, ok := values["region"]
 		// If no region is defined it means it was passed via ENV variables
 		// and it's not tracked on the Plan or HCL so we'll assume the

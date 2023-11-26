@@ -7,7 +7,8 @@ import (
 	"github.com/kaytu.io/pennywise/server/azurerm"
 	azuretf "github.com/kaytu.io/pennywise/server/azurerm/terraform"
 	"github.com/kaytu.io/pennywise/server/cost"
-	"github.com/kaytu.io/pennywise/server/query"
+	ingester2 "github.com/kaytu.io/pennywise/server/internal/ingester"
+	"github.com/kaytu.io/pennywise/server/internal/query"
 	"github.com/kaytu.io/pennywise/server/resource"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -90,7 +91,7 @@ func (h *HttpHandler) IngestAwsTables(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
-	err = IngestPricing(ctx.Request().Context(), h.backend, ingester)
+	err = ingester2.IngestPricing(ctx.Request().Context(), h.backend, ingester)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -107,7 +108,7 @@ func (h *HttpHandler) IngestAzureTables(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
-	err = IngestPricing(ctx.Request().Context(), h.backend, ingester)
+	err = ingester2.IngestPricing(ctx.Request().Context(), h.backend, ingester)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}

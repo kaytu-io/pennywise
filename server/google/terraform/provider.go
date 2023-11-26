@@ -1,7 +1,7 @@
 package terraform
 
 import (
-	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/internal/query"
 	"github.com/kaytu.io/pennywise/server/resource"
 )
 

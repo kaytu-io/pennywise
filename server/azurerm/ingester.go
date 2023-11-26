@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/kaytu.io/pennywise/server/internal/price"
+	"github.com/kaytu.io/pennywise/server/internal/product"
 	"net/http"
 	"net/url"
 	"strings"
 
-	"github.com/kaytu.io/pennywise/server/price"
-	"github.com/kaytu.io/pennywise/server/product"
 	"github.com/shopspring/decimal"
 )
 

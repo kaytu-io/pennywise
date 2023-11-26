@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
+	"github.com/kaytu.io/pennywise/server/internal/price"
+	"github.com/kaytu.io/pennywise/server/internal/product"
 	"io"
 	"net/http"
 	"time"
@@ -14,8 +16,6 @@ import (
 
 	"github.com/kaytu.io/pennywise/server/aws/field"
 	"github.com/kaytu.io/pennywise/server/aws/region"
-	"github.com/kaytu.io/pennywise/server/price"
-	"github.com/kaytu.io/pennywise/server/product"
 )
 
 // ProviderName uniquely identifies this provider implementation.

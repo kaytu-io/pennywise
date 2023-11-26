@@ -3,6 +3,10 @@ package cost_test
 import (
 	"context"
 	"errors"
+	"github.com/kaytu.io/pennywise/server/internal/price"
+	product2 "github.com/kaytu.io/pennywise/server/internal/product"
+	"github.com/kaytu.io/pennywise/server/internal/query"
+	"github.com/kaytu.io/pennywise/server/internal/util"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -12,10 +16,6 @@ import (
 
 	"github.com/kaytu.io/pennywise/server/cost"
 	"github.com/kaytu.io/pennywise/server/mock"
-	"github.com/kaytu.io/pennywise/server/price"
-	"github.com/kaytu.io/pennywise/server/product"
-	"github.com/kaytu.io/pennywise/server/query"
-	"github.com/kaytu.io/pennywise/server/util"
 )
 
 func TestNewState(t *testing.T) {
@@ -26,12 +26,12 @@ func TestNewState(t *testing.T) {
 				{
 					Name:           "Compute",
 					HourlyQuantity: decimal.NewFromInt(1),
-					ProductFilter: &product.Filter{
+					ProductFilter: &product2.Filter{
 						Provider: util.StringPtr("aws"),
 						Service:  util.StringPtr("AmazonEC2"),
 						Family:   util.StringPtr("Compute Instance"),
 						Location: util.StringPtr("eu-west-3"),
-						AttributeFilters: []*product.AttributeFilter{
+						AttributeFilters: []*product2.AttributeFilter{
 							{Key: "instanceType", Value: util.StringPtr("t3.micro")},
 						},
 					},
@@ -55,8 +55,8 @@ func TestNewState(t *testing.T) {
 		backend.EXPECT().Products().AnyTimes().Return(productRepo)
 		backend.EXPECT().Prices().AnyTimes().Return(priceRepo)
 
-		prod1 := &product.Product{ID: product.ID(1)}
-		productRepo.EXPECT().Filter(ctx, queries[0].Components[0].ProductFilter).Return([]*product.Product{prod1}, nil)
+		prod1 := &product2.Product{ID: product2.ID(1)}
+		productRepo.EXPECT().Filter(ctx, queries[0].Components[0].ProductFilter).Return([]*product2.Product{prod1}, nil)
 		prc1 := &price.Price{Value: decimal.NewFromFloat(1.23), Unit: "Hrs", Currency: "USD"}
 		priceRepo.EXPECT().Filter(ctx, prod1.ID, queries[0].Components[0].PriceFilter).Return([]*price.Price{prc1}, nil)
 
@@ -110,8 +110,8 @@ func TestNewState(t *testing.T) {
 		backend.EXPECT().Products().AnyTimes().Return(productRepo)
 		backend.EXPECT().Prices().AnyTimes().Return(priceRepo)
 
-		prod1 := &product.Product{ID: product.ID(1)}
-		productRepo.EXPECT().Filter(ctx, queries[0].Components[0].ProductFilter).Return([]*product.Product{prod1}, nil)
+		prod1 := &product2.Product{ID: product2.ID(1)}
+		productRepo.EXPECT().Filter(ctx, queries[0].Components[0].ProductFilter).Return([]*product2.Product{prod1}, nil)
 		priceRepo.EXPECT().Filter(ctx, prod1.ID, queries[0].Components[0].PriceFilter).Return(nil, errors.New("repo fail"))
 
 		state, err := cost.NewState(ctx, backend, queries)

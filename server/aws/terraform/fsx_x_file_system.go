@@ -2,13 +2,13 @@ package terraform
 
 import (
 	"fmt"
+	"github.com/kaytu.io/pennywise/server/internal/product"
+	"github.com/kaytu.io/pennywise/server/internal/query"
+	"github.com/kaytu.io/pennywise/server/internal/util"
 
 	"github.com/shopspring/decimal"
 
 	"github.com/kaytu.io/pennywise/server/aws/region"
-	"github.com/kaytu.io/pennywise/server/product"
-	"github.com/kaytu.io/pennywise/server/query"
-	"github.com/kaytu.io/pennywise/server/util"
 )
 
 // FSxFileSystem represents an EFS that can be cost-estimated.
