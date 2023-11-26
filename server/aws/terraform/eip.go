@@ -6,9 +6,9 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/util"
 	"github.com/kaytu.io/pennywise/server/aws/region"
+	"github.com/kaytu.io/pennywise/server/internal/price"
+	"github.com/kaytu.io/pennywise/server/internal/util"
 )
 
 // ElasticIP represents an ElasticIP instance definition that can be cost-estimated.
