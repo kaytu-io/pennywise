@@ -1,9 +1,9 @@
 package aws
 
 import (
-	"github.com/kaytu.io/pennywise/server/aws/region"
-	awstf "github.com/kaytu.io/pennywise/server/aws/terraform"
-	"github.com/kaytu.io/pennywise/server/resource"
+	"github.com/kaytu-io/pennywise/server/aws/region"
+	awstf "github.com/kaytu-io/pennywise/server/aws/terraform"
+	"github.com/kaytu-io/pennywise/server/resource"
 )
 
 const (

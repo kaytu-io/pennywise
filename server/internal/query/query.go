@@ -1,8 +1,8 @@
 package query
 
 import (
-	"github.com/kaytu.io/pennywise/server/internal/price"
-	"github.com/kaytu.io/pennywise/server/internal/product"
+	"github.com/kaytu-io/pennywise/server/internal/price"
+	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/shopspring/decimal"
 )
 

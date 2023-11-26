@@ -2,8 +2,8 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/kaytu.io/pennywise/server/internal/price"
-	product2 "github.com/kaytu.io/pennywise/server/internal/product"
+	"github.com/kaytu-io/pennywise/server/internal/price"
+	product2 "github.com/kaytu-io/pennywise/server/internal/product"
 	"strings"
 )
 

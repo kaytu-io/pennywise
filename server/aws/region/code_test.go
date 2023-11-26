@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kaytu.io/pennywise/server/aws/region"
+	"github.com/kaytu-io/pennywise/server/aws/region"
 )
 
 func TestNewFromZone(t *testing.T) {

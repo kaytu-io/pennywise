@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	price2 "github.com/kaytu.io/pennywise/server/internal/price"
-	"github.com/kaytu.io/pennywise/server/internal/product"
+	price2 "github.com/kaytu-io/pennywise/server/internal/price"
+	"github.com/kaytu-io/pennywise/server/internal/product"
 	"strings"
 
 	"golang.org/x/text/currency"

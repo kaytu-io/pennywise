@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/kaytu.io/pennywise/server/aws"
-	awsrg "github.com/kaytu.io/pennywise/server/aws/region"
-	awstf "github.com/kaytu.io/pennywise/server/aws/terraform"
-	"github.com/kaytu.io/pennywise/server/azurerm"
-	azuretf "github.com/kaytu.io/pennywise/server/azurerm/terraform"
-	"github.com/kaytu.io/pennywise/server/cost"
-	ingester2 "github.com/kaytu.io/pennywise/server/internal/ingester"
-	"github.com/kaytu.io/pennywise/server/internal/query"
-	"github.com/kaytu.io/pennywise/server/resource"
+	"github.com/kaytu-io/pennywise/server/aws"
+	awsrg "github.com/kaytu-io/pennywise/server/aws/region"
+	awstf "github.com/kaytu-io/pennywise/server/aws/terraform"
+	"github.com/kaytu-io/pennywise/server/azurerm"
+	azuretf "github.com/kaytu-io/pennywise/server/azurerm/terraform"
+	"github.com/kaytu-io/pennywise/server/cost"
+	ingester2 "github.com/kaytu-io/pennywise/server/internal/ingester"
+	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )

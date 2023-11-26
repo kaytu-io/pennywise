@@ -3,7 +3,7 @@ package mysql
 import (
 	"context"
 	"database/sql"
-	"github.com/kaytu.io/pennywise/server/internal/mysql/migrations"
+	"github.com/kaytu-io/pennywise/server/internal/mysql/migrations"
 
 	"github.com/lopezator/migrator"
 )

@@ -2,8 +2,8 @@ package mysql
 
 import (
 	"github.com/cycloidio/sqlr"
-	"github.com/kaytu.io/pennywise/server/internal/price"
-	"github.com/kaytu.io/pennywise/server/internal/product"
+	"github.com/kaytu-io/pennywise/server/internal/price"
+	"github.com/kaytu-io/pennywise/server/internal/product"
 )
 
 // Backend is the MySQL implementation of the costestimation.Backend, using repositories that connect

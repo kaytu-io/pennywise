@@ -1,10 +1,10 @@
 package resource
 
 import (
-	"github.com/kaytu.io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/internal/query"
 )
 
-//go:generate mockgen -destination=../mock/terraform_provider.go -mock_names=Provider=TerraformProvider -package mock github.com/kaytu.io/pennywise/server/terraform Provider
+//go:generate mockgen -destination=../mock/terraform_provider.go -mock_names=Provider=TerraformProvider -package mock github.com/kaytu-io/pennywise/server/terraform Provider
 
 // Provider represents a Terraform provider. It extracts price queries from Terraform resources.
 type Provider interface {

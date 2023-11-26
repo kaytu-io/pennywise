@@ -1,8 +1,8 @@
 package terraform
 
 import (
-	"github.com/kaytu.io/pennywise/server/internal/query"
-	"github.com/kaytu.io/pennywise/server/resource"
+	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/resource"
 )
 
 const ProviderName = "azurerm"

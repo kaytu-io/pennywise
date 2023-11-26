@@ -1,4 +1,4 @@
-module github.com/kaytu.io/pennywise/cli
+module github.com/kaytu-io/pennywise/cli
 
 go 1.21.3
 

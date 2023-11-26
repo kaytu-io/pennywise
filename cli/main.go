@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/kaytu.io/pennywise/cli/parser/terraform"
-	"github.com/kaytu.io/pennywise/cli/usage"
-	"github.com/kaytu.io/pennywise/server/resource"
+	"github.com/kaytu-io/pennywise/cli/parser/terraform"
+	"github.com/kaytu-io/pennywise/cli/usage"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"golang.org/x/net/context"
 	"io"
 	"log"

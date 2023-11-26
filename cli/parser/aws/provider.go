@@ -2,7 +2,7 @@ package aws
 
 import (
 	"fmt"
-	"github.com/kaytu.io/pennywise/cli/parser/aws/region"
+	"github.com/kaytu-io/pennywise/cli/parser/aws/region"
 )
 
 // Provider is an implementation of the terraform.Provider, used to extract component queries from

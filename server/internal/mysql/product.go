@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	product2 "github.com/kaytu.io/pennywise/server/internal/product"
+	product2 "github.com/kaytu-io/pennywise/server/internal/product"
 
 	"github.com/cycloidio/sqlr"
 )

@@ -3,12 +3,12 @@ package ingester
 import (
 	"context"
 	"fmt"
-	"github.com/kaytu.io/pennywise/server/internal/backend"
-	"github.com/kaytu.io/pennywise/server/internal/price"
-	"github.com/kaytu.io/pennywise/server/internal/product"
+	"github.com/kaytu-io/pennywise/server/internal/backend"
+	"github.com/kaytu-io/pennywise/server/internal/price"
+	"github.com/kaytu-io/pennywise/server/internal/product"
 )
 
-//go:generate mockgen -destination=mock/ingester.go -mock_names=Ingester=Ingester -package mock github.com/kaytu.io/pennywise/server Ingester
+//go:generate mockgen -destination=mock/ingester.go -mock_names=Ingester=Ingester -package mock github.com/kaytu-io/pennywise/server Ingester
 
 // Ingester represents a vendor-specific mechanism to load pricing data.
 type Ingester interface {

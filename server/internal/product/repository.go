@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-//go:generate mockgen -destination=../mock/product_repository.go -mock_names=Repository=ProductRepository -package mock github.com/kaytu.io/pennywise/server/product Repository
+//go:generate mockgen -destination=../mock/product_repository.go -mock_names=Repository=ProductRepository -package mock github.com/kaytu-io/pennywise/server/product Repository
 
 // Repository describes interactions with a storage system to deal with Product entries.
 type Repository interface {

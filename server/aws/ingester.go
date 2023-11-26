@@ -5,8 +5,8 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"github.com/kaytu.io/pennywise/server/internal/price"
-	"github.com/kaytu.io/pennywise/server/internal/product"
+	"github.com/kaytu-io/pennywise/server/internal/price"
+	"github.com/kaytu-io/pennywise/server/internal/product"
 	"io"
 	"net/http"
 	"time"
@@ -14,8 +14,8 @@ import (
 	"github.com/machinebox/progress"
 	"github.com/shopspring/decimal"
 
-	"github.com/kaytu.io/pennywise/server/aws/field"
-	"github.com/kaytu.io/pennywise/server/aws/region"
+	"github.com/kaytu-io/pennywise/server/aws/field"
+	"github.com/kaytu-io/pennywise/server/aws/region"
 )
 
 // ProviderName uniquely identifies this provider implementation.

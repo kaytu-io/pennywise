@@ -1,8 +1,8 @@
 package azurerm
 
 import (
-	azurermtf "github.com/kaytu.io/pennywise/server/azurerm/terraform"
-	"github.com/kaytu.io/pennywise/server/resource"
+	azurermtf "github.com/kaytu-io/pennywise/server/azurerm/terraform"
+	"github.com/kaytu-io/pennywise/server/resource"
 )
 
 // RegistryName is the fully qualified name under which this provider is stored in the registry.

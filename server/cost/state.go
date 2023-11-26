@@ -3,9 +3,9 @@ package cost
 import (
 	"context"
 	"fmt"
-	"github.com/kaytu.io/pennywise/server/internal/backend"
-	"github.com/kaytu.io/pennywise/server/internal/query"
-	"github.com/kaytu.io/pennywise/server/resource"
+	"github.com/kaytu-io/pennywise/server/internal/backend"
+	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/resource"
 )
 
 // State represents a collection of all the Resource costs (either prior or planned.) It is not tied to any specific

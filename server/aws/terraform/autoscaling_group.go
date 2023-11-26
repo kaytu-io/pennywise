@@ -1,11 +1,11 @@
 package terraform
 
 import (
-	"github.com/kaytu.io/pennywise/server/resource"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 
-	"github.com/kaytu.io/pennywise/server/aws/region"
+	"github.com/kaytu-io/pennywise/server/aws/region"
 )
 
 // autoscalingGroup represents the structure of Terraform values for autoscaling_group resource.

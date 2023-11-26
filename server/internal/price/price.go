@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
-	"github.com/kaytu.io/pennywise/server/internal/product"
+	"github.com/kaytu-io/pennywise/server/internal/product"
 	"sort"
 	"strings"
 

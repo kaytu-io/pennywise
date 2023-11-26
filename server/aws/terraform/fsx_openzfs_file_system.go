@@ -1,7 +1,7 @@
 package terraform
 
 import (
-	"github.com/kaytu.io/pennywise/server/resource"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	mysql2 "github.com/kaytu.io/pennywise/server/internal/mysql"
+	mysql2 "github.com/kaytu-io/pennywise/server/internal/mysql"
 	"go.uber.org/zap"
 	"golang.org/x/net/context"
 )

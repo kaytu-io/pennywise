@@ -2,10 +2,10 @@ package price
 
 import (
 	"context"
-	"github.com/kaytu.io/pennywise/server/internal/product"
+	"github.com/kaytu-io/pennywise/server/internal/product"
 )
 
-//go:generate mockgen -destination=../mock/price_repository.go -mock_names=Repository=PriceRepository -package mock github.com/kaytu.io/pennywise/server/price Repository
+//go:generate mockgen -destination=../mock/price_repository.go -mock_names=Repository=PriceRepository -package mock github.com/kaytu-io/pennywise/server/price Repository
 
 // Repository describes interactions with a storage system to deal with Price entries.
 type Repository interface {
