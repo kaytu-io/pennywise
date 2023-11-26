@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/cycloidio/terracost/azurerm"
-	"github.com/cycloidio/terracost/testutil"
+	"github.com/kaytu.io/pennywise/server/azurerm"
+	"github.com/kaytu.io/pennywise/server/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

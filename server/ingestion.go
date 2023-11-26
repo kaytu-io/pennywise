@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cycloidio/terracost/backend"
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/product"
+	"github.com/kaytu.io/pennywise/server/backend"
+	"github.com/kaytu.io/pennywise/server/price"
+	"github.com/kaytu.io/pennywise/server/product"
 )
 
-//go:generate mockgen -destination=mock/ingester.go -mock_names=Ingester=Ingester -package mock github.com/cycloidio/terracost Ingester
+//go:generate mockgen -destination=mock/ingester.go -mock_names=Ingester=Ingester -package mock github.com/kaytu.io/pennywise/server Ingester
 
 // Ingester represents a vendor-specific mechanism to load pricing data.
 type Ingester interface {

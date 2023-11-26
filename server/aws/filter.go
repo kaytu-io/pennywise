@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/cycloidio/terracost/price"
+	"github.com/kaytu.io/pennywise/server/price"
 )
 
 // IngestionFilter allows control over what pricing data is ingested. Given a price.WithProduct the function returns

@@ -3,7 +3,7 @@ package usage_test
 import (
 	"testing"
 
-	"github.com/cycloidio/terracost/usage"
+	"github.com/kaytu.io/pennywise/server/usage"
 	"github.com/stretchr/testify/assert"
 )
 

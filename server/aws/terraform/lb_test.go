@@ -3,16 +3,16 @@ package terraform_test
 import (
 	"testing"
 
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/product"
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/terraform"
-	"github.com/cycloidio/terracost/util"
+	"github.com/kaytu.io/pennywise/server/price"
+	"github.com/kaytu.io/pennywise/server/product"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/terraform"
+	"github.com/kaytu.io/pennywise/server/util"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	awstf "github.com/cycloidio/terracost/aws/terraform"
+	awstf "github.com/kaytu.io/pennywise/server/aws/terraform"
 )
 
 func TestLB_Components(t *testing.T) {

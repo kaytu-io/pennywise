@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/cycloidio/terracost/google"
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/testutil"
+	"github.com/kaytu.io/pennywise/server/google"
+	"github.com/kaytu.io/pennywise/server/price"
+	"github.com/kaytu.io/pennywise/server/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/api/option"

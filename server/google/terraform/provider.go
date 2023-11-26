@@ -1,8 +1,8 @@
 package terraform
 
 import (
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/terraform"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/resource"
 )
 
 // Provider is an implementation of the terraform.Provider, used to extract component queries from
@@ -24,7 +24,7 @@ func NewProvider(key, region string) (*Provider, error) {
 func (p *Provider) Name() string { return p.key }
 
 // ResourceComponents returns Component queries for a given terraform.Resource.
-func (p *Provider) ResourceComponents(rss map[string]terraform.Resource, tfRes terraform.Resource) []query.Component {
+func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes resource.Resource) []query.Component {
 	switch tfRes.Type {
 	case "google_compute_instance":
 		vals, err := decodeComputeInstanceValues(tfRes.Values)

@@ -1,12 +1,11 @@
 package terraform
 
 import (
+	"github.com/kaytu.io/pennywise/server/resource"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
-
-	"github.com/cycloidio/terracost/terraform"
 )
 
 // fsxOpenzfsFileSystemValues represents the structure of Terraform values for aws_efs_file_system resource.
@@ -62,7 +61,7 @@ func (v *FSxFileSystem) getOpenzfsDeployOption(deploymentType string) string {
 }
 
 // newFSxOpenzfsFileSystem creates a new FSxOpenzfsFileSystem from fsxOpenzfsFileSystemValues.
-func (p *Provider) newFSxOpenzfsFileSystem(rss map[string]terraform.Resource, vals fsxOpenzfsFileSystemValues) *FSxFileSystem {
+func (p *Provider) newFSxOpenzfsFileSystem(rss map[string]resource.Resource, vals fsxOpenzfsFileSystemValues) *FSxFileSystem {
 	v := &FSxFileSystem{
 		provider:           p,
 		region:             p.region,

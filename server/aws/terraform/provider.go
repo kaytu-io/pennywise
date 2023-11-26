@@ -2,10 +2,10 @@ package terraform
 
 import (
 	"fmt"
+	"github.com/kaytu.io/pennywise/server/resource"
 
-	"github.com/cycloidio/terracost/aws/region"
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/terraform"
+	"github.com/kaytu.io/pennywise/server/aws/region"
+	"github.com/kaytu.io/pennywise/server/query"
 )
 
 // Provider is an implementation of the terraform.Provider, used to extract component queries from
@@ -27,7 +27,7 @@ func NewProvider(key string, regionCode region.Code) (*Provider, error) {
 func (p *Provider) Name() string { return p.key }
 
 // ResourceComponents returns Component queries for a given terraform.Resource.
-func (p *Provider) ResourceComponents(rss map[string]terraform.Resource, tfRes terraform.Resource) []query.Component {
+func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes resource.Resource) []query.Component {
 	switch tfRes.Type {
 	case "aws_instance":
 		vals, err := decodeInstanceValues(tfRes.Values)

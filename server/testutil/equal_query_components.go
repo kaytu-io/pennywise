@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cycloidio/terracost/query"
+	"github.com/kaytu.io/pennywise/server/query"
 	"github.com/stretchr/testify/assert"
 )
 

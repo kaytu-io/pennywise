@@ -1,9 +1,11 @@
 package terraform
 
 import (
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/terraform"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/resource"
 )
+
+const ProviderName = "azurerm"
 
 var (
 	locationDisplayToName = map[string]string{
@@ -64,7 +66,7 @@ type Provider struct {
 	key string
 }
 
-// NewProvider initializes a new Google provider with key and region
+// NewProvider initializes a new Azure provider with key and region
 func NewProvider(key string) (*Provider, error) {
 	return &Provider{
 		key: key,
@@ -75,7 +77,7 @@ func NewProvider(key string) (*Provider, error) {
 func (p *Provider) Name() string { return p.key }
 
 // ResourceComponents returns Component queries for a given terraform.Resource.
-func (p *Provider) ResourceComponents(rss map[string]terraform.Resource, tfRes terraform.Resource) []query.Component {
+func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes resource.Resource) []query.Component {
 	switch tfRes.Type {
 	case "azurerm_linux_virtual_machine":
 		vals, err := decodeLinuxVirtualMachineValues(tfRes.Values)

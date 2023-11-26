@@ -9,7 +9,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/cycloidio/terracost/product"
+	"github.com/kaytu.io/pennywise/server/product"
 )
 
 // ID represents the Price ID.

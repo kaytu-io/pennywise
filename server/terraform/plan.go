@@ -6,8 +6,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/usage"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/usage"
 )
 
 // Plan is a representation of a Terraform plan file.

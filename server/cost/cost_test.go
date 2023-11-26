@@ -3,7 +3,7 @@ package cost_test
 import (
 	"testing"
 
-	"github.com/cycloidio/terracost/cost"
+	"github.com/kaytu.io/pennywise/server/cost"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )

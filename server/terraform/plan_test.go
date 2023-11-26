@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cycloidio/terracost/mock"
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/terraform"
+	"github.com/kaytu.io/pennywise/server/mock"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/terraform"
 )
 
 func TestPlan_ExtractPlannedQueries(t *testing.T) {

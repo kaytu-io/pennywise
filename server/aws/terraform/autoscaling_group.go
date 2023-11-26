@@ -1,11 +1,11 @@
 package terraform
 
 import (
+	"github.com/kaytu.io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 
-	"github.com/cycloidio/terracost/aws/region"
-	"github.com/cycloidio/terracost/terraform"
+	"github.com/kaytu.io/pennywise/server/aws/region"
 )
 
 // autoscalingGroup represents the structure of Terraform values for autoscaling_group resource.
@@ -61,7 +61,7 @@ func decodeAutoscalingGroupValues(tfVals map[string]interface{}) (autoscalingGro
 }
 
 // newInstance creates a new Instance from instanceValues.
-func (p *Provider) newAutoscalingGroup(rss map[string]terraform.Resource, vals autoscalingGroupValues) *Instance {
+func (p *Provider) newAutoscalingGroup(rss map[string]resource.Resource, vals autoscalingGroupValues) *Instance {
 
 	inst := &Instance{
 		provider: p,

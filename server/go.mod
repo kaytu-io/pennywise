@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/cycloidio/sqlr v1.0.0
-	github.com/cycloidio/terracost v0.5.1
+	github.com/kaytu.io/pennywise/server v0.5.1
 	github.com/dmarkham/enumer v1.5.3
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-sql-driver/mysql v1.6.0
@@ -185,6 +185,6 @@ require (
 
 replace github.com/hashicorp/terraform => github.com/cycloidio/terraform v1.1.9-cy
 
-replace github.com/cycloidio/terracost => /home/arta/data/codes/Work/Kaytu/pennywise/server
+replace github.com/kaytu.io/pennywise/server => /home/arta/data/codes/Work/Kaytu/pennywise/server
 
 replace github.com/gruntwork-io/terragrunt => github.com/cycloidio/terragrunt v0.0.0-20230905115542-1fe1ff682fd9

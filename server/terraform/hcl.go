@@ -20,9 +20,9 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/usage"
-	"github.com/cycloidio/terracost/util"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/usage"
+	"github.com/kaytu.io/pennywise/server/util"
 )
 
 // ExtractQueriesFromHCL returns the resources found in the module identified by the modPath.

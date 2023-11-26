@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cycloidio/terracost/cost"
+	"github.com/kaytu.io/pennywise/server/cost"
 )
 
 func TestResourceDiff_Errors(t *testing.T) {

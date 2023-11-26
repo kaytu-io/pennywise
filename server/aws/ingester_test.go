@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cycloidio/terracost/mock"
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/product"
+	"github.com/kaytu.io/pennywise/server/mock"
+	"github.com/kaytu.io/pennywise/server/price"
+	"github.com/kaytu.io/pennywise/server/product"
 )
 
 func TestIngester_Ingest(t *testing.T) {

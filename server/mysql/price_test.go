@@ -8,9 +8,9 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cycloidio/terracost/mysql"
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/product"
+	"github.com/kaytu.io/pennywise/server/mysql"
+	"github.com/kaytu.io/pennywise/server/price"
+	"github.com/kaytu.io/pennywise/server/product"
 )
 
 var priceColumns = []string{"id", "hash", "product_id", "currency", "price", "unit", "attributes"}

@@ -1,12 +1,11 @@
 package terraform
 
 import (
+	"github.com/kaytu.io/pennywise/server/resource"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
-
-	"github.com/cycloidio/terracost/terraform"
 )
 
 // fsxOntapFileSystemValues represents the structure of Terraform values for aws_efs_file_system resource.
@@ -62,7 +61,7 @@ func (v *FSxFileSystem) getOntapDeployOption(deploymentType string) string {
 }
 
 // newFSxOntapFileSystem creates a new FSxOntapFileSystem from fsxOntapFileSystemValues.
-func (p *Provider) newFSxOntapFileSystem(rss map[string]terraform.Resource, vals fsxOntapFileSystemValues) *FSxFileSystem {
+func (p *Provider) newFSxOntapFileSystem(rss map[string]resource.Resource, vals fsxOntapFileSystemValues) *FSxFileSystem {
 	v := &FSxFileSystem{
 		provider:           p,
 		region:             p.region,

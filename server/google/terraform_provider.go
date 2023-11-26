@@ -1,8 +1,8 @@
 package google
 
 import (
-	googletf "github.com/cycloidio/terracost/google/terraform"
-	"github.com/cycloidio/terracost/terraform"
+	googletf "github.com/kaytu.io/pennywise/server/google/terraform"
+	"github.com/kaytu.io/pennywise/server/terraform"
 )
 
 // RegistryName is the fully qualified name under which this provider is stored in the registry.

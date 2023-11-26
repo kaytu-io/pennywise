@@ -1,6 +1,6 @@
 package google
 
-import "github.com/cycloidio/terracost/price"
+import "github.com/kaytu.io/pennywise/server/price"
 
 // IngestionFilter allows control over what pricing data is ingested. Given a price.WithProduct the function returns
 // true if the record should be ingested, false if it should be skipped.

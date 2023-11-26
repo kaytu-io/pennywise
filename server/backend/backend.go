@@ -1,11 +1,11 @@
 package backend
 
 import (
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/product"
+	"github.com/kaytu.io/pennywise/server/price"
+	"github.com/kaytu.io/pennywise/server/product"
 )
 
-//go:generate mockgen -destination=../mock/backend.go -mock_names=Backend=Backend -package mock github.com/cycloidio/terracost/backend Backend
+//go:generate mockgen -destination=../mock/backend.go -mock_names=Backend=Backend -package mock github.com/kaytu.io/pennywise/server/backend Backend
 
 // Backend represents a storage method used to store pricing data. It must include concrete implementations
 // of all repositories.

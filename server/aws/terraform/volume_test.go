@@ -7,11 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	awstf "github.com/cycloidio/terracost/aws/terraform"
-	"github.com/cycloidio/terracost/product"
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/terraform"
-	"github.com/cycloidio/terracost/util"
+	awstf "github.com/kaytu.io/pennywise/server/aws/terraform"
+	"github.com/kaytu.io/pennywise/server/product"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/terraform"
+	"github.com/kaytu.io/pennywise/server/util"
 )
 
 func TestVolume_Components(t *testing.T) {

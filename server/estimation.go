@@ -13,16 +13,16 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/spf13/afero"
 
-	"github.com/cycloidio/terracost/backend"
-	"github.com/cycloidio/terracost/cost"
-	"github.com/cycloidio/terracost/terraform"
-	"github.com/cycloidio/terracost/usage"
-	"github.com/cycloidio/terracost/util"
 	"github.com/gruntwork-io/terragrunt/cli"
 	"github.com/gruntwork-io/terragrunt/cli/tfsource"
 	"github.com/gruntwork-io/terragrunt/config"
 	"github.com/gruntwork-io/terragrunt/configstack"
 	"github.com/gruntwork-io/terragrunt/options"
+	"github.com/kaytu.io/pennywise/server/backend"
+	"github.com/kaytu.io/pennywise/server/cost"
+	"github.com/kaytu.io/pennywise/server/terraform"
+	"github.com/kaytu.io/pennywise/server/usage"
+	"github.com/kaytu.io/pennywise/server/util"
 )
 
 // EstimateTerraformPlan is a helper function that reads a Terraform plan using the provided io.Reader,

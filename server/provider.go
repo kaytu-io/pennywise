@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/cycloidio/terracost/aws"
-	"github.com/cycloidio/terracost/azurerm"
-	"github.com/cycloidio/terracost/google"
-	"github.com/cycloidio/terracost/terraform"
+	"github.com/kaytu.io/pennywise/server/aws"
+	"github.com/kaytu.io/pennywise/server/azurerm"
+	"github.com/kaytu.io/pennywise/server/google"
+	"github.com/kaytu.io/pennywise/server/terraform"
 )
 
 // defaultProviders are the currently known and supported terraform providers

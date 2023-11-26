@@ -2,15 +2,15 @@ package terraform
 
 import (
 	"fmt"
+	"github.com/kaytu.io/pennywise/server/resource"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 
-	"github.com/cycloidio/terracost/aws/region"
-	"github.com/cycloidio/terracost/product"
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/terraform"
-	"github.com/cycloidio/terracost/util"
+	"github.com/kaytu.io/pennywise/server/aws/region"
+	"github.com/kaytu.io/pennywise/server/product"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/util"
 )
 
 // EFSFileSystem represents an EFS that can be cost-estimated.
@@ -68,7 +68,7 @@ func decodeEFSFileSystemValues(tfVals map[string]interface{}) (efsFileSystemValu
 }
 
 // newEFSFileSystem creates a new EFSFileSystem from efsFileSystemValues.
-func (p *Provider) newEFSFileSystem(rss map[string]terraform.Resource, vals efsFileSystemValues) *EFSFileSystem {
+func (p *Provider) newEFSFileSystem(rss map[string]resource.Resource, vals efsFileSystemValues) *EFSFileSystem {
 	v := &EFSFileSystem{
 		provider:       p,
 		region:         p.region,

@@ -2,12 +2,12 @@ package terraform
 
 import (
 	"fmt"
+	"github.com/kaytu.io/pennywise/server/resource"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 
-	"github.com/cycloidio/terracost/aws/region"
-	"github.com/cycloidio/terracost/terraform"
+	"github.com/kaytu.io/pennywise/server/aws/region"
 )
 
 // eksNodeGroup represents the structure of Terraform values for autoscaling_group resource.
@@ -47,7 +47,7 @@ func decodeEKSNodeGroupValues(tfVals map[string]interface{}) (eksNodeGroupValues
 }
 
 // newInstance creates a new Instance from instanceValues.
-func (p *Provider) newEKSNodeGroup(rss map[string]terraform.Resource, vals eksNodeGroupValues) *Instance {
+func (p *Provider) newEKSNodeGroup(rss map[string]resource.Resource, vals eksNodeGroupValues) *Instance {
 
 	inst := &Instance{
 		provider: p,

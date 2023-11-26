@@ -1,12 +1,11 @@
 package terraform
 
 import (
+	"github.com/kaytu.io/pennywise/server/resource"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
-
-	"github.com/cycloidio/terracost/terraform"
 )
 
 // fsxWindowsFileSystemValues represents the structure of Terraform values for aws_efs_file_system resource.
@@ -57,7 +56,7 @@ func (v *FSxFileSystem) getWindowsDeployOption(deploymentType string) string {
 }
 
 // newFSxWindowsFileSystem creates a new FSxWindowsFileSystem from fsxWindowsFileSystemValues.
-func (p *Provider) newFSxWindowsFileSystem(rss map[string]terraform.Resource, vals fsxWindowsFileSystemValues) *FSxFileSystem {
+func (p *Provider) newFSxWindowsFileSystem(rss map[string]resource.Resource, vals fsxWindowsFileSystemValues) *FSxFileSystem {
 	v := &FSxFileSystem{
 		provider:           p,
 		region:             p.region,

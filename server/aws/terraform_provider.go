@@ -1,9 +1,9 @@
 package aws
 
 import (
-	"github.com/cycloidio/terracost/aws/region"
-	awstf "github.com/cycloidio/terracost/aws/terraform"
-	"github.com/cycloidio/terracost/terraform"
+	"github.com/kaytu.io/pennywise/server/aws/region"
+	awstf "github.com/kaytu.io/pennywise/server/aws/terraform"
+	"github.com/kaytu.io/pennywise/server/terraform"
 )
 
 const (

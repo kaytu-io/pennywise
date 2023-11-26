@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cycloidio/terracost/backend"
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/terraform"
+	"github.com/kaytu.io/pennywise/server/backend"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/terraform"
 )
 
 // State represents a collection of all the Resource costs (either prior or planned.) It is not tied to any specific

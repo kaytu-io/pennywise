@@ -1,14 +1,14 @@
 package terraform
 
 import (
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/product"
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/util"
+	"github.com/kaytu.io/pennywise/server/price"
+	"github.com/kaytu.io/pennywise/server/product"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/util"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 
-	"github.com/cycloidio/terracost/aws/region"
+	"github.com/kaytu.io/pennywise/server/aws/region"
 )
 
 // LB represents a Load Balancer definition that can be cost-estimated.

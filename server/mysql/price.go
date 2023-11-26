@@ -11,8 +11,8 @@ import (
 	"github.com/cycloidio/sqlr"
 	"github.com/shopspring/decimal"
 
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/product"
+	"github.com/kaytu.io/pennywise/server/price"
+	"github.com/kaytu.io/pennywise/server/product"
 )
 
 // PriceRepository implements the price.Repository.

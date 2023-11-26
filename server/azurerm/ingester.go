@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/product"
+	"github.com/kaytu.io/pennywise/server/price"
+	"github.com/kaytu.io/pennywise/server/product"
 	"github.com/shopspring/decimal"
 )
 

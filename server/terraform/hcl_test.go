@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cycloidio/terracost/mock"
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/terraform"
-	"github.com/cycloidio/terracost/usage"
+	"github.com/kaytu.io/pennywise/server/mock"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/terraform"
+	"github.com/kaytu.io/pennywise/server/usage"
 )
 
 var noInputs = make(map[string]interface{})

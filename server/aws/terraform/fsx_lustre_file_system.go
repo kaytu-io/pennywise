@@ -1,10 +1,9 @@
 package terraform
 
 import (
+	"github.com/kaytu.io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
-
-	"github.com/cycloidio/terracost/terraform"
 )
 
 // fsxLustreFileSystemValues represents the structure of Terraform values for aws_efs_file_system resource.
@@ -41,7 +40,7 @@ func decodeFSxLustreFileSystemValues(tfVals map[string]interface{}) (fsxLustreFi
 }
 
 // newFSxLustreFileSystem creates a new FSxLustreFileSystem from fsxLustreFileSystemValues.
-func (p *Provider) newFSxLustreFileSystem(rss map[string]terraform.Resource, vals fsxLustreFileSystemValues) *FSxFileSystem {
+func (p *Provider) newFSxLustreFileSystem(rss map[string]resource.Resource, vals fsxLustreFileSystemValues) *FSxFileSystem {
 	v := &FSxFileSystem{
 		provider:           p,
 		region:             p.region,

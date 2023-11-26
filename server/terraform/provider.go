@@ -1,10 +1,11 @@
 package terraform
 
 import (
-	"github.com/cycloidio/terracost/query"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/resource"
 )
 
-//go:generate mockgen -destination=../mock/terraform_provider.go -mock_names=Provider=TerraformProvider -package mock github.com/cycloidio/terracost/terraform Provider
+//go:generate mockgen -destination=../mock/terraform_provider.go -mock_names=Provider=TerraformProvider -package mock github.com/kaytu.io/pennywise/server/terraform Provider
 
 // Provider represents a Terraform provider. It extracts price queries from Terraform resources.
 type Provider interface {
@@ -15,7 +16,7 @@ type Provider interface {
 	// which signifies a resource that is not supported by this Provider.
 	// It also expects all the resources in case it needs to check the configuration of another
 	// resource
-	ResourceComponents(rss map[string]Resource, res Resource) []query.Component
+	ResourceComponents(rss map[string]resource.Resource, res resource.Resource) []query.Component
 }
 
 // ProviderInitializer is used to initialize a Provider for each provider name that matches one of the MatchNames.

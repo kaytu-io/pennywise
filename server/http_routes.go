@@ -13,7 +13,18 @@ func (h *HttpHandler) Register(e *echo.Echo) {
 	v1.PUT("/ingest/azure", h.IngestAzureTables)
 	v1.PUT("/ingest/aws", h.IngestAwsTables)
 
+	//cost := e.Group("/cost")
+	//cost.GET("/azure/resource", h.GetResourceCost)
 }
+
+//func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
+//	provider, err := azuretf.NewProvider(azuretf.ProviderName)
+//	if err != nil {
+//		return ctx.JSON(http.StatusInternalServerError, err.Error())
+//	}
+//	provider.ResourceComponents()
+//	return nil
+//}
 
 // IngestAwsTables run the ingester to receive pricing and store in the database for aws services
 // Params: service (query param), region (query param)

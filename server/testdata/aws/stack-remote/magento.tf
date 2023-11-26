@@ -2,7 +2,7 @@ module "magento" {
 
   #####################################
   # Do not modify the following lines #
-  source   = "git::https://github.com/cycloidio/terracost.git//testdata/aws/stack-magento/module-magento"
+  source   = "git::https://github.com/kaytu.io/pennywise/server.git//testdata/aws/stack-magento/module-magento"
   env      = var.env
   customer = var.customer
   project  = var.project

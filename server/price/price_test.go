@@ -3,7 +3,7 @@ package price_test
 import (
 	"testing"
 
-	"github.com/cycloidio/terracost/price"
+	"github.com/kaytu.io/pennywise/server/price"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

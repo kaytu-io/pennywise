@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cycloidio/terracost/cost"
-	"github.com/cycloidio/terracost/mock"
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/product"
-	"github.com/cycloidio/terracost/query"
-	"github.com/cycloidio/terracost/util"
+	"github.com/kaytu.io/pennywise/server/cost"
+	"github.com/kaytu.io/pennywise/server/mock"
+	"github.com/kaytu.io/pennywise/server/price"
+	"github.com/kaytu.io/pennywise/server/product"
+	"github.com/kaytu.io/pennywise/server/query"
+	"github.com/kaytu.io/pennywise/server/util"
 )
 
 func TestNewState(t *testing.T) {

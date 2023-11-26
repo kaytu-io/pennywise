@@ -7,8 +7,8 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cycloidio/terracost/mysql"
-	"github.com/cycloidio/terracost/product"
+	"github.com/kaytu.io/pennywise/server/mysql"
+	"github.com/kaytu.io/pennywise/server/product"
 )
 
 var productColumns = []string{"id", "provider", "sku", "service", "family", "location", "attributes"}

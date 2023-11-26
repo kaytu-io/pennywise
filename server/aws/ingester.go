@@ -12,10 +12,10 @@ import (
 	"github.com/machinebox/progress"
 	"github.com/shopspring/decimal"
 
-	"github.com/cycloidio/terracost/aws/field"
-	"github.com/cycloidio/terracost/aws/region"
-	"github.com/cycloidio/terracost/price"
-	"github.com/cycloidio/terracost/product"
+	"github.com/kaytu.io/pennywise/server/aws/field"
+	"github.com/kaytu.io/pennywise/server/aws/region"
+	"github.com/kaytu.io/pennywise/server/price"
+	"github.com/kaytu.io/pennywise/server/product"
 )
 
 // ProviderName uniquely identifies this provider implementation.
