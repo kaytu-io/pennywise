@@ -22,4 +22,4 @@
 //	for _, res := range plan.ResourceDifferences() {
 //	    fmt.Printf("%s: %s -> %s\n", res.Address, res.PriorCost().String(), res.PlannedCost().String())
 //	}
-package pennywise
+package main

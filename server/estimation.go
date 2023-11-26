@@ -1,4 +1,4 @@
-package pennywise
+package main
 
 import (
 	"context"
