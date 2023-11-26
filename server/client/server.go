@@ -31,7 +31,7 @@ func NewPennywiseServerClient(baseURL string) *serverClient {
 	}
 }
 
-func (s *serverClient) GetCost(ctx *echo.Context, req resource.Resource) (*cost.Cost, error) {
+func (s *serverClient) GetCost(req resource.Resource) (*cost.Cost, error) {
 	url := fmt.Sprintf("%s/api/v1/cost/resource", s.baseURL)
 
 	payload, err := json.Marshal(req)
