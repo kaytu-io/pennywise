@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"github.com/kaytu-io/pennywise/cli/cmd/cost"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -15,6 +16,12 @@ var rootCmd = &cobra.Command{
 		}
 		return cmd.Help()
 	},
+}
+
+func init() {
+	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(ingest)
+	rootCmd.AddCommand(cost.CostCmd)
 }
 
 func Execute() {

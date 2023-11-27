@@ -38,7 +38,6 @@ var ingest = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(ingest)
 	ingest.Flags().String("provider", "", "cloud provider (aws | azure)")
 	ingest.MarkFlagRequired("provider")
 	ingest.Flags().String("service", "", "service")
