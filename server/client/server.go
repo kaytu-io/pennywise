@@ -17,7 +17,9 @@ type EchoError struct {
 }
 
 type OnboardServiceClient interface {
-	GetCost(ctx *echo.Context, sourceID resource.Resource) (*cost.Cost, error)
+	GetCost(req resource.Resource) (*cost.Cost, error)
+	IngestAws(service, region string) error
+	IngestAzure(service, region string) error
 }
 
 type serverClient struct {
@@ -28,6 +30,30 @@ func NewPennywiseServerClient(baseURL string) *serverClient {
 	return &serverClient{
 		baseURL: baseURL,
 	}
+}
+
+func (s *serverClient) IngestAws(service, region string) error {
+	url := fmt.Sprintf("%s/api/v1/ingest/azure?service=%s&region=%s", s.baseURL, service, region)
+
+	if statusCode, err := doRequest(http.MethodGet, url, nil, nil); err != nil {
+		if 400 <= statusCode && statusCode < 500 {
+			return echo.NewHTTPError(statusCode, err.Error())
+		}
+		return err
+	}
+	return nil
+}
+
+func (s *serverClient) IngestAzure(service, region string) error {
+	url := fmt.Sprintf("%s/api/v1/ingest/aws?service=%s&region=%s", s.baseURL, service, region)
+
+	if statusCode, err := doRequest(http.MethodGet, url, nil, nil); err != nil {
+		if 400 <= statusCode && statusCode < 500 {
+			return echo.NewHTTPError(statusCode, err.Error())
+		}
+		return err
+	}
+	return nil
 }
 
 func (s *serverClient) GetCost(req resource.Resource) (*cost.Cost, error) {

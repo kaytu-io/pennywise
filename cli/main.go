@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/kaytu-io/pennywise/cli/cmd"
 	"github.com/kaytu-io/pennywise/cli/parser/terraform"
 	"github.com/kaytu-io/pennywise/cli/usage"
 	"github.com/kaytu-io/pennywise/server/client"
 	"io"
-	"log"
 	"os"
 	"sort"
 )
@@ -16,17 +16,18 @@ var (
 )
 
 func main() {
-	file, err := os.Open("../../terracost_test/linux_virtual_machine/tfplan.json")
-	if err != nil {
-		fmt.Println(err)
-		log.Fatal(err)
-	}
-	usage := usage.Default
-	err = EstimateTerraformPlan(file, usage)
-	if err != nil {
-		fmt.Println(err)
-		log.Fatal(err)
-	}
+	cmd.Execute()
+	//file, err := os.Open("../../terracost_test/linux_virtual_machine/tfplan.json")
+	//if err != nil {
+	//	fmt.Println(err)
+	//	log.Fatal(err)
+	//}
+	//usage := usage.Default
+	//err = EstimateTerraformPlan(file, usage)
+	//if err != nil {
+	//	fmt.Println(err)
+	//	log.Fatal(err)
+	//}
 }
 
 // EstimateTerraformPlan is a helper function that reads a Terraform plan using the provided io.Reader,
