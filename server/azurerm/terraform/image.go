@@ -1,7 +1,6 @@
 package terraform
 
 import (
-	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
@@ -27,23 +26,26 @@ type StorageDisk struct {
 	DiskSizeGb *float64 `mapstructure:"disk_size_gb"`
 }
 
+type sourceVirtualMachineValues struct {
+	Index   string `mapstructure:"index"`
+	Address string `mapstructure:"address"`
+	Values  struct {
+		StorageOsDisk   []StorageDisk `mapstructure:"storage_os_disk"`
+		StorageDataDisk []StorageDisk `mapstructure:"storage_data_disk"`
+	} `mapstructure:"values"`
+}
+
 type imageValues struct {
 	Location string `mapstructure:"location"`
 
-	StorageOsDisk []StorageDisk `mapstructure:"storage_os_disk"`
-
-	StorageDataDisk []StorageDisk `mapstructure:"storage_data_disk"`
-
-	OsDisk []Disk `mapstructure:"os_disk"`
-
-	DataDisk               []Disk `mapstructure:"data_disk"`
-	SourceVirtualMachineId string
-	StorageGB              *float64 `mapstructure:"storage_gb"`
+	OsDisk               []Disk                      `mapstructure:"os_disk"`
+	DataDisk             []Disk                      `mapstructure:"data_disk"`
+	SourceVirtualMachine *sourceVirtualMachineValues `mapstructure:"source_virtual_machine_id"`
+	StorageGB            *float64                    `mapstructure:"storage_gb"`
 }
 
 // decodeImageValues decodes and returns computeInstanceValues from a Terraform values map.
 func decodeImageValues(tfVals map[string]interface{}) (imageValues, error) {
-	fmt.Println("tfVals", tfVals)
 	var v imageValues
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
@@ -54,7 +56,6 @@ func decodeImageValues(tfVals map[string]interface{}) (imageValues, error) {
 	if err != nil {
 		return v, err
 	}
-
 	if err := decoder.Decode(tfVals); err != nil {
 		return v, err
 	}
@@ -63,19 +64,24 @@ func decodeImageValues(tfVals map[string]interface{}) (imageValues, error) {
 
 // newImage initializes a new ManagedImage from the provider
 func (p *Provider) newImage(vals imageValues) *Image {
+	sSize := float64(0)
+	if imageStorageSize(vals) != nil {
+		sSize = *imageStorageSize(vals)
+	}
+
 	return &Image{
 		provider:  p,
 		location:  vals.Location,
-		storageGB: decimal.NewFromFloat(*imageStorageSize(vals)),
+		storageGB: decimal.NewFromFloat(sSize),
 	}
 }
 
 func imageStorageSize(vals imageValues) *float64 {
 	diskSize := getImageDiskStorage(vals)
 
-	sources := vals.SourceVirtualMachineId
-	if diskSize == 0 && len(sources) > 0 {
-		diskSize += getVMStorageSize(vals, sources)
+	source := vals.SourceVirtualMachine
+	if diskSize == 0 && source != nil {
+		diskSize += getVMStorageSize(*source)
 	}
 
 	if diskSize == 0 {
@@ -106,14 +112,18 @@ func getImageDiskStorage(vals imageValues) float64 {
 	return diskSize
 }
 
-func getVMStorageSize(vals imageValues, sources string) float64 {
+func getVMStorageSize(source sourceVirtualMachineValues) float64 {
 	var size float64 = 128
-	if vals.StorageOsDisk != nil && len(vals.StorageOsDisk) > 0 {
-		size = *vals.StorageOsDisk[0].DiskSizeGb
+	for _, disk := range source.Values.StorageOsDisk {
+		if disk.DiskSizeGb != nil {
+			size = *disk.DiskSizeGb
+		}
 	}
 
-	for _, v := range vals.StorageDataDisk {
-		size += *v.DiskSizeGb
+	for _, disk := range source.Values.StorageDataDisk {
+		if disk.DiskSizeGb != nil {
+			size += *disk.DiskSizeGb
+		}
 	}
 
 	return size
@@ -135,7 +145,7 @@ func getDiskSizeGB(disk Disk, refs []StorageDisk, i int) float64 {
 func (inst *Image) Components() []query.Component {
 	return []query.Component{{
 		Name:            "Storage",
-		Unit:            "GB",
+		Unit:            "1 GB/Month",
 		MonthlyQuantity: inst.storageGB,
 		ProductFilter: &product.Filter{
 			Location: util.StringPtr(inst.location),
@@ -143,12 +153,10 @@ func (inst *Image) Components() []query.Component {
 			Family:   util.StringPtr("Storage"),
 			AttributeFilters: []*product.AttributeFilter{
 				{Key: "sku_name", Value: util.StringPtr("Snapshots LRS")},
-				{Key: "meter_name", Value: util.StringPtr("LRS Snapshots")},
 				{Key: "product_name", Value: util.StringPtr("Standard HDD Managed Disks")},
 			},
 		},
 		PriceFilter: &price.Filter{
-			Unit: util.StringPtr("1 Hour"),
 			AttributeFilters: []*price.AttributeFilter{
 				{Key: "type", Value: util.StringPtr("Consumption")},
 			},

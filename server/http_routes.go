@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/kaytu-io/pennywise/server/aws"
 	awsrg "github.com/kaytu-io/pennywise/server/aws/region"
 	awstf "github.com/kaytu-io/pennywise/server/aws/terraform"
@@ -51,7 +50,7 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 		resources := make(map[string]resource.Resource)
 		resources[req.Address] = req
 		components := provider.ResourceComponents(resources, req)
-		fmt.Println("COMPONENTS", components)
+		//fmt.Println("COMPONENTS", components)
 		qResource = query.Resource{
 			Address:    req.Address,
 			Provider:   req.ProviderName,

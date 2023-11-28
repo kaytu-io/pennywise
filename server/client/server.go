@@ -35,7 +35,7 @@ func NewPennywiseServerClient(baseURL string) *serverClient {
 func (s *serverClient) IngestAws(service, region string) error {
 	url := fmt.Sprintf("%s/api/v1/ingest/azure?service=%s&region=%s", s.baseURL, service, region)
 
-	if statusCode, err := doRequest(http.MethodGet, url, nil, nil); err != nil {
+	if statusCode, err := doRequest(http.MethodPut, url, nil, nil); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return echo.NewHTTPError(statusCode, err.Error())
 		}
@@ -47,7 +47,7 @@ func (s *serverClient) IngestAws(service, region string) error {
 func (s *serverClient) IngestAzure(service, region string) error {
 	url := fmt.Sprintf("%s/api/v1/ingest/aws?service=%s&region=%s", s.baseURL, service, region)
 
-	if statusCode, err := doRequest(http.MethodGet, url, nil, nil); err != nil {
+	if statusCode, err := doRequest(http.MethodPut, url, nil, nil); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return echo.NewHTTPError(statusCode, err.Error())
 		}
