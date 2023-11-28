@@ -7,7 +7,7 @@ import "fmt"
 type Resource struct {
 	Provider   string
 	Type       string
-	Components map[string]Component
+	Components map[string][]Component
 	Skipped    bool
 }
 
@@ -17,9 +17,12 @@ func (re Resource) Cost() (Cost, error) {
 	var total Cost
 	var err error
 	for name, comp := range re.Components {
-		total, err = total.Add(comp.Cost())
-		if err != nil {
-			return Zero, fmt.Errorf("failed to add cost of component %s: %w", name, err)
+		for _, c := range comp {
+			total, err = total.Add(c.Cost())
+			if err != nil {
+				return Zero, fmt.Errorf("failed to add cost of component %s: %w", name, err)
+			}
+
 		}
 	}
 	return total, nil

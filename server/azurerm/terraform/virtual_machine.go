@@ -7,14 +7,10 @@ import (
 	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
+	"strings"
 )
 
 type OS string
-
-const (
-	WindowsOS OS = "Windows"
-	LinuxOS   OS = "Linux"
-)
 
 type OsDisk struct {
 	storageAccountType string
@@ -26,13 +22,13 @@ type OsDisk struct {
 type VirtualMachine struct {
 	provider *Provider
 
-	location        string
-	vmSize          string
-	operatingSystem OS
-	licenseType     string
-	storageOsDisk   bool
-	storageDataDisk bool
-	managedDiskType string
+	location              string
+	vmSize                string
+	licenseType           string
+	storageOsDisk         []StorageDisk
+	storageDataDisk       []StorageDisk
+	managedDiskType       string
+	storageImageReference []StorageImageReference `mapstructure:"storage_image_reference"`
 
 	// Usage
 	monthlyOsDiskOperations   decimal.Decimal
@@ -40,16 +36,26 @@ type VirtualMachine struct {
 	monthlyHours              decimal.Decimal
 }
 
+type StorageImageReference struct {
+	Offer string `mapstructure:"offer"`
+}
+
+type StorageDisk struct {
+	DiskSizeGb      *float64 `mapstructure:"disk_size_gb"`
+	ManagedDiskType string   `mapstructure:"managed_disk_type"`
+	OsType          string   `mapstructure:"os_type"`
+}
+
 // virtualMachineValues is holds the values that we need to be able
 // to calculate the price of the ComputeInstance
 type virtualMachineValues struct {
-	VMSize          string `mapstructure:"vm_size"`
-	Location        string `mapstructure:"location"`
-	OperatingSystem OS     `mapstructure:"operating_system"`
-	LicenseType     string `mapstructure:"license_type"`
-	StorageOsDisk   bool   `mapstructure:"storage_os_disk"`
-	StorageDataDisk bool   `mapstructure:"storage_data_disk"`
-	ManagedDiskType string `mapstructure:"managed_disk_type"`
+	VMSize                string                  `mapstructure:"vm_size"`
+	Location              string                  `mapstructure:"location"`
+	LicenseType           string                  `mapstructure:"license_type"`
+	StorageOsDisk         []StorageDisk           `mapstructure:"storage_os_disk"`
+	StorageDataDisk       []StorageDisk           `mapstructure:"storage_data_disk"`
+	ManagedDiskType       string                  `mapstructure:"managed_disk_type"`
+	StorageImageReference []StorageImageReference `mapstructure:"storage_image_reference"`
 
 	Usage struct {
 		MonthlyOsDiskOperations   float64 `mapstructure:"monthly_os_disk_operations"`
@@ -84,41 +90,53 @@ func (p *Provider) newVirtualMachine(vals virtualMachineValues) *VirtualMachine 
 
 		location:                  getLocationName(vals.Location),
 		vmSize:                    vals.VMSize,
-		operatingSystem:           vals.OperatingSystem,
 		licenseType:               vals.LicenseType,
 		storageOsDisk:             vals.StorageOsDisk,
 		storageDataDisk:           vals.StorageDataDisk,
 		monthlyOsDiskOperations:   decimal.NewFromFloat(vals.Usage.MonthlyOsDiskOperations),
 		monthlyDataDiskOperations: decimal.NewFromFloat(vals.Usage.MonthlyDataDiskOperations),
 		monthlyHours:              decimal.NewFromFloat(vals.Usage.MonthlyHours),
+		storageImageReference:     vals.StorageImageReference,
 	}
-
 	return inst
 }
 
 // Components returns the price component queries that make up this Instance.
 func (inst *VirtualMachine) Components() []query.Component {
 	var components []query.Component
-	if inst.operatingSystem == WindowsOS {
+
+	os := "Linux"
+	if len(inst.storageImageReference) > 0 {
+		if strings.ToLower(inst.storageImageReference[0].Offer) == "windowsserver" {
+			os = "Windows"
+		}
+	}
+	if len(inst.storageOsDisk) > 0 {
+		if strings.ToLower(inst.storageOsDisk[0].OsType) == "windows" {
+			os = "Windows"
+		}
+	}
+
+	if os == "Windows" {
 		windowsInst := inst.provider.newWindowsVirtualMachine(windowsVirtualMachineValues{Size: inst.vmSize, Location: inst.location, LicenseType: inst.licenseType, Usage: struct {
 			MonthlyHours float64 `mapstructure:"monthly_hours"`
 		}{MonthlyHours: inst.monthlyHours.InexactFloat64()}})
 		components = []query.Component{windowsInst.windowsVirtualMachineComponent()}
-	} else if inst.operatingSystem == LinuxOS {
+	} else if os == "Linux" {
 		linuxInst := inst.provider.newLinuxVirtualMachine(linuxVirtualMachineValues{Size: inst.vmSize, Location: inst.location, Usage: struct {
 			MonthlyHours float64 `mapstructure:"monthly_hours"`
 		}{MonthlyHours: inst.monthlyHours.InexactFloat64()}})
 		components = []query.Component{linuxInst.linuxVirtualMachineComponent()}
 	}
-
-	if inst.storageOsDisk {
+	components = append(components, ultraSSDReservationCostComponent(inst.provider.key, inst.location))
+	if len(inst.storageOsDisk) > 0 {
 		managedStorage := inst.provider.newManagedStorage(managedDiskValues{
-			StorageAccountType: inst.managedDiskType,
+			StorageAccountType: inst.storageOsDisk[0].ManagedDiskType,
 			Location:           inst.location,
-			DiskSizeGb:         1024,
-			DiskIopsReadWrite:  2048,
+			DiskSizeGb:         0,
+			DiskIopsReadWrite:  0,
 			BurstingEnabled:    false,
-			DiskMbpsReadWrite:  8,
+			DiskMbpsReadWrite:  0,
 
 			Usage: struct {
 				MonthlyDiskOperations float64 `mapstructure:"monthly_disk_operations"`
@@ -127,27 +145,29 @@ func (inst *VirtualMachine) Components() []query.Component {
 		components = append(components, managedStorage.Components()...)
 	}
 
-	if inst.storageDataDisk {
-		managedStorage := inst.provider.newManagedStorage(managedDiskValues{
-			StorageAccountType: inst.managedDiskType,
-			Location:           inst.location,
-			DiskSizeGb:         1024,
-			DiskIopsReadWrite:  2048,
-			BurstingEnabled:    false,
-			DiskMbpsReadWrite:  8,
+	if len(inst.storageDataDisk) > 0 {
+		for _, disk := range inst.storageDataDisk {
+			managedStorage := inst.provider.newManagedStorage(managedDiskValues{
+				StorageAccountType: disk.ManagedDiskType,
+				Location:           inst.location,
+				DiskSizeGb:         0,
+				DiskIopsReadWrite:  0,
+				BurstingEnabled:    false,
+				DiskMbpsReadWrite:  0,
 
-			Usage: struct {
-				MonthlyDiskOperations float64 `mapstructure:"monthly_disk_operations"`
-			}{MonthlyDiskOperations: inst.monthlyOsDiskOperations.InexactFloat64()},
-		})
-		components = append(components, managedStorage.Components()...)
+				Usage: struct {
+					MonthlyDiskOperations float64 `mapstructure:"monthly_disk_operations"`
+				}{MonthlyDiskOperations: inst.monthlyDataDiskOperations.InexactFloat64()},
+			})
+			components = append(components, managedStorage.Components()...)
+		}
 	}
 
 	return components
 }
 
-func ultraSSDReservationCostComponent(key, location string) *query.Component {
-	return &query.Component{
+func ultraSSDReservationCostComponent(key, location string) query.Component {
+	return query.Component{
 		Name:           "Ultra disk reservation (if unattached)",
 		Unit:           "vCPU",
 		HourlyQuantity: decimal.NewFromInt(1),

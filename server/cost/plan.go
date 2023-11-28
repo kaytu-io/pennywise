@@ -98,19 +98,21 @@ func mergeResourceDiffsFromState(rdmap map[string]ResourceDiff, state *State, pl
 			}
 		}
 
-		for label, comp := range res.Components {
-			comp := comp
+		for label, comps := range res.Components {
+			for _, comp := range comps {
+				comp := comp
 
-			cd, ok := rdmap[address].ComponentDiffs[label]
-			if !ok {
-				cd = &ComponentDiff{}
-				rdmap[address].ComponentDiffs[label] = cd
-			}
+				cd, ok := rdmap[address].ComponentDiffs[label]
+				if !ok {
+					cd = &ComponentDiff{}
+					rdmap[address].ComponentDiffs[label] = cd
+				}
 
-			if planned {
-				cd.Planned = &comp
-			} else {
-				cd.Prior = &comp
+				if planned {
+					cd.Planned = &comp
+				} else {
+					cd.Prior = &comp
+				}
 			}
 		}
 	}

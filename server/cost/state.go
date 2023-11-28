@@ -29,6 +29,10 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 	}
 	for _, res := range resources {
 		// Mark the Resource as skipped if there are no valid Components.
+		if res.Address == "azurerm_virtual_machine.windows" {
+			fmt.Println("RES", res.Address)
+			fmt.Println("COMPONENT", res.Components)
+		}
 		state.ensureResource(res.Address, res.Provider, res.Type, len(res.Components) == 0)
 		for _, comp := range res.Components {
 			prods, err := backend.Products().Filter(ctx, comp.ProductFilter)
@@ -59,6 +63,7 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 			}
 
 			component := Component{
+				Name:     comp.Name,
 				Quantity: quantity,
 				Unit:     comp.Unit,
 				Rate:     rate,
@@ -101,7 +106,7 @@ func (s *State) ensureResource(address, provider, typ string, skipped bool) {
 		}
 
 		if !skipped {
-			res.Components = make(map[string]Component)
+			res.Components = make(map[string][]Component)
 		}
 
 		s.Resources[address] = res
@@ -110,5 +115,8 @@ func (s *State) ensureResource(address, provider, typ string, skipped bool) {
 
 // addComponent adds the Component with given label to the Resource at given address.
 func (s *State) addComponent(resAddress, compLabel string, component Component) {
-	s.Resources[resAddress].Components[compLabel] = component
+	if _, ok := s.Resources[resAddress].Components[compLabel]; !ok {
+		s.Resources[resAddress].Components[compLabel] = []Component{}
+	}
+	s.Resources[resAddress].Components[compLabel] = append(s.Resources[resAddress].Components[compLabel], component)
 }

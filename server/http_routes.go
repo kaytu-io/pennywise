@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/kaytu-io/pennywise/server/aws"
 	awsrg "github.com/kaytu-io/pennywise/server/aws/region"
 	awstf "github.com/kaytu-io/pennywise/server/aws/terraform"
@@ -50,7 +51,6 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 		resources := make(map[string]resource.Resource)
 		resources[req.Address] = req
 		components := provider.ResourceComponents(resources, req)
-		//fmt.Println("COMPONENTS", components)
 		qResource = query.Resource{
 			Address:    req.Address,
 			Provider:   req.ProviderName,
@@ -75,6 +75,17 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 	state, err := cost.NewState(ctx.Request().Context(), h.backend, []query.Resource{qResource})
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+	for _, re := range state.Resources {
+		fmt.Println("====================")
+		fmt.Println("RESOURCE", req.Address)
+		for _, comp := range re.Components {
+			for _, c := range comp {
+				fmt.Println("comp", c.Name)
+				fmt.Println("comp cost", c.Cost())
+				fmt.Println("-------")
+			}
+		}
 	}
 	cost, err := state.Cost()
 	if err != nil {

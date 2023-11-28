@@ -7,6 +7,7 @@ import (
 // Component describes the pricing of a single resource cost component. This includes Rate and Quantity
 // and allows for final cost computation.
 type Component struct {
+	Name     string
 	Quantity decimal.Decimal
 	Unit     string
 	Rate     Cost

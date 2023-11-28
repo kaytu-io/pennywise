@@ -22,10 +22,6 @@ type Disk struct {
 	SizeGb        *float64      `mapstructure:"size_gb"`
 }
 
-type StorageDisk struct {
-	DiskSizeGb *float64 `mapstructure:"disk_size_gb"`
-}
-
 type sourceVirtualMachineValues struct {
 	Index   string `mapstructure:"index"`
 	Address string `mapstructure:"address"`

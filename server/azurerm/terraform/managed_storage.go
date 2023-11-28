@@ -86,16 +86,31 @@ func (inst *ManagedDisk) Components() []query.Component {
 	if sku[0] == "PremiumV2" {
 		return nil // Not Supported
 	} else if sku[0] == "UltraSSD" {
-		components = append(components, inst.ultraLRSThroughputComponent(inst.provider.key, inst.location, inst.diskMbpsReadWrite))
-		components = append(components, inst.ultraLRSCapacityComponent(inst.provider.key, inst.location, inst.diskSizeGb))
-		components = append(components, inst.ultraLRSIOPsComponent(inst.provider.key, inst.location, inst.diskIopsReadWrite))
+		requestedSize := float64(1024)
+		iops := float64(2048)
+		throughput := float64(8)
+
+		if inst.diskSizeGb != 0 {
+			requestedSize = inst.diskSizeGb
+		}
+
+		if inst.diskIopsReadWrite != 0 {
+			iops = inst.diskIopsReadWrite
+		}
+
+		if inst.diskMbpsReadWrite != 0 {
+			throughput = inst.diskMbpsReadWrite
+		}
+		components = append(components, inst.ultraLRSThroughputComponent(inst.provider.key, inst.location, throughput))
+		components = append(components, inst.ultraLRSCapacityComponent(inst.provider.key, inst.location, requestedSize))
+		components = append(components, inst.ultraLRSIOPsComponent(inst.provider.key, inst.location, iops))
 	} else {
 		requestedSize := 30
 		if int(inst.diskSizeGb) != 0 {
 			requestedSize = int(inst.diskSizeGb)
 		}
 		skuName := mapDiskName(sku[0], requestedSize)
-		fmt.Println(fmt.Sprintf("%s %s: %v", skuName, sku[1], inst.diskSizeGb))
+		fmt.Println(fmt.Sprintf("%s %s: %v", skuName, sku[1], requestedSize))
 		productName, ok := diskProductNameMap[sku[0]]
 		if !ok {
 			return nil
@@ -113,6 +128,7 @@ func (inst *ManagedDisk) Components() []query.Component {
 		opsQty = inst.monthlyDiskOperations.Div(decimal.NewFromInt(10000))
 		inst.diskOperationsComponent(inst.provider.key, inst.location, inst.storageAccountType, opsQty)
 	}
+	fmt.Println("COMPONENTS", components)
 	return components
 }
 
