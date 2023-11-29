@@ -125,11 +125,25 @@ func (p *Plan) extractReferences(resourcesMap map[string][]Resource) []Resource 
 			for key, val := range res.Values {
 				if value, ok := val.(string); ok {
 					ref := strings.Split(value, ".")
-					if ref[0] == "each" && len(ref) > 1 {
-						if refValue, ok := resourcesMap[fmt.Sprintf("%s.%s", ref[1], ref[2])][i].Values[key]; ok {
-							res.Values[key] = refValue
+					if ref[0] == "*ref*" && len(ref) > 2 {
+						if _, ok := resourcesMap[strings.Join(ref[1:len(ref)-1], ".")]; ok {
+							if refValue, ok := resourcesMap[strings.Join(ref[1:len(ref)-1], ".")][0].Values[ref[len(ref)-1]]; ok {
+								res.Values[key] = refValue
+							} else {
+								res.Values[key] = resourcesMap[strings.Join(ref[1:len(ref)-1], ".")][0]
+							}
 						} else {
-							res.Values[key] = resourcesMap[fmt.Sprintf("%s.%s", ref[1], ref[2])][i]
+							res.Values[key] = nil
+						}
+					} else if ref[0] == "*each*" && len(ref) > 2 {
+						if _, ok := resourcesMap[strings.Join(ref[1:len(ref)-1], ".")]; ok && len(resourcesMap[strings.Join(ref[1:len(ref)-1], ".")]) > i {
+							if refValue, ok := resourcesMap[strings.Join(ref[1:len(ref)-1], ".")][i].Values[ref[len(ref)-1]]; ok {
+								res.Values[key] = refValue
+							} else {
+								res.Values[key] = resourcesMap[strings.Join(ref[1:len(ref)-1], ".")][i]
+							}
+						} else {
+							res.Values[key] = nil
 						}
 					}
 				} else {
@@ -363,7 +377,7 @@ func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]int
 			return nil, fmt.Errorf("refernce %q has invalid format", refs[0])
 		}
 		if ref[0] == "each" {
-			values[name] = fmt.Sprintf("each.%s.%s", forEach["references"].([]interface{})[0], ref[2])
+			values[name] = fmt.Sprintf("*each*.%s.%s", forEach["references"].([]interface{})[0], ref[2])
 			continue
 		}
 		// "local" variables are not set on the plan
@@ -379,23 +393,26 @@ func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]int
 
 		// The references can be 'var', 'local' and any other resource referenced, so if it's not either of the first
 		// ones is a resource reference so we use it as value
-		if ref[0] != "var" {
-			// The case for 2 is when aws_launch_configuration.as_conf.name which is 3 but we only want the aws_launch_configuration.as_conf
-			// so as the e.References hold all of the precedents of the separation we take the 1 as the 0 is the full with the '.name' at the end
-			if len(ref) > 2 {
-				values[name] = fmt.Sprintf("%s.%s", prefix, refs[1])
-			} else {
-				values[name] = fmt.Sprintf("%s.%s", prefix, refs[0])
+		//if ref[0] != "var" {
+		//	// The case for 2 is when aws_launch_configuration.as_conf.name which is 3 but we only want the aws_launch_configuration.as_conf
+		//	// so as the e.References hold all of the precedents of the separation we take the 1 as the 0 is the full with the '.name' at the end
+		//	if len(ref) > 2 {
+		//		values[name] = fmt.Sprintf("%s.%s", prefix, refs[1])
+		//	} else {
+		//		values[name] = fmt.Sprintf("%s.%s", prefix, refs[0])
+		//	}
+		//	continue
+		//}
+		if ref[0] == "var" {
+			varName := ref[1]
+			v, ok := variables[varName]
+			if !ok || v.Value == "" {
+				return nil, fmt.Errorf("required variable %q is not defined", varName)
 			}
+			values[name] = v.Value
 			continue
 		}
-
-		varName := ref[1]
-		v, ok := variables[varName]
-		if !ok || v.Value == "" {
-			return nil, fmt.Errorf("required variable %q is not defined", varName)
-		}
-		values[name] = v.Value
+		values[name] = fmt.Sprintf("*ref*.%s", refs[0])
 	}
 	return values, nil
 }
