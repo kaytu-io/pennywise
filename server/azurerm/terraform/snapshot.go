@@ -44,10 +44,15 @@ func (p *Provider) newSnapshot(vals snapshotValues) *Image {
 	if storageSize != nil {
 		storageGB = *storageSize
 	}
+	fmt.Println("IMAGE", Image{
+		imageType: "Snapshot",
+		storageGB: decimal.NewFromFloat(storageGB),
+		location:  getLocationName(vals.Location),
+	})
 	return &Image{
 		imageType: "Snapshot",
 		storageGB: decimal.NewFromFloat(storageGB),
-		location:  vals.Location,
+		location:  getLocationName(vals.Location),
 	}
 }
 

@@ -53,6 +53,10 @@ var (
 	}
 )
 
+func GetRegionCode(location string) string {
+	return locationDisplayToName[location]
+}
+
 // Provider is an implementation of the terraform.Provider, used to extract component queries from
 // terraform resources.
 type Provider struct {

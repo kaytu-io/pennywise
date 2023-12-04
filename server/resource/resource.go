@@ -1,6 +1,6 @@
 package resource
 
-// Resource is a single Terraform resource definition.
+// Resource is a single resource definition.
 type Resource struct {
 	Address      string                 `json:"address"`
 	Type         string                 `json:"type"`
