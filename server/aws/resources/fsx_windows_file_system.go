@@ -1,4 +1,4 @@
-package terraform
+package resources
 
 import (
 	"github.com/kaytu-io/pennywise/server/resource"
@@ -8,29 +8,22 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// fsxOntapFileSystemValues represents the structure of Terraform values for aws_efs_file_system resource.
-type fsxOntapFileSystemValues struct {
+// fsxWindowsFileSystemValues represents the structure of Terraform values for aws_efs_file_system resource.
+type fsxWindowsFileSystemValues struct {
 	StorageCapacity              float64 `mapstructure:"storage_capacity"`
 	StorageType                  string  `mapstructure:"storage_type"`
 	DeploymentType               string  `mapstructure:"deployment_type"`
 	ThroughputCapacity           float64 `mapstructure:"throughput_capacity"`
 	AutomaticBackupRetentionDays float64 `mapstructure:"automatic_backup_retention_days"`
 
-	DiskIopsConfiguration []struct {
-		IOPS     float64 `mapstructure:"iops"`
-		IOPSMode string  `mapstructure:"mode"`
-	} `mapstructure:"disk_iops_configuration"`
-
-	DataCompressionType string `mapstructure:"data_compression_type"`
-
 	Usage struct {
 		BackupStorageGB float64 `mapstructure:"backup_storage_gb"`
 	} `mapstructure:"tc_usage"`
 }
 
-// decodeFSxOntapFileSystemValues decodes and returns fsxOntapFileSystemValues from a Terraform values map.
-func decodeFSxOntapFileSystemValues(tfVals map[string]interface{}) (fsxOntapFileSystemValues, error) {
-	var v fsxOntapFileSystemValues
+// decodeFSxWindowsFileSystemValues decodes and returns fsxWindowsFileSystemValues from a Terraform values map.
+func decodeFSxWindowsFileSystemValues(tfVals map[string]interface{}) (fsxWindowsFileSystemValues, error) {
+	var v fsxWindowsFileSystemValues
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
 		Result:           &v,
@@ -47,10 +40,12 @@ func decodeFSxOntapFileSystemValues(tfVals map[string]interface{}) (fsxOntapFile
 	return v, nil
 }
 
-func (v *FSxFileSystem) getOntapDeployOption(deploymentType string) string {
+func (v *FSxFileSystem) getWindowsDeployOption(deploymentType string) string {
 
 	deploymentOption := "Multi-AZ"
 	switch strings.ToLower(deploymentType) {
+	// case "multi_az_1":
+	// 	deploymentOption = "Multi-AZ"
 	case "single_az_1":
 		deploymentOption = "Single-AZ"
 	case "single_az_2":
@@ -60,14 +55,14 @@ func (v *FSxFileSystem) getOntapDeployOption(deploymentType string) string {
 	return deploymentOption
 }
 
-// newFSxOntapFileSystem creates a new FSxOntapFileSystem from fsxOntapFileSystemValues.
-func (p *Provider) newFSxOntapFileSystem(rss map[string]resource.Resource, vals fsxOntapFileSystemValues) *FSxFileSystem {
+// newFSxWindowsFileSystem creates a new FSxWindowsFileSystem from fsxWindowsFileSystemValues.
+func (p *Provider) newFSxWindowsFileSystem(rss map[string]resource.Resource, vals fsxWindowsFileSystemValues) *FSxFileSystem {
 	v := &FSxFileSystem{
 		provider:           p,
 		region:             p.region,
 		storageType:        "SSD",
 		storageCapacity:    decimal.NewFromFloat(32),
-		fsxType:            "ONTAP",
+		fsxType:            "Windows",
 		throughputCapacity: decimal.NewFromFloat(vals.ThroughputCapacity),
 		deploymentOption:   "Single-AZ",
 		// From Usage
@@ -79,7 +74,7 @@ func (p *Provider) newFSxOntapFileSystem(rss map[string]resource.Resource, vals 
 	}
 
 	if len(vals.DeploymentType) > 0 {
-		v.deploymentOption = v.getOntapDeployOption(vals.DeploymentType)
+		v.deploymentOption = v.getWindowsDeployOption(vals.DeploymentType)
 	}
 
 	if len(vals.StorageType) > 0 {

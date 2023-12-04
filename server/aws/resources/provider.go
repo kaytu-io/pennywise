@@ -1,4 +1,4 @@
-package terraform
+package resources
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 
 const ProviderName = "aws"
 
-// Provider is an implementation of the terraform.Provider, used to extract component queries from
+// Provider is an implementation of the resources.Provider, used to extract component queries from
 // terraform resources.
 type Provider struct {
 	key    string

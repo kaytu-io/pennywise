@@ -1,4 +1,4 @@
-package terraform
+package resources
 
 import (
 	"github.com/kaytu-io/pennywise/server/resource"
@@ -8,8 +8,8 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// fsxOpenzfsFileSystemValues represents the structure of Terraform values for aws_efs_file_system resource.
-type fsxOpenzfsFileSystemValues struct {
+// fsxOntapFileSystemValues represents the structure of Terraform values for aws_efs_file_system resource.
+type fsxOntapFileSystemValues struct {
 	StorageCapacity              float64 `mapstructure:"storage_capacity"`
 	StorageType                  string  `mapstructure:"storage_type"`
 	DeploymentType               string  `mapstructure:"deployment_type"`
@@ -28,9 +28,9 @@ type fsxOpenzfsFileSystemValues struct {
 	} `mapstructure:"tc_usage"`
 }
 
-// decodeFSxOpenzfsFileSystemValues decodes and returns fsxOpenzfsFileSystemValues from a Terraform values map.
-func decodeFSxOpenzfsFileSystemValues(tfVals map[string]interface{}) (fsxOpenzfsFileSystemValues, error) {
-	var v fsxOpenzfsFileSystemValues
+// decodeFSxOntapFileSystemValues decodes and returns fsxOntapFileSystemValues from a Terraform values map.
+func decodeFSxOntapFileSystemValues(tfVals map[string]interface{}) (fsxOntapFileSystemValues, error) {
+	var v fsxOntapFileSystemValues
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
 		Result:           &v,
@@ -47,27 +47,27 @@ func decodeFSxOpenzfsFileSystemValues(tfVals map[string]interface{}) (fsxOpenzfs
 	return v, nil
 }
 
-func (v *FSxFileSystem) getOpenzfsDeployOption(deploymentType string) string {
+func (v *FSxFileSystem) getOntapDeployOption(deploymentType string) string {
 
 	deploymentOption := "Multi-AZ"
 	switch strings.ToLower(deploymentType) {
 	case "single_az_1":
 		deploymentOption = "Single-AZ"
 	case "single_az_2":
-		deploymentOption = "Single-AZ_2"
+		deploymentOption = "Single-AZ_2N"
 	}
 
 	return deploymentOption
 }
 
-// newFSxOpenzfsFileSystem creates a new FSxOpenzfsFileSystem from fsxOpenzfsFileSystemValues.
-func (p *Provider) newFSxOpenzfsFileSystem(rss map[string]resource.Resource, vals fsxOpenzfsFileSystemValues) *FSxFileSystem {
+// newFSxOntapFileSystem creates a new FSxOntapFileSystem from fsxOntapFileSystemValues.
+func (p *Provider) newFSxOntapFileSystem(rss map[string]resource.Resource, vals fsxOntapFileSystemValues) *FSxFileSystem {
 	v := &FSxFileSystem{
 		provider:           p,
 		region:             p.region,
 		storageType:        "SSD",
 		storageCapacity:    decimal.NewFromFloat(32),
-		fsxType:            "OpenZFS",
+		fsxType:            "ONTAP",
 		throughputCapacity: decimal.NewFromFloat(vals.ThroughputCapacity),
 		deploymentOption:   "Single-AZ",
 		// From Usage
@@ -79,7 +79,7 @@ func (p *Provider) newFSxOpenzfsFileSystem(rss map[string]resource.Resource, val
 	}
 
 	if len(vals.DeploymentType) > 0 {
-		v.deploymentOption = v.getOpenzfsDeployOption(vals.DeploymentType)
+		v.deploymentOption = v.getOntapDeployOption(vals.DeploymentType)
 	}
 
 	if len(vals.StorageType) > 0 {

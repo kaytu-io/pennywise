@@ -2,7 +2,7 @@ package aws
 
 import (
 	"github.com/kaytu-io/pennywise/server/aws/region"
-	awstf "github.com/kaytu-io/pennywise/server/aws/terraform"
+	aws "github.com/kaytu-io/pennywise/server/aws/resources"
 	"github.com/kaytu-io/pennywise/server/resource"
 )
 
@@ -26,6 +26,6 @@ var TerraformProviderInitializer = resource.ProviderInitializer{
 			r = DefaultRegion
 		}
 		regCode := region.Code(r.(string))
-		return awstf.NewProvider(ProviderName, regCode)
+		return aws.NewProvider(ProviderName, regCode)
 	},
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/aws"
 	awsrg "github.com/kaytu-io/pennywise/server/aws/region"
-	awsres "github.com/kaytu-io/pennywise/server/aws/terraform"
+	awsres "github.com/kaytu-io/pennywise/server/aws/resources"
 	"github.com/kaytu-io/pennywise/server/azurerm"
 	azurermres "github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/cost"
