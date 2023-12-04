@@ -110,7 +110,6 @@ func (inst *ManagedDisk) Components() []query.Component {
 			requestedSize = int(inst.diskSizeGb)
 		}
 		skuName := mapDiskName(sku[0], requestedSize)
-		fmt.Println(fmt.Sprintf("%s %s: %v", skuName, sku[1], requestedSize))
 		productName, ok := diskProductNameMap[sku[0]]
 		if !ok {
 			return nil
@@ -128,7 +127,6 @@ func (inst *ManagedDisk) Components() []query.Component {
 		opsQty = inst.monthlyDiskOperations.Div(decimal.NewFromInt(10000))
 		inst.diskOperationsComponent(inst.provider.key, inst.location, inst.storageAccountType, opsQty)
 	}
-	fmt.Println("COMPONENTS", components)
 	return components
 }
 

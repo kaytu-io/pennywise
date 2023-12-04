@@ -29,10 +29,6 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 	}
 	for _, res := range resources {
 		// Mark the Resource as skipped if there are no valid Components.
-		if res.Address == "azurerm_virtual_machine.windows" {
-			fmt.Println("RES", res.Address)
-			fmt.Println("COMPONENT", res.Components)
-		}
 		state.ensureResource(res.Address, res.Provider, res.Type, len(res.Components) == 0)
 		for _, comp := range res.Components {
 			prods, err := backend.Products().Filter(ctx, comp.ProductFilter)
