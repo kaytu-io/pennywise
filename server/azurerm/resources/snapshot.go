@@ -7,7 +7,7 @@ import (
 )
 
 type SourceUri struct {
-	Valuse struct {
+	Values struct {
 		DiskSizeGb *float64 `mapstructure:"disk_size_gb"`
 	} `mapstructure:"values"`
 }
@@ -62,7 +62,7 @@ func snapshotStorageSize(vals snapshotValues) *float64 {
 	}
 
 	if vals.SourceUri != nil {
-		size := vals.SourceUri[0].Valuse.DiskSizeGb
+		size := vals.SourceUri[0].Values.DiskSizeGb
 		return size
 	}
 

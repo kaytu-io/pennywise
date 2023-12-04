@@ -42,5 +42,12 @@ func ParseHclResources(path string) (string, []Resource, error) {
 		}
 	}
 
+	for i, res := range resources {
+		if makeResource, ok := makeResourceProcesses[res.Type]; ok {
+			resources[i] = makeResource.setRefs(resources, res)
+			resources[i] = makeResource.runFunctions(res)
+		}
+	}
+
 	return provider, resources, nil
 }
