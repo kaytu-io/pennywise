@@ -1,4 +1,4 @@
-package terraform
+package resources
 
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/aws"
 	awsrg "github.com/kaytu-io/pennywise/server/aws/region"
-	awstf "github.com/kaytu-io/pennywise/server/aws/terraform"
+	awsres "github.com/kaytu-io/pennywise/server/aws/terraform"
 	"github.com/kaytu-io/pennywise/server/azurerm"
-	azuretf "github.com/kaytu-io/pennywise/server/azurerm/terraform"
+	azurermres "github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/cost"
 	ingester2 "github.com/kaytu-io/pennywise/server/internal/ingester"
 	"github.com/kaytu-io/pennywise/server/internal/query"
@@ -44,7 +44,7 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	if req.ProviderName == "azurerm" {
-		provider, err := azuretf.NewProvider(azuretf.ProviderName)
+		provider, err := azurermres.NewProvider(azurermres.ProviderName)
 		if err != nil {
 			return ctx.JSON(http.StatusInternalServerError, err.Error())
 		}
@@ -58,7 +58,7 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 			Components: components,
 		}
 	} else if req.ProviderName == "aws" {
-		provider, err := awstf.NewProvider(awstf.ProviderName, awsrg.Code(req.RegionCode))
+		provider, err := awsres.NewProvider(awsres.ProviderName, awsrg.Code(req.RegionCode))
 		if err != nil {
 			return ctx.JSON(http.StatusInternalServerError, err.Error())
 		}

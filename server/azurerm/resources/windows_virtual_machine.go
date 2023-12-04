@@ -1,33 +1,35 @@
-package terraform
+package resources
 
 import (
-	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
+	"strings"
 )
 
-// LinuxVirtualMachine is the entity that holds the logic to calculate price
+// WindowsVirtualMachine is the entity that holds the logic to calculate price
 // of the google_compute_instance
-type LinuxVirtualMachine struct {
+type WindowsVirtualMachine struct {
 	provider *Provider
 
-	location string
-	size     string
-	osDisk   []OsDisk
+	location    string
+	size        string
+	licenseType string
+	osDisk      []OsDisk
 
 	// Usage
 	monthlyHours decimal.Decimal
 }
 
-// linuxVirtualMachineValues is holds the values that we need to be able
+// windowsVirtualMachineValues is holds the values that we need to be able
 // to calculate the price of the ComputeInstance
-type linuxVirtualMachineValues struct {
-	Size     string `mapstructure:"size"`
-	Location string `mapstructure:"location"`
+type windowsVirtualMachineValues struct {
+	Size        string `mapstructure:"size"`
+	Location    string `mapstructure:"location"`
+	LicenseType string `mapstructure:"license_type"`
 
 	OsDisk []struct {
 		StorageAccountType string  `mapstructure:"storage_account_type"`
@@ -39,9 +41,9 @@ type linuxVirtualMachineValues struct {
 	} `mapstructure:"tc_usage"`
 }
 
-// decodeLinuxVirtualMachineValues decodes and returns computeInstanceValues from a Terraform values map.
-func decodeLinuxVirtualMachineValues(tfVals map[string]interface{}) (linuxVirtualMachineValues, error) {
-	var v linuxVirtualMachineValues
+// decodeWindowsVirtualMachineValues decodes and returns computeInstanceValues from a Terraform values map.
+func decodeWindowsVirtualMachineValues(tfVals map[string]interface{}) (windowsVirtualMachineValues, error) {
+	var v windowsVirtualMachineValues
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
 		Result:           &v,
@@ -58,18 +60,18 @@ func decodeLinuxVirtualMachineValues(tfVals map[string]interface{}) (linuxVirtua
 	return v, nil
 }
 
-// newLinuxVirtualMachine initializes a new LinuxVirtualMachine from the provider
-func (p *Provider) newLinuxVirtualMachine(vals linuxVirtualMachineValues) *LinuxVirtualMachine {
+// newWindowsVirtualMachine initializes a new WindowsVirtualMachine from the provider
+func (p *Provider) newWindowsVirtualMachine(vals windowsVirtualMachineValues) *WindowsVirtualMachine {
 	var osDisks []OsDisk
 	for _, disk := range vals.OsDisk {
 		osDisks = append(osDisks, OsDisk{storageAccountType: disk.StorageAccountType, diskSizeGb: decimal.NewFromFloat(disk.DiskSizeGb)})
 	}
-
-	inst := &LinuxVirtualMachine{
+	inst := &WindowsVirtualMachine{
 		provider: p,
 
 		location:     getLocationName(vals.Location),
 		size:         vals.Size,
+		licenseType:  vals.LicenseType,
 		osDisk:       osDisks,
 		monthlyHours: decimal.NewFromFloat(vals.Usage.MonthlyHours),
 	}
@@ -78,22 +80,25 @@ func (p *Provider) newLinuxVirtualMachine(vals linuxVirtualMachineValues) *Linux
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *LinuxVirtualMachine) Components() []query.Component {
+func (inst *WindowsVirtualMachine) Components() []query.Component {
 	// TODO: check if we have ultra ssd or not
-	components := []query.Component{inst.linuxVirtualMachineComponent()}
+	components := []query.Component{inst.windowsVirtualMachineComponent()}
 	components = append(components, osDiskSubResource(inst.provider, inst.location, inst.osDisk, nil)...)
-
 	return components
 }
 
 // linuxVirtualMachineComponent returns the query needed to be able to calculate the price
-func (inst *LinuxVirtualMachine) linuxVirtualMachineComponent() query.Component {
-	return linuxVirtualMachineComponent(inst.provider.key, inst.location, inst.size, inst.monthlyHours)
+func (inst *WindowsVirtualMachine) windowsVirtualMachineComponent() query.Component {
+	purchaseOption := "Consumption"
+	if strings.ToLower(inst.licenseType) == "windows_client" || strings.ToLower(inst.licenseType) == "windows_server" {
+		purchaseOption = "DevTestConsumption"
+	}
+	return windowsVirtualMachineComponent(inst.provider.key, inst.location, inst.size, purchaseOption, inst.monthlyHours)
 }
 
 // linuxVirtualMachineComponent is the abstraction of the same LinuxVirtualMachine.linuxVirtualMachineComponent
 // so it can be reused
-func linuxVirtualMachineComponent(key, location, size string, qty decimal.Decimal) query.Component {
+func windowsVirtualMachineComponent(key, location, size, purchaseOption string, qty decimal.Decimal) query.Component {
 	return query.Component{
 		Name:            "Compute",
 		MonthlyQuantity: qty,
@@ -103,15 +108,15 @@ func linuxVirtualMachineComponent(key, location, size string, qty decimal.Decima
 			Family:   util.StringPtr("Compute"),
 			Location: util.StringPtr(location),
 			AttributeFilters: []*product.AttributeFilter{
-				{Key: "arm_sku_name", ValueRegex: util.StringPtr(fmt.Sprintf("%s", size))},
+				{Key: "arm_sku_name", Value: util.StringPtr(size)},
 				{Key: "priority", Value: util.StringPtr("regular")},
-				{Key: "product_name", ValueRegex: util.StringPtr("^(?!.*Windows).*")},
+				{Key: "product_name", ValueRegex: util.StringPtr(".*Windows.*")},
 			},
 		},
 		PriceFilter: &price.Filter{
 			Unit: util.StringPtr("1 Hour"),
 			AttributeFilters: []*price.AttributeFilter{
-				{Key: "type", Value: util.StringPtr("Consumption")},
+				{Key: "type", Value: util.StringPtr(purchaseOption)},
 			},
 		},
 	}

@@ -1,7 +1,7 @@
 package azurerm
 
 import (
-	azurermtf "github.com/kaytu-io/pennywise/server/azurerm/terraform"
+	azurerm "github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/resource"
 )
 
@@ -12,6 +12,6 @@ const RegistryName = "registry.terraform.io/hashicorp/azurerm"
 var TerraformProviderInitializer = resource.ProviderInitializer{
 	MatchNames: []string{ProviderName, RegistryName},
 	Provider: func(values map[string]interface{}) (resource.Provider, error) {
-		return azurermtf.NewProvider(ProviderName)
+		return azurerm.NewProvider(ProviderName)
 	},
 }

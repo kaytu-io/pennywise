@@ -1,4 +1,4 @@
-package terraform
+package resources
 
 import (
 	"github.com/kaytu-io/pennywise/server/internal/query"
@@ -60,7 +60,7 @@ var (
 	}
 )
 
-// Provider is an implementation of the terraform.Provider, used to extract component queries from
+// Provider is an implementation of the resources.Provider, used to extract component queries from
 // terraform resources.
 type Provider struct {
 	key string
