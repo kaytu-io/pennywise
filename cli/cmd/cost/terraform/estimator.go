@@ -9,20 +9,17 @@ import (
 	"github.com/kaytu-io/pennywise/server/client"
 	"io"
 	"os"
-	"sort"
 )
 
 var (
 	ServerClientAddress = os.Getenv("SERVER_CLIENT_URL")
 )
 
-// EstimateTerraformPlan is a helper function that reads a Terraform plan using the provided io.Reader,
-// generates the prior and planned cost.State, and then creates a cost.Plan from them that is returned.
+// EstimateTerraformPlanJson is a helper function that reads a Terraform plan json file using the provided io.Reader,
+// calculates the costs of the resources and show them.
 // It uses the Backend to retrieve the pricing data.
-func EstimateTerraformPlan(plan io.Reader, u usage.Usage, providerInitializers ...terraform.ProviderInitializer) error {
-	if len(providerInitializers) == 0 {
-		providerInitializers = getDefaultProviders()
-	}
+func EstimateTerraformPlanJson(plan io.Reader, u usage.Usage) error {
+	providerInitializers := getDefaultProviders()
 
 	tfplan := terraform.NewPlan(providerInitializers...)
 	if err := tfplan.Read(plan); err != nil {
@@ -43,12 +40,6 @@ func EstimateTerraformPlan(plan io.Reader, u usage.Usage, providerInitializers .
 		}
 		fmt.Println(rs.Address, ":", cost)
 	}
-
-	modules := make([]string, 0, 0)
-	for k := range tfplan.Configuration.RootModule.ModuleCalls {
-		modules = append(modules, k)
-	}
-	sort.Strings(modules)
 	return nil
 }
 
