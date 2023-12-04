@@ -16,4 +16,5 @@ func init() {
 	CostCmd.AddCommand(terraformCommand)
 	terraformCommand.Flags().String("json-path", "", "terraform plan json file path")
 	terraformCommand.Flags().String("project", "", "terraform project directory")
+	terraformCommand.Flags().String("usage", "", "usage file path")
 }
