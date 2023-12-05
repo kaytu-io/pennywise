@@ -238,10 +238,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
-replace github.com/kaytu-io/infracost => /home/arta/data/codes/Work/Kaytu/infracost
-
-replace github.com/kaytu-io/pennywise/server => /home/arta/data/codes/Work/Kaytu/pennywise/server
-
 replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e
 
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
