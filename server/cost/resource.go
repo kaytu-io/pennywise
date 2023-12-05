@@ -28,6 +28,20 @@ func (re Resource) Cost() (Cost, error) {
 	return total, nil
 }
 
+func (re Resource) CostString() (string, error) {
+	cost, err := re.Cost()
+	if err != nil {
+		return "", err
+	}
+	costString := fmt.Sprintf("---- Total Resource Cost: %v", cost)
+	for _, comps := range re.Components {
+		for _, c := range comps {
+			costString = fmt.Sprintf("%s\n-------- %s : %s", costString, c.Name, c.CostString())
+		}
+	}
+	return costString, nil
+}
+
 // ResourceDiff is the difference in costs between prior and planned Resource. It contains a ComponentDiff
 // map, keyed by the label.
 type ResourceDiff struct {
@@ -35,34 +49,6 @@ type ResourceDiff struct {
 	Provider       string
 	Type           string
 	ComponentDiffs map[string]*ComponentDiff
-}
-
-// PriorCost returns the sum of costs of every Component's PriorCost.
-// Error is returned if there is a mismatch between currencies of the Components.
-func (rd ResourceDiff) PriorCost() (Cost, error) {
-	total := Zero
-	var err error
-	for _, cd := range rd.ComponentDiffs {
-		total, err = total.Add(cd.PriorCost())
-		if err != nil {
-			return Zero, fmt.Errorf("failed calculating prior cost: %w", err)
-		}
-	}
-	return total, nil
-}
-
-// PlannedCost returns the sum of costs of every Component's PlannedCost.
-// Error is returned if there is a mismatch between currencies of the Components.
-func (rd ResourceDiff) PlannedCost() (Cost, error) {
-	total := Zero
-	var err error
-	for _, cd := range rd.ComponentDiffs {
-		total, err = total.Add(cd.PlannedCost())
-		if err != nil {
-			return Zero, fmt.Errorf("failed calculating planned cost: %w", err)
-		}
-	}
-	return total, nil
 }
 
 // Errors returns a map of Component errors keyed by the Component label.

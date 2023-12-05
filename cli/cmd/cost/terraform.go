@@ -79,7 +79,7 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(rs.Address, ":", cost)
+		fmt.Println(cost.CostString())
 	}
 	return nil
 }
