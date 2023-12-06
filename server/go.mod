@@ -54,6 +54,6 @@ require (
 
 replace github.com/hashicorp/terraform => github.com/cycloidio/terraform v1.1.9-cy
 
-replace github.com/kaytu-io/pennywise/server => /home/arta/data/codes/Work/Kaytu/pennywise/server
+replace github.com/kaytu-io/pennywise/server => /home/saber-ubuntu/GolandProjects/pennywise/server
 
 replace github.com/gruntwork-io/terragrunt => github.com/cycloidio/terragrunt v0.0.0-20230905115542-1fe1ff682fd9
