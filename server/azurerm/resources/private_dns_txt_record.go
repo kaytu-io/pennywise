@@ -8,21 +8,24 @@ import (
 type PrivateDNSTXTRecord struct {
 	provider *Provider
 
-	location       string
+	location string
+
+	// Usage
 	monthlyQueries *int64
 }
 
 type privateDNSTXTRecordValues struct {
-	Value struct {
-		Location string `mapstructure:"location"`
-	} `mapstructure:"value"`
-	MonthlyQueries int64 `mapstructure:"monthly_queries"`
+	Location string `mapstructure:"location"`
+
+	Usage struct {
+		MonthlyQueries int64 `mapstructure:"monthly_queries"`
+	} `mapstructure:"tc_usage"`
 }
 
 func (p *Provider) newPrivateDNSTXTRecord(vals privateDNSTXTRecordValues) *PrivateDNSTXTRecord {
 	inst := &PrivateDNSTXTRecord{
-		location:       vals.Value.Location,
-		monthlyQueries: &vals.MonthlyQueries,
+		location:       vals.Location,
+		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
 	return inst
 }

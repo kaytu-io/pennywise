@@ -11,14 +11,12 @@ type PrivateDNSZone struct {
 }
 
 type privateDNSZoneValue struct {
-	Value struct {
-		Location string `mapstructure:"location"`
-	} `mapstructure:"value"`
+	Location string `mapstructure:"location"`
 }
 
 func (p *Provider) newPrivateDNSZone(vals privateDNSZoneValue) *PrivateDNSZone {
 	inst := &PrivateDNSZone{
-		location: vals.Value.Location,
+		location: vals.Location,
 	}
 	return inst
 }

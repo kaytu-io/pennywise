@@ -14,14 +14,17 @@ import (
 type DNSARecord struct {
 	provider *Provider
 
-	location       string
+	location string
+	// Usage
 	monthlyQueries *int64
 }
 
 type dnsARecordValues struct {
 	Location string `mapstructure:"location"`
-	// TODO:we should get MonthlyQueries field from user
-	MonthlyQueries *int64 `mapstructure:"monthly_queries"`
+
+	Usage struct {
+		MonthlyQueries int64 `mapstructure:"monthly_queries"`
+	} `mapstructure:"tc_usage"`
 }
 
 func decoderDNSARecord(tfVals map[string]interface{}) (dnsARecordValues, error) {
@@ -45,7 +48,7 @@ func decoderDNSARecord(tfVals map[string]interface{}) (dnsARecordValues, error) 
 func (p *Provider) newDNSARecord(vals dnsARecordValues) *DNSARecord {
 	inst := &DNSARecord{
 		location:       vals.Location,
-		monthlyQueries: vals.MonthlyQueries,
+		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
 	return inst
 }

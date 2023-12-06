@@ -10,16 +10,18 @@ import (
 type kubernetesClusterNodePool struct {
 	provider *Provider
 
-	monthlyHrs   decimal.Decimal
 	location     string
 	minCount     *int64
 	nodeCount    *int64
-	nodes        *int64
 	vmSize       string
 	skuTier      string
 	osSku        *string
 	osDiskType   *string
 	osDiskSizeGB *int
+
+	// Usage
+	nodes      *int64
+	monthlyHrs decimal.Decimal
 }
 
 type kubernetesClusterNodePoolValues struct {
@@ -30,13 +32,14 @@ type kubernetesClusterNodePoolValues struct {
 		NodeCount    int64  `mapstructure:"node_count"`
 		VmSize       string `mapstructure:"vm_size"`
 		OSSku        string `mapstructure:"os_sku"`
-		OSDiskType   string `json:"os_disk_type"`
-		OsDiskSizeGB int    `json:"os_disk_size_gb"`
+		OSDiskType   string `mapstructure:"os_disk_type"`
+		OsDiskSizeGB int    `mapstructure:"os_disk_size_gb"`
 	} `mapstructure:"default_node_pool"`
 
-	// TODO: we should get this fields from user
-	Nodes      int64   `json:"nodes"`
-	MonthlyHrs float64 `json:"monthly_hrs"`
+	Usage struct {
+		Nodes      int64   `json:"nodes"`
+		MonthlyHrs float64 `json:"monthly_hrs"`
+	} `mapstructure:"tc_usage"`
 }
 
 // decoderKubernetesCluster decodes and returns kubernetesClusterValues from a Terraform values map.
@@ -68,8 +71,8 @@ func (p *Provider) newAzureRMKubernetesClusterNodePool(vals kubernetesClusterNod
 		osSku:      &vals.DefaultNodePool.OSSku,
 		osDiskType: &vals.DefaultNodePool.OSDiskType,
 
-		nodes:      &vals.Nodes,
-		monthlyHrs: decimal.NewFromFloat(vals.MonthlyHrs),
+		nodes:      &vals.Usage.Nodes,
+		monthlyHrs: decimal.NewFromFloat(vals.Usage.MonthlyHrs),
 	}
 	return inst
 }

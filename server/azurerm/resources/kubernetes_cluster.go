@@ -16,19 +16,19 @@ type kubernetesCluster struct {
 	location                      string
 	httpApplicationRoutingEnabled bool
 
-	nodeCount                 *int64
-	minCount                  *int64
-	osSku                     *string
-	vmSize                    string
-	osDiskType                *string
-	defaultNodePoolNodes      *int64
-	defaultNodePoolMonthlyHrs int64
+	nodeCount  *int64
+	minCount   *int64
+	osSku      *string
+	vmSize     string
+	osDiskType *string
 
-	loadBalancerSku *string
-
-	LoadBalancerMonthlyDataProcessedGB *int64
-
+	loadBalancerSku                          *string
 	addonProfileHttpApplicationRoutingEnable *bool
+
+	// Usage
+	LoadBalancerMonthlyDataProcessedGB *int64
+	defaultNodePoolNodes               *int64
+	defaultNodePoolMonthlyHrs          int64
 }
 
 type kubernetesClusterValues struct {
@@ -42,10 +42,6 @@ type kubernetesClusterValues struct {
 		OSSku      string `mapstructure:"os_sku"`
 		VmSize     string `mapstructure:"vm_size"`
 		OSDiskType string `mapstructure:"os_disk_type"`
-
-		//TODO:we should get Nodes , MonthlyHrs fields from user
-		Nodes      int64 `mapstructure:"nodes"`
-		MonthlyHrs int64 `mapstructure:"monthly_hrs"`
 	} `mapstructure:"default_node_pool"`
 
 	NetworkProfile struct {
@@ -58,10 +54,16 @@ type kubernetesClusterValues struct {
 		} `mapstructure:"http_application_routing"`
 	} `mapstructure:"addon_profile"`
 
-	//TODO:we should get this field from user
-	LoadBalancer struct {
-		MonthlyDataProcessedGB int64 `mapstructure:"monthly_data_processed_gb"`
-	} `mapstructure:"load_balancer"`
+	Usage struct {
+		DefaultNodePool struct {
+			Nodes      int64 `mapstructure:"nodes"`
+			MonthlyHrs int64 `mapstructure:"monthly_hrs"`
+		} `mapstructure:"default_node_pool"`
+
+		LoadBalancer struct {
+			MonthlyDataProcessedGB int64 `mapstructure:"monthly_data_processed_gb"`
+		} `mapstructure:"load_balancer"`
+	} `mapstructure:"tc_usage"`
 }
 
 // decoderKubernetesCluster decodes and returns kubernetesClusterValues from a Terraform values map.
@@ -93,11 +95,11 @@ func (p *Provider) NewAzureRMKubernetesCluster(vals kubernetesClusterValues) *ku
 		osSku:                         &vals.DefaultNodePool.OSSku,
 		vmSize:                        vals.DefaultNodePool.VmSize,
 		osDiskType:                    &vals.DefaultNodePool.OSDiskType,
-		defaultNodePoolNodes:          &vals.DefaultNodePool.Nodes,
-		defaultNodePoolMonthlyHrs:     vals.DefaultNodePool.MonthlyHrs,
+		defaultNodePoolNodes:          &vals.Usage.DefaultNodePool.Nodes,
+		defaultNodePoolMonthlyHrs:     vals.Usage.DefaultNodePool.MonthlyHrs,
 
 		loadBalancerSku:                          &vals.NetworkProfile.LoadBalancerSku,
-		LoadBalancerMonthlyDataProcessedGB:       &vals.LoadBalancer.MonthlyDataProcessedGB,
+		LoadBalancerMonthlyDataProcessedGB:       &vals.Usage.LoadBalancer.MonthlyDataProcessedGB,
 		addonProfileHttpApplicationRoutingEnable: &vals.AddonProfile.HttpApplicationRouting.Enable,
 	}
 	return inst

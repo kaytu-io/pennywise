@@ -8,14 +8,16 @@ import (
 type DNSMXRecord struct {
 	provider *Provider
 
-	location       string
+	location string
+	// Usage
 	monthlyQueries *int64
 }
 
 type dnsMAXRecordValues struct {
 	Location string `mapstructure:"location"`
-	// TODO:we should get MonthlyQueries field from user
-	MonthlyQueries int64 `mapstructure:"monthly_queries"`
+	Usage    struct {
+		MonthlyQueries int64 `mapstructure:"monthly_queries"`
+	} `mapstructure:"tc_usage"`
 }
 
 func decoderDNSMXRecord(tfVals map[string]interface{}) (dnsMAXRecordValues, error) {
@@ -39,7 +41,7 @@ func decoderDNSMXRecord(tfVals map[string]interface{}) (dnsMAXRecordValues, erro
 func (p *Provider) newDNSMXRecord(vals dnsMAXRecordValues) *DNSMXRecord {
 	inst := &DNSMXRecord{
 		location:       vals.Location,
-		monthlyQueries: &vals.MonthlyQueries,
+		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
 	return inst
 }

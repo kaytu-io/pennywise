@@ -8,21 +8,23 @@ import (
 type PrivateDNSSRVRecord struct {
 	provider *Provider
 
-	location       string
+	location string
+	// Usage
 	monthlyQueries *int64
 }
 
 type privateDNSSRVRecordValues struct {
-	Value struct {
-		Location string `mapstructure:"location"`
-	} `mapstructure:"value"`
-	MonthlyQueries int64 `mapstructure:"monthly_queries"`
+	Location string `mapstructure:"location"`
+
+	Usage struct {
+		MonthlyQueries int64 `mapstructure:"monthly_queries"`
+	} `mapstructure:"tc_usage"`
 }
 
 func (p *Provider) newPrivateDNSSRVRecord(vals privateDNSSRVRecordValues) *PrivateDNSSRVRecord {
 	inst := &PrivateDNSSRVRecord{
-		location:       vals.Value.Location,
-		monthlyQueries: &vals.MonthlyQueries,
+		location:       vals.Location,
+		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
 	return inst
 }

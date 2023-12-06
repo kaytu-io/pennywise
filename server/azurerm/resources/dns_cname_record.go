@@ -8,14 +8,16 @@ import (
 type DNSCNAMERecord struct {
 	provider *Provider
 
-	location       string
+	location string
+	// Usage
 	monthlyQueries *int64
 }
 
 type dnsCNAMERecordValues struct {
 	Location string `mapstructure:"location"`
-	// TODO:we should get MonthlyQueries field from user
-	MonthlyQueries int64 `mapstructure:"monthly_queries"`
+	Usage    struct {
+		MonthlyQueries int64 `mapstructure:"monthly_queries"`
+	} `mapstructure:"tc_usage"`
 }
 
 func decoderDNSCNAMERecord(tfVals map[string]interface{}) (dnsCNAMERecordValues, error) {
@@ -39,7 +41,7 @@ func decoderDNSCNAMERecord(tfVals map[string]interface{}) (dnsCNAMERecordValues,
 func (p *Provider) newDNSCNAMERecord(vals dnsCNAMERecordValues) *DNSCNAMERecord {
 	inst := &DNSCNAMERecord{
 		location:       vals.Location,
-		monthlyQueries: &vals.MonthlyQueries,
+		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
 	return inst
 }
