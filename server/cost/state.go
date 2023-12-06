@@ -90,13 +90,13 @@ func (s *State) CostString() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	costString := fmt.Sprintf("- Total Cost: %v", cost)
+	costString := fmt.Sprintf("- Total Cost (per month): %v", cost)
 	for name, rs := range s.Resources {
 		rsCostString, err := rs.CostString()
 		if err != nil {
 			return "", err
 		}
-		costString = fmt.Sprintf("%s\nCosts for %s :", costString, name)
+		costString = fmt.Sprintf("%s\n--- Costs for %s :", costString, name)
 		costString = fmt.Sprintf("%s\n%s", costString, rsCostString)
 
 	}

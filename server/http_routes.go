@@ -22,6 +22,7 @@ func (h *HttpHandler) Register(e *echo.Echo) {
 
 	cost := v1.Group("/cost")
 	cost.GET("/resource", h.GetResourceCost)
+	cost.GET("/state", h.GetStateCost)
 }
 
 func bindValidate(ctx echo.Context, i any) error {
@@ -34,6 +35,54 @@ func bindValidate(ctx echo.Context, i any) error {
 	}
 
 	return nil
+}
+
+func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
+	var req resource.State
+	var qResources []query.Resource
+	if err := bindValidate(ctx, &req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	for _, res := range req.Resources {
+		if res.ProviderName == "azurerm" {
+			provider, err := azurermres.NewProvider(azurermres.ProviderName)
+			if err != nil {
+				return ctx.JSON(http.StatusInternalServerError, err.Error())
+			}
+			resources := make(map[string]resource.Resource)
+			resources[res.Address] = res
+			components := provider.ResourceComponents(resources, res)
+			qResources = append(qResources, query.Resource{
+				Address:    res.Address,
+				Provider:   res.ProviderName,
+				Type:       res.Type,
+				Components: components,
+			})
+		} else if res.ProviderName == "aws" {
+			provider, err := awsres.NewProvider(awsres.ProviderName, awsrg.Code(res.RegionCode))
+			if err != nil {
+				return ctx.JSON(http.StatusInternalServerError, err.Error())
+			}
+			resources := make(map[string]resource.Resource)
+			resources[res.Address] = res
+			components := provider.ResourceComponents(resources, res)
+			qResources = append(qResources, query.Resource{
+				Address:    res.Address,
+				Provider:   res.ProviderName,
+				Type:       res.Type,
+				Components: components,
+			})
+		}
+	}
+
+	state, err := cost.NewState(ctx.Request().Context(), h.backend, qResources)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return ctx.JSON(http.StatusOK, state)
 }
 
 func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
@@ -75,18 +124,6 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
-	//for _, re := range state.Resources {
-	//	fmt.Println("====================")
-	//	fmt.Println("RESOURCE", req.Address)
-	//	for _, comp := range re.Components {
-	//		for _, c := range comp {
-	//			fmt.Println("comp", c)
-	//			fmt.Println("comp cost", c.Cost())
-	//			fmt.Println("-------")
-	//		}
-	//	}
-	//}
-	//cost, err := state.Cost()
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}

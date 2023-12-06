@@ -18,7 +18,8 @@ type EchoError struct {
 }
 
 type OnboardServiceClient interface {
-	GetCost(req resource.Resource) (*cost.Cost, error)
+	GetResourceCost(req resource.Resource) (*cost.Cost, error)
+	GetStateCost(req []resource.Resource) (*cost.Cost, error)
 	IngestAws(service, region string) error
 	IngestAzure(service, region string) error
 }
@@ -57,8 +58,25 @@ func (s *serverClient) IngestAzure(service, region string) error {
 	return nil
 }
 
-func (s *serverClient) GetCost(req resource.Resource) (*cost.State, error) {
+func (s *serverClient) GetResourceCost(req resource.Resource) (*cost.State, error) {
 	url := fmt.Sprintf("%s/api/v1/cost/resource", s.baseURL)
+
+	payload, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	var cost cost.State
+	if statusCode, err := doRequest(http.MethodGet, url, payload, &cost); err != nil {
+		if 400 <= statusCode && statusCode < 500 {
+			return nil, echo.NewHTTPError(statusCode, err.Error())
+		}
+		return nil, err
+	}
+	return &cost, nil
+}
+
+func (s *serverClient) GetStateCost(req resource.State) (*cost.State, error) {
+	url := fmt.Sprintf("%s/api/v1/cost/state", s.baseURL)
 
 	payload, err := json.Marshal(req)
 	if err != nil {

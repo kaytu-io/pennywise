@@ -9,3 +9,7 @@ type Resource struct {
 	ProviderName string                 `json:"provider_name"`
 	Values       map[string]interface{} `json:"values"`
 }
+
+type State struct {
+	Resources []Resource `json:"resources"`
+}

@@ -32,15 +32,21 @@ func (c Component) Cost() Cost {
 
 func (c Component) CostString() string {
 	var str string
+	str = fmt.Sprintf("%v", c.Cost())
 	if !c.MonthlyQuantity.IsZero() {
-		str = fmt.Sprintf("%v monthly cost", c.Rate.Decimal)
+		str = fmt.Sprintf("%s (%v monthly cost", str, c.Rate.Decimal)
+		if c.Unit != "" {
+			str = fmt.Sprintf("%s per %s", str, c.Unit)
+		}
+		str = fmt.Sprintf("%s, qty: %s)", str, c.MonthlyQuantity)
 	} else if !c.HourlyQuantity.IsZero() {
-		str = fmt.Sprintf("%v hourly cost", c.Rate.Decimal)
+		str = fmt.Sprintf("%s (%v hourly cost", str, c.Rate.Decimal)
+		if c.Unit != "" {
+			str = fmt.Sprintf("%s per %s", str, c.Unit)
+		}
+		str = fmt.Sprintf("%s, qty: %s)", str, c.HourlyQuantity.Mul(HoursPerMonth))
 	} else {
 		return fmt.Sprintf("No cost")
-	}
-	if c.Unit != "" {
-		str = fmt.Sprintf("%s per %s", str, c.Unit)
 	}
 	return str
 }
