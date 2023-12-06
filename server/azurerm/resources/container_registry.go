@@ -13,8 +13,10 @@ type ContainerRegistry struct {
 	location                string
 	geoReplicationLocations int
 	sKU                     string
-	storageGB               *float64
-	monthlyBuildVCPUHrs     *float64
+
+	// Usage
+	storageGB           *float64
+	monthlyBuildVCPUHrs *float64
 }
 
 type ContainerRegistryValue struct {
@@ -22,9 +24,10 @@ type ContainerRegistryValue struct {
 	SKU            string                 `mapstructure:"sku"`
 	GeoReplication map[string]interface{} `mapstructure:"georeplications"`
 
-	// we should get this fields from user
-	StorageGB           *float64 `mapstructure:"storage_gb"`
-	MonthlyBuildVCPUHrs *float64 `mapstructure:"monthly_build_vcpu_hrs"`
+	Usage struct {
+		StorageGB           *float64 `mapstructure:"storage_gb"`
+		MonthlyBuildVCPUHrs *float64 `mapstructure:"monthly_build_vcpu_hrs"`
+	} `mapstructure:"tc_usage"`
 }
 
 func (p *Provider) newContainerRegistry(vals ContainerRegistryValue) *ContainerRegistry {
@@ -32,8 +35,8 @@ func (p *Provider) newContainerRegistry(vals ContainerRegistryValue) *ContainerR
 		location:                vals.Location,
 		sKU:                     vals.SKU,
 		geoReplicationLocations: len(vals.GeoReplication),
-		storageGB:               vals.StorageGB,
-		monthlyBuildVCPUHrs:     vals.MonthlyBuildVCPUHrs,
+		storageGB:               vals.Usage.StorageGB,
+		monthlyBuildVCPUHrs:     vals.Usage.MonthlyBuildVCPUHrs,
 	}
 	return inst
 }

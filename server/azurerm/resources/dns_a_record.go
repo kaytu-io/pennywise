@@ -27,7 +27,7 @@ type dnsARecordValues struct {
 	} `mapstructure:"tc_usage"`
 }
 
-func decoderDNSARecord(tfVals map[string]interface{}) (dnsARecordValues, error) {
+func decoderDNSSARecord(tfVals map[string]interface{}) (dnsARecordValues, error) {
 	var v dnsARecordValues
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
@@ -45,7 +45,7 @@ func decoderDNSARecord(tfVals map[string]interface{}) (dnsARecordValues, error) 
 	return v, nil
 }
 
-func (p *Provider) newDNSARecord(vals dnsARecordValues) *DNSARecord {
+func (p *Provider) newDNSSARecord(vals dnsARecordValues) *DNSARecord {
 	inst := &DNSARecord{
 		location:       vals.Location,
 		monthlyQueries: &vals.Usage.MonthlyQueries,

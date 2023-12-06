@@ -135,78 +135,61 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 		}
 		return p.newVirtualNetworkGatewayConnection(vals).Component()
 	case "azurerm_load_balancer":
+
 		return p.newLoadBalancer(loadBalancerValues{}).Components()
 	case "azurerm_dns_a_record":
-		vals, err := decoderDNSARecord(tfRes.Values)
+		vals, err := decoderDNSSARecord(tfRes.Values)
 		if err != nil {
 			return nil
 		}
-		monthlyQueries := int64(1500000000)
-		vals.MonthlyQueries = &monthlyQueries
-		return p.newDNSARecord(vals).component()
+		return p.newDNSSARecord(vals).component()
 	case "azurerm_dns_aaaa_record":
 		vals, err := decoderDNSAAAARecord(tfRes.Values)
 		if err != nil {
 			return nil
 		}
-		monthlyQueries := int64(1500000000)
-		vals.MonthlyQueries = monthlyQueries
 		return p.newDNSAAAARecord(vals).component()
 	case "azurerm_dns_caa_record":
 		vals, err := decoderDNSCAARecord(tfRes.Values)
 		if err != nil {
 			return nil
 		}
-		monthlyQueries := int64(1000000000)
-		vals.MonthlyQueries = monthlyQueries
 		return p.newDNSCAARecord(vals).component()
 	case "azurerm_dns_cname_record":
 		vals, err := decoderDNSCNAMERecord(tfRes.Values)
 		if err != nil {
 			return nil
 		}
-		monthlyQueries := int64(1000000000)
-		vals.MonthlyQueries = monthlyQueries
 		return p.newDNSCNAMERecord(vals).component()
 	case "azurerm_dns_mx_record":
 		vals, err := decoderDNSMXRecord(tfRes.Values)
 		if err != nil {
 			return nil
 		}
-		monthlyQueries := int64(1000000000)
-		vals.MonthlyQueries = monthlyQueries
 		return p.newDNSMXRecord(vals).component()
 	case "azurerm_dns_ns_record":
 		vals, err := decoderDNSNSRecord(tfRes.Values)
 		if err != nil {
 			return nil
 		}
-		monthlyQueries := int64(1000000000)
-		vals.MonthlyQueries = monthlyQueries
 		return p.newDNSNSRecord(vals).component()
 	case "azurerm_dns_ptr_record":
 		vals, err := decoderDNSPTRRecord(tfRes.Values)
 		if err != nil {
 			return nil
 		}
-		monthlyQueries := int64(1000000000)
-		vals.MonthlyQueries = monthlyQueries
 		return p.newDNSPTRRecord(vals).component()
 	case "azurerm_dns_srv_record":
-		vals, err := decoderDNSARecord(tfRes.Values)
+		vals, err := decoderDNSSARecord(tfRes.Values)
 		if err != nil {
 			return nil
 		}
-		monthlyQueries := int64(1000000000)
-		vals.MonthlyQueries = &monthlyQueries
-		return p.newDNSARecord(vals).component()
+		return p.newDNSSARecord(vals).component()
 	case "azurerm_dns_txt_record":
 		vals, err := decoderDNSTXTRecord(tfRes.Values)
 		if err != nil {
 			return nil
 		}
-		monthlyQueries := int64(1000000000)
-		vals.MonthlyQueries = monthlyQueries
 		return p.newDNSTXTRecord(vals).component()
 	case "azurerm_dns_zone":
 		vals, err := decoderRMDNSZone(tfRes.Values)
@@ -219,10 +202,6 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 		if err != nil {
 			return nil
 		}
-		storageGb := 150.0
-		monthlyBuildVCPUHrs := 150.0
-		vals.StorageGB = &storageGb
-		vals.MonthlyBuildVCPUHrs = &monthlyBuildVCPUHrs
 		return p.newContainerRegistry(vals).component()
 	case "azurerm_kubernetes_cluster":
 		vals, err := decoderKubernetesCluster(tfRes.Values)
