@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
@@ -39,7 +38,6 @@ type loadBalancerValues struct {
 
 // decodeLoadBalancerValues decodes and returns computeInstanceValues from a Terraform values map.
 func decodeLoadBalancerValues(tfVals map[string]interface{}) (loadBalancerValues, error) {
-	fmt.Println("TF VALS", tfVals)
 	var v loadBalancerValues
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
@@ -81,6 +79,10 @@ func (p *Provider) newLoadBalancer(vals loadBalancerValues) *LoadBalancer {
 func (inst *LoadBalancer) Components() []query.Component {
 	var components []query.Component
 
+	if inst.sku == "Basic" {
+		return nil
+	}
+
 	if inst.skuTier == "Regional" {
 		components = append(components, inst.regionalIncludedRulesComponent(inst.provider.key, inst.location))
 		// NAT rules are free.
@@ -116,7 +118,7 @@ func regionalDataProceedComponent(key, location string, dataProceed decimal.Deci
 			Location: util.StringPtr(location),
 			AttributeFilters: []*product.AttributeFilter{
 				{Key: "sku_name", Value: util.StringPtr("Standard")},
-				{Key: "meter_name", ValueRegex: util.StringPtr("Data Processed")},
+				{Key: "meter_name", Value: util.StringPtr("Standard Data Processed")},
 			},
 		},
 	}
@@ -134,7 +136,7 @@ func (inst *LoadBalancer) globalDataProceedComponent(key, location string, dataP
 			Location: util.StringPtr(location),
 			AttributeFilters: []*product.AttributeFilter{
 				{Key: "sku_name", Value: util.StringPtr("Global")},
-				{Key: "meter_name", ValueRegex: util.StringPtr("Data Processed")},
+				{Key: "meter_name", ValueRegex: util.StringPtr("Global Data Processed")},
 			},
 		},
 	}

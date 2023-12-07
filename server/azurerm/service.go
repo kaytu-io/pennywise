@@ -18,5 +18,6 @@ var (
 		"Storage":                {},
 		"Container Registry":     {},
 		"Azure DNS":              {},
+		"Load Balancer":          {},
 	}
 )
