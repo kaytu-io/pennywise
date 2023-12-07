@@ -19,7 +19,7 @@ const ProviderName = "azurerm"
 
 var (
 	// ErrNotSupportedService reports that the service is not supported
-	ErrNotSupportedService = errors.New("not supported service")
+	ErrNotSupportedService = errors.New("service not supported")
 )
 
 // Ingester is the entity that will manage the ingestion process from AzureRM
@@ -38,8 +38,9 @@ type Ingester struct {
 
 // NewIngester returns a new Ingester for AzureRM for the specified service and region (ex: francecentral) with the
 // given options
-func NewIngester(ctx context.Context, service, region string, opts ...Option) (*Ingester, error) {
+func NewIngester(service, region string, opts ...Option) (*Ingester, error) {
 	if _, ok := services[service]; !ok {
+		fmt.Println(service, "not supported")
 		return nil, ErrNotSupportedService
 	}
 	ing := &Ingester{

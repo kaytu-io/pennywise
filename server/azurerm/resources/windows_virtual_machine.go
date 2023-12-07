@@ -101,6 +101,7 @@ func (inst *WindowsVirtualMachine) windowsVirtualMachineComponent() query.Compon
 func windowsVirtualMachineComponent(key, location, size, purchaseOption string, qty decimal.Decimal) query.Component {
 	return query.Component{
 		Name:            "Compute",
+		Unit:            "Monthly Hours",
 		MonthlyQuantity: qty,
 		ProductFilter: &product.Filter{
 			Provider: util.StringPtr(key),

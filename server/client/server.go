@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -17,7 +18,8 @@ type EchoError struct {
 }
 
 type OnboardServiceClient interface {
-	GetCost(req resource.Resource) (*cost.Cost, error)
+	GetResourceCost(req resource.Resource) (*cost.Cost, error)
+	GetStateCost(req []resource.Resource) (*cost.Cost, error)
 	IngestAws(service, region string) error
 	IngestAzure(service, region string) error
 }
@@ -33,8 +35,8 @@ func NewPennywiseServerClient(baseURL string) *serverClient {
 }
 
 func (s *serverClient) IngestAws(service, region string) error {
-	url := fmt.Sprintf("%s/api/v1/ingest/azure?service=%s&region=%s", s.baseURL, service, region)
-
+	url := fmt.Sprintf("%s/api/v1/ingest/aws?service=%s&region=%s", s.baseURL, service, region)
+	url = strings.ReplaceAll(url, " ", "%20")
 	if statusCode, err := doRequest(http.MethodPut, url, nil, nil); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return echo.NewHTTPError(statusCode, err.Error())
@@ -45,8 +47,8 @@ func (s *serverClient) IngestAws(service, region string) error {
 }
 
 func (s *serverClient) IngestAzure(service, region string) error {
-	url := fmt.Sprintf("%s/api/v1/ingest/aws?service=%s&region=%s", s.baseURL, service, region)
-
+	url := fmt.Sprintf("%s/api/v1/ingest/azure?service=%s&region=%s", s.baseURL, service, region)
+	url = strings.ReplaceAll(url, " ", "%20")
 	if statusCode, err := doRequest(http.MethodPut, url, nil, nil); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return echo.NewHTTPError(statusCode, err.Error())
@@ -56,14 +58,31 @@ func (s *serverClient) IngestAzure(service, region string) error {
 	return nil
 }
 
-func (s *serverClient) GetCost(req resource.Resource) (*cost.Cost, error) {
+func (s *serverClient) GetResourceCost(req resource.Resource) (*cost.State, error) {
 	url := fmt.Sprintf("%s/api/v1/cost/resource", s.baseURL)
 
 	payload, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
-	var cost cost.Cost
+	var cost cost.State
+	if statusCode, err := doRequest(http.MethodGet, url, payload, &cost); err != nil {
+		if 400 <= statusCode && statusCode < 500 {
+			return nil, echo.NewHTTPError(statusCode, err.Error())
+		}
+		return nil, err
+	}
+	return &cost, nil
+}
+
+func (s *serverClient) GetStateCost(req resource.State) (*cost.State, error) {
+	url := fmt.Sprintf("%s/api/v1/cost/state", s.baseURL)
+
+	payload, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	var cost cost.State
 	if statusCode, err := doRequest(http.MethodGet, url, payload, &cost); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return nil, echo.NewHTTPError(statusCode, err.Error())

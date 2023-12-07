@@ -1,49 +1,59 @@
 package cost
 
 import (
+	"fmt"
 	"github.com/shopspring/decimal"
 )
 
 // Component describes the pricing of a single resource cost component. This includes Rate and Quantity
 // and allows for final cost computation.
 type Component struct {
-	Name     string
-	Quantity decimal.Decimal
-	Unit     string
-	Rate     Cost
-	Details  []string
-	Usage    bool
+	Name            string
+	MonthlyQuantity decimal.Decimal
+	HourlyQuantity  decimal.Decimal
+	Unit            string
+	Rate            Cost
+	Details         []string
+	Usage           bool
 
 	Error error
 }
 
 // Cost returns the cost of this component (Rate multiplied by Quantity).
 func (c Component) Cost() Cost {
-	if c.Rate.IsZero() || c.Quantity.IsZero() {
+	if !c.MonthlyQuantity.IsZero() {
+		return c.Rate.MulDecimal(c.MonthlyQuantity)
+	} else if !c.HourlyQuantity.IsZero() {
+		return c.Rate.MulDecimal(c.HourlyQuantity.Mul(HoursPerMonth))
+	} else {
 		return Zero
 	}
-	return c.Rate.MulDecimal(c.Quantity)
+}
+
+func (c Component) CostString() string {
+	var str string
+	str = fmt.Sprintf("%v", c.Cost())
+	if !c.MonthlyQuantity.IsZero() {
+		str = fmt.Sprintf("%s (%v monthly cost", str, c.Rate.Decimal)
+		if c.Unit != "" {
+			str = fmt.Sprintf("%s per %s", str, c.Unit)
+		}
+		str = fmt.Sprintf("%s, qty: %s)", str, c.MonthlyQuantity)
+	} else if !c.HourlyQuantity.IsZero() {
+		str = fmt.Sprintf("%s (%v hourly cost", str, c.Rate.Decimal)
+		if c.Unit != "" {
+			str = fmt.Sprintf("%s per %s", str, c.Unit)
+		}
+		str = fmt.Sprintf("%s, qty: %s)", str, c.HourlyQuantity.Mul(HoursPerMonth))
+	} else {
+		return fmt.Sprintf("No cost")
+	}
+	return str
 }
 
 // ComponentDiff is a difference between the Prior and Planned Component.
 type ComponentDiff struct {
 	Prior, Planned *Component
-}
-
-// PriorCost returns the full cost of the Prior Component or decimal.Zero if it doesn't exist.
-func (cd ComponentDiff) PriorCost() Cost {
-	if cd.Prior == nil {
-		return Zero
-	}
-	return cd.Prior.Cost()
-}
-
-// PlannedCost returns the full cost of the Planned Component or decimal.Zero if it doesn't exist.
-func (cd ComponentDiff) PlannedCost() Cost {
-	if cd.Planned == nil {
-		return Zero
-	}
-	return cd.Planned.Cost()
 }
 
 // Valid returns true if there are no errors in both the Planned and Prior components.

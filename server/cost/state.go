@@ -50,21 +50,14 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 				continue
 			}
 
-			quantity := comp.MonthlyQuantity
-			rate := NewMonthly(prices[0].Value, prices[0].Currency)
-
-			if quantity.IsZero() {
-				quantity = comp.HourlyQuantity
-				rate = NewHourly(prices[0].Value, prices[0].Currency)
-			}
-
 			component := Component{
-				Name:     comp.Name,
-				Quantity: quantity,
-				Unit:     comp.Unit,
-				Rate:     rate,
-				Details:  comp.Details,
-				Usage:    comp.Usage,
+				Name:            comp.Name,
+				MonthlyQuantity: comp.MonthlyQuantity,
+				HourlyQuantity:  comp.HourlyQuantity,
+				Unit:            comp.Unit,
+				Rate:            Cost{Decimal: prices[0].Value, Currency: prices[0].Currency},
+				Details:         comp.Details,
+				Usage:           comp.Usage,
 			}
 
 			state.addComponent(res.Address, comp.Name, component)
@@ -90,6 +83,24 @@ func (s *State) Cost() (Cost, error) {
 	}
 
 	return total, nil
+}
+
+func (s *State) CostString() (string, error) {
+	cost, err := s.Cost()
+	if err != nil {
+		return "", err
+	}
+	costString := fmt.Sprintf("- Total Cost (per month): %v", cost)
+	for name, rs := range s.Resources {
+		rsCostString, err := rs.CostString()
+		if err != nil {
+			return "", err
+		}
+		costString = fmt.Sprintf("%s\n--- Costs for %s :", costString, name)
+		costString = fmt.Sprintf("%s\n%s", costString, rsCostString)
+
+	}
+	return costString, nil
 }
 
 // ensureResource creates Resource at the given address if it doesn't already exist.

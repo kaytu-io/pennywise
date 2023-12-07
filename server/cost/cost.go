@@ -21,16 +21,6 @@ type Cost struct {
 // Zero is Cost with zero value.
 var Zero = Cost{}
 
-// NewMonthly returns a new Cost from price per month with currency.
-func NewMonthly(monthly decimal.Decimal, currency string) Cost {
-	return Cost{Decimal: monthly, Currency: currency}
-}
-
-// NewHourly returns a new Cost from price per hour with currency.
-func NewHourly(hourly decimal.Decimal, currency string) Cost {
-	return Cost{Decimal: hourly.Mul(HoursPerMonth), Currency: currency}
-}
-
 // Monthly returns the cost per month.
 func (c Cost) Monthly() decimal.Decimal {
 	return c.Decimal

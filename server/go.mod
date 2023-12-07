@@ -20,6 +20,7 @@ require (
 	golang.org/x/net v0.17.0
 	golang.org/x/text v0.13.0
 	golang.org/x/tools v0.6.0
+	gopkg.in/go-playground/validator.v9 v9.31.0
 
 )
 
@@ -48,12 +49,10 @@ require (
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 replace github.com/hashicorp/terraform => github.com/cycloidio/terraform v1.1.9-cy
-
-replace github.com/kaytu-io/pennywise/server => /home/arta/data/codes/Work/Kaytu/pennywise/server
 
 replace github.com/gruntwork-io/terragrunt => github.com/cycloidio/terragrunt v0.0.0-20230905115542-1fe1ff682fd9

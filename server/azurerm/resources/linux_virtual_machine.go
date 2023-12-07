@@ -96,6 +96,7 @@ func (inst *LinuxVirtualMachine) linuxVirtualMachineComponent() query.Component 
 func linuxVirtualMachineComponent(key, location, size string, qty decimal.Decimal) query.Component {
 	return query.Component{
 		Name:            "Compute",
+		Unit:            "Monthly Hours",
 		MonthlyQuantity: qty,
 		ProductFilter: &product.Filter{
 			Provider: util.StringPtr(key),
