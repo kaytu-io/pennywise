@@ -43,5 +43,4 @@ func init() {
 	ingest.Flags().String("service", "", "service")
 	ingest.MarkFlagRequired("service")
 	ingest.Flags().String("region", "", "region")
-	ingest.MarkFlagRequired("region")
 }
