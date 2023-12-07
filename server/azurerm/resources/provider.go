@@ -115,6 +115,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newSnapshot(vals).Components()
+	case "azurerm_lb":
+		vals, err := decodeLoadBalancerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newLoadBalancer(vals).Components()
 	default:
 		return nil
 	}

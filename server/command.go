@@ -43,7 +43,6 @@ func start(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("new logger: %w", err)
 	}
-
 	handler, err := InitializeHttpHandler(logger, MySQLUser, MySQLPassword, MySQLHost, MySQLPort, MySQLDb)
 	if err != nil {
 		return fmt.Errorf("init http handler: %w", err)

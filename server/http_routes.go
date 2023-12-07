@@ -79,9 +79,6 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
-	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
-	}
 	return ctx.JSON(http.StatusOK, state)
 }
 
