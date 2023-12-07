@@ -52,6 +52,9 @@ var Default = Usage{
 	"azurerm_windows_virtual_machine": map[string]interface{}{
 		"monthly_hours": 730,
 	},
+	"azurerm_lb": map[string]interface{}{
+		"daily_data_proceed": 1000,
+	},
 }
 
 // Usage is the struct defining all the configure usages
