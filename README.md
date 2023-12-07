@@ -22,14 +22,13 @@ git clone https://github.com/kaytu-io/pennywise.git
 cd pennywise/server
 ```
 
-Set up the server configuration by editing config.yaml.
-
-Run the migrator to set up the required database tables:
+Set up the server configuration by editing config.yaml or by exporting environmental variables:
+MYSQL_HOST, MYSQL_PORT, MYSQL_DB, MYSQL_USERNAME, MYSQL_PASSWORD, HTTP_ADDRESS
 
 Start the Pennywise server:
 
 ```shell
-go run server.go
+go run .
 ```
 
 ### CLI Program
@@ -40,26 +39,27 @@ Navigate to the CLI program directory:
 ```shell
 cd pennywise/cli
 ```
-
-Create a Terraform plan file:
-
-```shell
-terraform plan -out planfile.tfplan
-```
-
-Generate a JSON file from the Terraform plan:
+Run the ingester for the services and regions you need (you can store service data for all regions if you don't define the region).
 
 ```shell
-terraform show -json planfile.tfplan > tfplan.json
+go run . ingest --provider (azure|aws) --service service-name --region region
 ```
-Run the CLI program with the generated Terraform plan file:
+
+Then run the cost estimator for your terraform project.
 
 ```shell
-go run cli.go -f planfile.tfplan
+go run . cost terraform --project path-to-project
 ```
-
-and the run with the JSON file:
-
-```shell
-go run cli.go -json tfplan.json
-```
+You can also specify the usage file path by usage tag.
+The usage file is responsible for getting usage details from user. As an example:
+{
+  "azurerm_linux_virtual_machine": {
+    "monthly_hours": 730
+  },
+  "azurerm_windows_virtual_machine": {
+    "monthly_hours": 730
+  },
+  "azurerm_lb": {
+    "monthly_data_proceed": 100
+  }
+}
