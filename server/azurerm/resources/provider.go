@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
 )
@@ -115,6 +116,13 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newSnapshot(vals).Components()
+	case "azurerm_lb":
+		vals, err := decodeLoadBalancerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		fmt.Println("VALS", vals)
+		return p.newLoadBalancer(vals).Components()
 	default:
 		return nil
 	}

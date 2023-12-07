@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/kaytu-io/pennywise/server/aws"
 	awsrg "github.com/kaytu-io/pennywise/server/aws/region"
 	awsres "github.com/kaytu-io/pennywise/server/aws/resources"
@@ -52,6 +53,8 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 			resources := make(map[string]resource.Resource)
 			resources[res.Address] = res
 			components := provider.ResourceComponents(resources, res)
+			fmt.Println("=====================")
+			fmt.Println("COMPONENTS", components)
 			qResources = append(qResources, query.Resource{
 				Address:    res.Address,
 				Provider:   res.ProviderName,
@@ -76,9 +79,6 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 	}
 
 	state, err := cost.NewState(ctx.Request().Context(), h.backend, qResources)
-	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
-	}
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
