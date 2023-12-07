@@ -834,6 +834,8 @@ github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7V
 github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0/go.mod h1:1NbS8ALrpOvjt0rHPNLyCIeMtbizbir8U//inJ+zuB8=
 github.com/kaytu-io/infracost v0.0.0-20231205120500-f8646d55af6b h1:+/DlU456I3uM+GeBpfCOiL2B54ZiyfOYXu0aHfaL+g0=
 github.com/kaytu-io/infracost v0.0.0-20231205120500-f8646d55af6b/go.mod h1:fAX40ddPkC+xBG63N8CPMzWuq4wvP4qhtzhJLEp7ppI=
+github.com/kaytu-io/pennywise/server v0.0.0-20231204201217-2c09c2109184 h1:nbPsF50pav2yftlorDtBtpd4ye3KVSpTnI/gf5iNNsY=
+github.com/kaytu-io/pennywise/server v0.0.0-20231204201217-2c09c2109184/go.mod h1:qiNPRjFXu8e7jclkWoBUuxRDXrQ6QC0sFRLeW/ku/lc=
 github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 h1:Z9n2FFNUXsshfwJMBgNA0RU6/i7WVaAegv3PtuIHPMs=
 github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51/go.mod h1:CzGEWj7cYgsdH8dAjBGEr58BoE7ScuLd+fwFZ44+/x8=
 github.com/kelseyhightower/envconfig v1.4.0 h1:Im6hONhd3pLkfDFsbRgu68RDNkGF1r3dvMUtDTo2cv8=
