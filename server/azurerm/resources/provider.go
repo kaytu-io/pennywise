@@ -121,6 +121,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newLoadBalancer(vals).Components()
+	case "azurerm_container_registry":
+		vals, err := decoderContainerRegistry(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newContainerRegistry(vals).component()
 	default:
 		return nil
 	}

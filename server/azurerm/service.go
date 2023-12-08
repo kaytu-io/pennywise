@@ -19,5 +19,6 @@ var (
 		"Container Registry":     {},
 		"Azure DNS":              {},
 		"Load Balancer":          {},
+		"Virtual Network":        {},
 	}
 )
