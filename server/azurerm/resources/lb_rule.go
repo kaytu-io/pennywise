@@ -26,7 +26,7 @@ type loadBalancerRuleValues struct {
 	LoadBalancer SourceLoadBalancer `mapstructure:"loadbalancer_id"`
 }
 
-// decodeLoadBalancerValues decodes and returns computeInstanceValues from a Terraform values map.
+// decodeLoadBalancerRuleValues decodes and returns computeInstanceValues from a Terraform values map.
 func decodeLoadBalancerRuleValues(tfVals map[string]interface{}) (loadBalancerRuleValues, error) {
 	var v loadBalancerRuleValues
 	config := &mapstructure.DecoderConfig{

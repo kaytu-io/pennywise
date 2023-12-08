@@ -133,6 +133,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newLoadBalancerRule(vals).Components()
+	case "azurerm_application_gateway":
+		vals, err := decodeApplicationGatewayValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newApplicationGateway(vals).Components()
 	default:
 		return nil
 	}

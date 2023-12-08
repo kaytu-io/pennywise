@@ -99,7 +99,8 @@ func (ing *Ingester) Ingest(ctx context.Context, chSize int) <-chan *price.WithP
 					Value:    decimal.NewFromFloat(rp.UnitPrice),
 					Currency: rp.CurrencyCode,
 					Attributes: map[string]string{
-						"type": rp.Type,
+						"type":               rp.Type,
+						"tier_minimum_units": fmt.Sprintf("%v", rp.TierMinimumUnits),
 					},
 				},
 				Product: prod,
