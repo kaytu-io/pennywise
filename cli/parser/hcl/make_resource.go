@@ -8,6 +8,12 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_snapshot": {
 		Refs: []string{"source_uri"},
 	},
+	"azurerm_lb_rule": {
+		Refs: []string{"loadbalancer_id"},
+	},
+	"azurerm_lb_outbound_rule": {
+		Refs: []string{"loadbalancer_id"},
+	},
 }
 
 type ResourceFunction func(Resource) (Resource, error)
@@ -59,7 +65,6 @@ func findResource(rss []Resource, id string) (*Resource, error) {
 				}
 			}
 		}
-		return nil, fmt.Errorf("id field not found")
 	}
 	return nil, fmt.Errorf("resource not found")
 }

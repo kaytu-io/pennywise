@@ -20,7 +20,7 @@ type LoadBalancer struct {
 	skuTier     string
 
 	// Usage
-	dailyDataProceed decimal.Decimal
+	monthlyDataProceed decimal.Decimal
 }
 
 // loadBalancerValues is holds the values that we need to be able
@@ -32,11 +32,11 @@ type loadBalancerValues struct {
 	SkuTier     string  `mapstructure:"sku_tier"`
 
 	Usage struct {
-		DailyDataProceed float64 `mapstructure:"daily_data_proceed"`
+		MonthlyDataProceed float64 `mapstructure:"monthly_data_proceed"`
 	} `mapstructure:"tc_usage"`
 }
 
-// decodeLoadBalancerValues decodes and returns computeInstanceValues from a Terraform values map.
+// decodeLoadBalancerValues decodes and returns loadBalancerValues from a Terraform values map.
 func decodeLoadBalancerValues(tfVals map[string]interface{}) (loadBalancerValues, error) {
 	var v loadBalancerValues
 	config := &mapstructure.DecoderConfig{
@@ -55,16 +55,16 @@ func decodeLoadBalancerValues(tfVals map[string]interface{}) (loadBalancerValues
 	return v, nil
 }
 
-// newManagedStorage initializes a new LoadBalancer from the provider
+// newLoadBalancer initializes a new LoadBalancer from the provider
 func (p *Provider) newLoadBalancer(vals loadBalancerValues) *LoadBalancer {
 	inst := &LoadBalancer{
 		provider: p,
 
-		location:         convertRegion(vals.Location),
-		sku:              "Basic",
-		rulesNumber:      decimal.NewFromFloat(vals.RulesNumber),
-		skuTier:          "Regional",
-		dailyDataProceed: decimal.NewFromFloat(vals.Usage.DailyDataProceed),
+		location:           convertRegion(vals.Location),
+		sku:                "Basic",
+		rulesNumber:        decimal.NewFromFloat(vals.RulesNumber),
+		skuTier:            "Regional",
+		monthlyDataProceed: decimal.NewFromFloat(vals.Usage.MonthlyDataProceed),
 	}
 	if vals.Sku != "" {
 		inst.sku = vals.Sku
@@ -84,23 +84,25 @@ func (inst *LoadBalancer) Components() []query.Component {
 	}
 
 	if inst.skuTier == "Regional" {
-		components = append(components, inst.regionalIncludedRulesComponent(inst.provider.key, inst.location))
+		// TODO: Check include rules. (They were calculated in azure web page but not in infracost)
+		//components = append(components, RegionalIncludedRulesComponent(inst.provider.key, inst.location))
 		// NAT rules are free.
 
 		if inst.rulesNumber.InexactFloat64() > 5 {
-			components = append(components, inst.regionalOverageRulesComponent(inst.provider.key, inst.location, inst.rulesNumber.Sub(decimal.NewFromInt(5))))
+			components = append(components, RegionalOverageRulesComponent(inst.provider.key, inst.location, inst.rulesNumber.Sub(decimal.NewFromInt(5))))
 		}
 
-		components = append(components, regionalDataProceedComponent(inst.provider.key, inst.location, inst.dailyDataProceed))
+		components = append(components, regionalDataProceedComponent(inst.provider.key, inst.location, inst.monthlyDataProceed))
 	} else if inst.skuTier == "Global" {
-		components = append(components, inst.globalIncludedRulesComponent(inst.provider.key, inst.location))
+		// TODO: Check include rules. (They were calculated in azure web page but not in infracost)
+		//components = append(components, GlobalIncludedRulesComponent(inst.provider.key, inst.location))
 		// NAT rules are free.
 
 		if inst.rulesNumber.InexactFloat64() > 5 {
-			components = append(components, inst.globalOverageRulesComponent(inst.provider.key, inst.location, inst.rulesNumber.Sub(decimal.NewFromInt(5))))
+			components = append(components, GlobalOverageRulesComponent(inst.provider.key, inst.location, inst.rulesNumber.Sub(decimal.NewFromInt(5))))
 		}
 
-		components = append(components, inst.globalDataProceedComponent(inst.provider.key, inst.location, inst.dailyDataProceed))
+		components = append(components, inst.globalDataProceedComponent(inst.provider.key, inst.location, inst.monthlyDataProceed))
 	}
 
 	return components
