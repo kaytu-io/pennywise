@@ -139,6 +139,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newApplicationGateway(vals).Components()
+	case "azurerm_nat_gateway":
+		vals, err := decodeNatGatewayValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newNatGateway(vals).Components()
 	default:
 		return nil
 	}

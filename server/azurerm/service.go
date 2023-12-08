@@ -13,5 +13,6 @@ var (
 		"Azure DNS":           {},
 		"Load Balancer":       {},
 		"Application Gateway": {},
+		"NAT Gateway":         {},
 	}
 )

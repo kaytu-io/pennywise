@@ -38,7 +38,7 @@ type ApplicationGateway struct {
 }
 
 // applicationGatewayValues is holds the values that we need to be able
-// to calculate the price of the ComputeInstance
+// to calculate the price of the ApplicationGateway
 type applicationGatewayValues struct {
 	Location               string                                     `mapstructure:"location"`
 	Sku                    []ApplicationGatewaySku                    `mapstructure:"sku"`
@@ -78,6 +78,7 @@ func (p *Provider) newApplicationGateway(vals applicationGatewayValues) *Applica
 		sku:                    vals.Sku,
 		autoscaleConfiguration: vals.AutoscaleConfiguration,
 		capacityUnits:          vals.Usage.CapacityUnits,
+		monthlyDataProcessedGb: vals.Usage.MonthlyDataProcessedGb,
 	}
 	return inst
 }
