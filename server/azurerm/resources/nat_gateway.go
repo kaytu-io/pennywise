@@ -10,7 +10,7 @@ import (
 )
 
 // NatGateway is the entity that holds the logic to calculate price
-// of the azurerm_application_gateway
+// of the azurerm_nat_gateway
 type NatGateway struct {
 	provider *Provider
 
@@ -21,7 +21,7 @@ type NatGateway struct {
 }
 
 // natGatewayValues is holds the values that we need to be able
-// to calculate the price of the ComputeInstance
+// to calculate the price of the NatGateway
 type natGatewayValues struct {
 	Location string `mapstructure:"location"`
 
