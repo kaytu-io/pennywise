@@ -121,6 +121,30 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newLoadBalancer(vals).Components()
+	case "azurerm_lb_rule":
+		vals, err := decodeLoadBalancerRuleValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newLoadBalancerRule(vals).Components()
+	case "azurerm_lb_outbound_rule":
+		vals, err := decodeLoadBalancerRuleValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newLoadBalancerRule(vals).Components()
+	case "azurerm_application_gateway":
+		vals, err := decodeApplicationGatewayValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newApplicationGateway(vals).Components()
+	case "azurerm_nat_gateway":
+		vals, err := decodeNatGatewayValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newNatGateway(vals).Components()
 	case "azurerm_container_registry":
 		vals, err := decoderContainerRegistry(tfRes.Values)
 		if err != nil {

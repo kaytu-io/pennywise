@@ -1,6 +1,8 @@
 package tier_request
 
-import "github.com/shopspring/decimal"
+import (
+	"github.com/shopspring/decimal"
+)
 
 // Use this method to calculate a resource's tiers
 // Assuming a resource with cost component tiers like this: "first 1GB, next 9GB, over 50GB", in
