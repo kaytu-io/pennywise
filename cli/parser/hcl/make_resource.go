@@ -11,6 +11,9 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_lb_rule": {
 		Refs: []string{"loadbalancer_id"},
 	},
+	"azurerm_lb_outbound_rule": {
+		Refs: []string{"loadbalancer_id"},
+	},
 }
 
 type ResourceFunction func(Resource) (Resource, error)

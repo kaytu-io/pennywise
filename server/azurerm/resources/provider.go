@@ -127,6 +127,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newLoadBalancerRule(vals).Components()
+	case "azurerm_lb_outbound_rule":
+		vals, err := decodeLoadBalancerRuleValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newLoadBalancerRule(vals).Components()
 	default:
 		return nil
 	}
