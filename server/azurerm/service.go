@@ -14,5 +14,6 @@ var (
 		"Load Balancer":       {},
 		"Application Gateway": {},
 		"NAT Gateway":         {},
+		"Virtual Network":     {},
 	}
 )

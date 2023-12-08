@@ -145,6 +145,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newNatGateway(vals).Components()
+	case "azurerm_public_ip":
+		vals, err := decodePublicIPValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPublicIP(vals).Components()
 	default:
 		return nil
 	}
