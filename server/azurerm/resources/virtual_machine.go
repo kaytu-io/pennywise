@@ -13,8 +13,9 @@ import (
 type OS string
 
 type OsDisk struct {
-	storageAccountType string
-	diskSizeGb         decimal.Decimal
+	Caching            string  `mapstructure:"caching"`
+	StorageAccountType string  `mapstructure:"storage_account_type"`
+	DiskSizeGb         float64 `mapstructure:"disk_size_gb"`
 }
 
 // VirtualMachine is the entity that holds the logic to calculate price
@@ -192,10 +193,17 @@ func ultraSSDReservationCostComponent(key, location string) query.Component {
 }
 
 func osDiskSubResource(provider *Provider, location string, osDisk []OsDisk, monthlyDiskOperations *decimal.Decimal) []query.Component {
+	diskOperations := float64(0)
+	if monthlyDiskOperations != nil {
+		diskOperations = monthlyDiskOperations.InexactFloat64()
+	}
 	managedStorage := provider.newManagedStorage(managedDiskValues{
-		StorageAccountType: osDisk[0].storageAccountType,
+		StorageAccountType: osDisk[0].StorageAccountType,
 		Location:           location,
-		DiskSizeGb:         osDisk[0].diskSizeGb.InexactFloat64(),
+		DiskSizeGb:         osDisk[0].DiskSizeGb,
+		Usage: struct {
+			MonthlyDiskOperations float64 `mapstructure:"monthly_disk_operations"`
+		}{MonthlyDiskOperations: diskOperations},
 	})
 	return managedStorage.Components()
 }

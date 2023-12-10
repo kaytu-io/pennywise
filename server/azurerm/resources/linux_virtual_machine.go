@@ -11,7 +11,7 @@ import (
 )
 
 // LinuxVirtualMachine is the entity that holds the logic to calculate price
-// of the google_compute_instance
+// of the azurerm_linux_virtual_machine
 type LinuxVirtualMachine struct {
 	provider *Provider
 
@@ -62,7 +62,7 @@ func decodeLinuxVirtualMachineValues(tfVals map[string]interface{}) (linuxVirtua
 func (p *Provider) newLinuxVirtualMachine(vals linuxVirtualMachineValues) *LinuxVirtualMachine {
 	var osDisks []OsDisk
 	for _, disk := range vals.OsDisk {
-		osDisks = append(osDisks, OsDisk{storageAccountType: disk.StorageAccountType, diskSizeGb: decimal.NewFromFloat(disk.DiskSizeGb)})
+		osDisks = append(osDisks, OsDisk{StorageAccountType: disk.StorageAccountType, DiskSizeGb: disk.DiskSizeGb})
 	}
 
 	inst := &LinuxVirtualMachine{
