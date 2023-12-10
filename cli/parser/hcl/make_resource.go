@@ -14,6 +14,9 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_lb_outbound_rule": {
 		Refs: []string{"loadbalancer_id"},
 	},
+	"azurerm_virtual_network_gateway_connection": {
+		Refs: []string{"virtual_network_gateway_id"},
+	},
 }
 
 type ResourceFunction func(Resource) (Resource, error)
