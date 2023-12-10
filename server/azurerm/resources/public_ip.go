@@ -29,7 +29,7 @@ type publicIPValues struct {
 	Sku              *string `mapstructure:"sku"`
 }
 
-// decodePublicIPValues decodes and returns natGatewayValues from a Terraform values map.
+// decodePublicIPValues decodes and returns publicIPValues from a Terraform values map.
 func decodePublicIPValues(tfVals map[string]interface{}) (publicIPValues, error) {
 	var v publicIPValues
 	config := &mapstructure.DecoderConfig{

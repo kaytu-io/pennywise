@@ -151,6 +151,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newPublicIP(vals).Components()
+	case "azurerm_public_ip_prefix":
+		vals, err := decodePublicIPPrefixValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPublicIPPrefix(vals).Components()
 	case "azurerm_container_registry":
 		vals, err := decoderContainerRegistry(tfRes.Values)
 		if err != nil {
