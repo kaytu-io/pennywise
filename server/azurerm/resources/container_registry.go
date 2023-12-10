@@ -42,7 +42,7 @@ func (p *Provider) newContainerRegistry(vals ContainerRegistryValue) *ContainerR
 	return inst
 }
 
-func decoderContainerRegistry(tfVals map[string]interface{}) (ContainerRegistryValue, error) {
+func decodeContainerRegistry(tfVals map[string]interface{}) (ContainerRegistryValue, error) {
 	var v ContainerRegistryValue
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
