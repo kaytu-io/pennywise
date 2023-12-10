@@ -145,12 +145,30 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newNatGateway(vals).Components()
+	case "azurerm_public_ip":
+		vals, err := decodePublicIPValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPublicIP(vals).Components()
+	case "azurerm_public_ip_prefix":
+		vals, err := decodePublicIPPrefixValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPublicIPPrefix(vals).Components()
 	case "azurerm_container_registry":
 		vals, err := decodeContainerRegistry(tfRes.Values)
 		if err != nil {
 			return nil
 		}
 		return p.newContainerRegistry(vals).component()
+	case "azurerm_private_endpoint":
+		vals, err := decodePrivateEndpointValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPrivateEndpoint(vals).Components()
 	case "azurerm_virtual_network_gateway":
 		vals, err := decodeVirtualNetworkGateway(tfRes.Values)
 		if err != nil {

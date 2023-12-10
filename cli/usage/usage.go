@@ -53,7 +53,7 @@ var Default = Usage{
 		"monthly_hours": 730,
 	},
 	"azurerm_lb": map[string]interface{}{
-		"daily_data_proceed": 1000,
+		"monthly_data_proceed": 1000,
 	},
 }
 

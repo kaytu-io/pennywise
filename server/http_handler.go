@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	mysql2 "github.com/kaytu-io/pennywise/server/internal/mysql"
+	"github.com/kaytu-io/pennywise/server/internal/mysql"
 	"go.uber.org/zap"
 	"golang.org/x/net/context"
 )
 
 type HttpHandler struct {
-	backend *mysql2.Backend
+	backend *mysql.Backend
 	logger  *zap.Logger
 }
 
@@ -26,9 +26,9 @@ func InitializeHttpHandler(
 	if err != nil {
 		logger.Error("Error while connecting to db", zap.Error(err))
 	}
-	err = mysql2.Migrate(context.Background(), db, "pricing_migrations")
+	err = mysql.Migrate(context.Background(), db, "pricing_migrations")
 
-	backend := mysql2.NewBackend(db)
+	backend := mysql.NewBackend(db)
 
 	return &HttpHandler{
 		logger:  logger,
