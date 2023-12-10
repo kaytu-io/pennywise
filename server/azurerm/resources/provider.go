@@ -163,6 +163,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newContainerRegistry(vals).component()
+	case "azurerm_private_endpoint":
+		vals, err := decodePrivateEndpointValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPrivateEndpoint(vals).Components()
 	default:
 		return nil
 	}

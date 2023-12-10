@@ -10,7 +10,7 @@ import (
 )
 
 // PublicIPPrefix is the entity that holds the logic to calculate price
-// of the azurerm_public_ip
+// of the azurerm_public_ip_prefix
 type PublicIPPrefix struct {
 	provider *Provider
 
@@ -47,7 +47,7 @@ func (p *Provider) newPublicIPPrefix(vals publicIPPrefixValues) *PublicIPPrefix 
 	inst := &PublicIPPrefix{
 		provider: p,
 
-		location: convertRegion(vals.Location),
+		location: vals.Location,
 	}
 	return inst
 }
