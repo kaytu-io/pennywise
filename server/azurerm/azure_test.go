@@ -102,6 +102,18 @@ func (ts *AzureTestSuite) TestLoadBalancer() {
 
 }
 
+func (ts *AzureTestSuite) TestPublicIp() {
+	ts.SetupSuite()
+	fmt.Println("Suite Setup")
+	ts.IngestService("Virtual Network", "")
+	fmt.Println("Virtual Network data ingested")
+
+	usg := usage.Usage{}
+	cost := ts.getDirCosts("../testdata/azure/public_ip", usg)
+	fmt.Println(cost.CostString())
+
+}
+
 func (ts *AzureTestSuite) TestPublicIpPrefix() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
@@ -110,6 +122,21 @@ func (ts *AzureTestSuite) TestPublicIpPrefix() {
 
 	usg := usage.Usage{}
 	cost := ts.getDirCosts("../testdata/azure/public_ip_prefix", usg)
+	fmt.Println(cost.CostString())
+
+}
+
+func (ts *AzureTestSuite) TestPrivateEndpoint() {
+	ts.SetupSuite()
+	fmt.Println("Suite Setup")
+	ts.IngestService("Virtual Network", "")
+	fmt.Println("Virtual Network data ingested")
+
+	usg := usage.Usage{"azurerm_private_endpoint": map[string]interface{}{
+		"monthly_inbound_data_processed_gb":  100,
+		"monthly_outbound_data_processed_gb": 100,
+	}}
+	cost := ts.getDirCosts("../testdata/azure/private_endpoint", usg)
 	fmt.Println(cost.CostString())
 
 }

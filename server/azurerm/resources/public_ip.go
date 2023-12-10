@@ -53,7 +53,7 @@ func (p *Provider) newPublicIP(vals publicIPValues) *PublicIP {
 	inst := &PublicIP{
 		provider: p,
 
-		location:         convertRegion(vals.Location),
+		location:         vals.Location,
 		allocationMethod: vals.AllocationMethod,
 		sku:              vals.Sku,
 	}
