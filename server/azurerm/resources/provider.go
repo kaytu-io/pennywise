@@ -127,6 +127,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newWindowsVirtualMachineScaleSet(vals).Components()
+	case "azurerm_virtual_machine_scale_set":
+		vals, err := decodeVirtualMachineScaleSetValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newVirtualMachineScaleSet(vals).Components()
 	case "azurerm_lb":
 		vals, err := decodeLoadBalancerValues(tfRes.Values)
 		if err != nil {

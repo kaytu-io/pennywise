@@ -60,7 +60,7 @@ func decodeWindowsVirtualMachineScaleSetValues(tfVals map[string]interface{}) (w
 	return v, nil
 }
 
-// newWindowsVirtualMachineScaleSet initializes a new LinuxVirtualMachineScaleSet from the provider
+// newWindowsVirtualMachineScaleSet initializes a new WindowsVirtualMachineScaleSet from the provider
 func (p *Provider) newWindowsVirtualMachineScaleSet(vals windowsVirtualMachineScaleSetValues) *WindowsVirtualMachineScaleSet {
 	var monthlyHours *decimal.Decimal
 	var osDiskMonthlyOperations *decimal.Decimal
