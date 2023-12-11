@@ -17,9 +17,12 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	},
 	"azurerm_storage_queue": {
 		Refs: []Reference{{RefValue: "storage_account_name", RefAttribute: "azurerm_storage_account.name"}},
-  },
+	},
+	"azurerm_storage_share": {
+		Refs: []Reference{{RefValue: "storage_account_name", RefAttribute: "azurerm_storage_account.name"}},
+	},
 	"azurerm_virtual_network_gateway_connection": {
-    Refs: []Reference{{RefValue: "virtual_network_gateway_id", RefAttribute: "id"}},
+		Refs: []Reference{{RefValue: "virtual_network_gateway_id", RefAttribute: "id"}},
 	},
 }
 
