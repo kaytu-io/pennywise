@@ -17,6 +17,9 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_virtual_network_gateway_connection": {
 		Refs: []string{"virtual_network_gateway_id"},
 	},
+	"azurerm_virtual_network_peering": {
+		Refs: []string{"virtual_network_name", "remote_virtual_network_id"},
+	},
 }
 
 type ResourceFunction func(Resource) (Resource, error)
