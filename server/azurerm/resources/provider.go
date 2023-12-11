@@ -187,6 +187,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newPrivateEndpoint(vals).Components()
+	case "azurerm_storage_queue":
+		vals, err := decodeStorageQueueValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newStorageQueue(vals).Components()
 	default:
 		return nil
 	}
