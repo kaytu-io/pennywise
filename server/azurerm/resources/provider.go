@@ -187,18 +187,6 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newPrivateEndpoint(vals).Components()
-	case "azurerm_virtual_network_gateway":
-		vals, err := decodeVirtualNetworkGateway(tfRes.Values)
-		if err != nil {
-			return nil
-		}
-		return p.newVirtualNetworkGateway(vals).Components()
-	case "azurerm_virtual_network_gateway_connection":
-		vals, err := decodeVirtualNetworkGatewayConnection(tfRes.Values)
-		if err != nil {
-			return nil
-		}
-		return p.newVirtualNetworkGatewayConnection(vals).Component()
 	default:
 		return nil
 	}
