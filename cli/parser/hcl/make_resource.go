@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"strings"
 )
 
 var makeResourceProcesses = map[string]MakeResourceProcess{
@@ -13,6 +14,9 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	},
 	"azurerm_lb_outbound_rule": {
 		Refs: []Reference{{RefValue: "loadbalancer_id", RefAttribute: "id"}},
+	},
+	"azurerm_storage_queue": {
+		Refs: []Reference{{RefValue: "storage_account_name", RefAttribute: "azurerm_storage_account.name"}},
 	},
 }
 
@@ -60,7 +64,18 @@ func (p MakeResourceProcess) setRefs(rss []Resource, rs Resource) Resource {
 }
 
 func findResource(rss []Resource, id string, refAttribute string) (*Resource, error) {
+	ref := strings.Split(refAttribute, ".")
+	var refType *string
+	if len(ref) > 1 {
+		refType = &ref[0]
+		refAttribute = ref[1]
+	}
 	for _, res := range rss {
+		if refType != nil {
+			if *refType != res.Type {
+				continue
+			}
+		}
 		for key, value := range res.Values {
 			if key == refAttribute {
 				if value.(string) == id {
