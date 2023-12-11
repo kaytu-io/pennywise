@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/kaytu-io/pennywise/server/aws"
 	awsrg "github.com/kaytu-io/pennywise/server/aws/region"
 	awsres "github.com/kaytu-io/pennywise/server/aws/resources"
@@ -11,6 +12,7 @@ import (
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/net/context"
 	"net/http"
 )
 
@@ -136,10 +138,15 @@ func (h *HttpHandler) IngestAwsTables(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
-	err = ingester2.IngestPricing(ctx.Request().Context(), h.backend, ingester)
-	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
-	}
+	go func() {
+		fmt.Println("===================")
+		fmt.Println("Started ingesting prices for ", service, region)
+		err = ingester2.IngestPricing(ctx.Request().Context(), h.backend, ingester)
+		if err != nil {
+			fmt.Println("Error while ingesting  prices", err.Error())
+		}
+		fmt.Println("Completed ingesting prices for ", service, region)
+	}()
 
 	return ctx.JSON(http.StatusOK, "Tables successfully ingested")
 }
@@ -153,10 +160,15 @@ func (h *HttpHandler) IngestAzureTables(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
-	err = ingester2.IngestPricing(ctx.Request().Context(), h.backend, ingester)
-	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
-	}
+	go func() {
+		fmt.Println("===================")
+		fmt.Println("Started ingesting prices for ", service, region)
+		err = ingester2.IngestPricing(context.Background(), h.backend, ingester)
+		if err != nil {
+			fmt.Println("Error while ingesting  prices", err.Error())
+		}
+		fmt.Println("Completed ingesting prices for ", service, region)
+	}()
 
 	return ctx.JSON(http.StatusOK, "Tables successfully ingested")
 }

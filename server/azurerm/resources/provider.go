@@ -115,6 +115,24 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newSnapshot(vals).Components()
+	case "azurerm_linux_virtual_machine_scale_set":
+		vals, err := decodeLinuxVirtualMachineScaleSetValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newLinuxVirtualMachineScaleSet(vals).Components()
+	case "azurerm_windows_virtual_machine_scale_set":
+		vals, err := decodeWindowsVirtualMachineScaleSetValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newWindowsVirtualMachineScaleSet(vals).Components()
+	case "azurerm_virtual_machine_scale_set":
+		vals, err := decodeVirtualMachineScaleSetValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newVirtualMachineScaleSet(vals).Components()
 	case "azurerm_lb":
 		vals, err := decodeLoadBalancerValues(tfRes.Values)
 		if err != nil {

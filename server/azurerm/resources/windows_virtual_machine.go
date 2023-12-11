@@ -64,7 +64,7 @@ func decodeWindowsVirtualMachineValues(tfVals map[string]interface{}) (windowsVi
 func (p *Provider) newWindowsVirtualMachine(vals windowsVirtualMachineValues) *WindowsVirtualMachine {
 	var osDisks []OsDisk
 	for _, disk := range vals.OsDisk {
-		osDisks = append(osDisks, OsDisk{storageAccountType: disk.StorageAccountType, diskSizeGb: decimal.NewFromFloat(disk.DiskSizeGb)})
+		osDisks = append(osDisks, OsDisk{StorageAccountType: disk.StorageAccountType, DiskSizeGb: disk.DiskSizeGb})
 	}
 	inst := &WindowsVirtualMachine{
 		provider: p,
