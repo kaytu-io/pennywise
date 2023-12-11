@@ -46,6 +46,11 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 				continue
 			}
 			if len(prices) < 1 {
+				fmt.Println("NOT FOUND", comp.Name, comp.PriceFilter)
+				fmt.Println("=====PRODS")
+				for _, prod := range prods {
+					fmt.Println(*prod)
+				}
 				state.addComponent(res.Address, comp.Name, Component{Error: ErrPriceNotFound})
 				continue
 			}

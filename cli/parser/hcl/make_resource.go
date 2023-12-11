@@ -6,13 +6,13 @@ import (
 
 var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_snapshot": {
-		Refs: []string{"source_uri"},
+		Refs: []Reference{{RefValue: "source_uri", RefAttribute: "id"}},
 	},
 	"azurerm_lb_rule": {
-		Refs: []string{"loadbalancer_id"},
+		Refs: []Reference{{RefValue: "loadbalancer_id", RefAttribute: "id"}},
 	},
 	"azurerm_lb_outbound_rule": {
-		Refs: []string{"loadbalancer_id"},
+		Refs: []Reference{{RefValue: "loadbalancer_id", RefAttribute: "id"}},
 	},
 	"azurerm_virtual_network_gateway_connection": {
 		Refs: []string{"virtual_network_gateway_id"},
@@ -24,8 +24,13 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 
 type ResourceFunction func(Resource) (Resource, error)
 
+type Reference struct {
+	RefValue     string
+	RefAttribute string
+}
+
 type MakeResourceProcess struct {
-	Refs      []string
+	Refs      []Reference
 	Functions map[string]ResourceFunction
 }
 
@@ -44,11 +49,11 @@ func (p MakeResourceProcess) runFunctions(rs Resource) Resource {
 func (p MakeResourceProcess) setRefs(rss []Resource, rs Resource) Resource {
 	for _, ref := range p.Refs {
 		for key, refId := range rs.Values {
-			if key == ref {
+			if key == ref.RefValue {
 				if refId == nil {
 					break
 				}
-				res, err := findResource(rss, refId.(string))
+				res, err := findResource(rss, refId.(string), ref.RefAttribute)
 				if err != nil {
 					fmt.Println(fmt.Sprintf("error while setting ref %s for resource %s: %s", ref, rs.Address, err.Error()))
 				}
@@ -60,10 +65,10 @@ func (p MakeResourceProcess) setRefs(rss []Resource, rs Resource) Resource {
 	return rs
 }
 
-func findResource(rss []Resource, id string) (*Resource, error) {
+func findResource(rss []Resource, id string, refAttribute string) (*Resource, error) {
 	for _, res := range rss {
 		for key, value := range res.Values {
-			if key == "id" || key == "self_link" {
+			if key == refAttribute {
 				if value.(string) == id {
 					return &res, nil
 				} else {
