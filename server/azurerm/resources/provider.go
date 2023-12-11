@@ -181,6 +181,18 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newVirtualNetworkGatewayConnection(vals).Component()
+	case "azurerm_virtual_network_peering":
+		vals, err := decodeVirtualNetworkPeeringValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newVirtualNetworkPeering(vals).Components()
+	case "azurerm_cdn_endpoint":
+		vals, err := decodeCDNEndpoint(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCDNEndpoint(vals).Component()
 	default:
 		return nil
 	}
