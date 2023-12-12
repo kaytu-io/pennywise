@@ -3,7 +3,7 @@ package usage
 const (
 	// Key is the key used to set the usage
 	// on the values passed to the resources
-	Key string = "tc_usage"
+	Key string = "pennywise_usage"
 )
 
 // Default is the default Usage that will be used if none is configured
