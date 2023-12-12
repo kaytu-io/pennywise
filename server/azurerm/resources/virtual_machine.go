@@ -62,7 +62,7 @@ type virtualMachineValues struct {
 		MonthlyOsDiskOperations   float64 `mapstructure:"monthly_os_disk_operations"`
 		MonthlyDataDiskOperations float64 `mapstructure:"monthly_data_disk_operations"`
 		MonthlyHours              float64 `mapstructure:"monthly_hours"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeVirtualMachineValues decodes and returns computeInstanceValues from a Terraform values map.

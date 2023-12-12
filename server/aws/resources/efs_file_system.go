@@ -45,7 +45,7 @@ type efsFileSystemValues struct {
 		InfrequentAccessStorageGB      float64 `mapstructure:"infrequent_access_storage_gb"`
 		MonthlyInfrequentAccessReadGB  float64 `mapstructure:"monthly_infrequent_access_read_gb"`
 		MonthlyInfrequentAccessWriteGB float64 `mapstructure:"monthly_infrequent_access_write_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeEFSFileSystemValues decodes and returns efsFileSystemValues from a Terraform values map.

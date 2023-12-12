@@ -60,6 +60,7 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 				Type:       res.Type,
 				Components: components,
 			})
+			fmt.Println("COMPONENTS", components)
 		} else if res.ProviderName == "aws" {
 			provider, err := awsres.NewProvider(awsres.ProviderName, awsrg.Code(res.RegionCode))
 			if err != nil {

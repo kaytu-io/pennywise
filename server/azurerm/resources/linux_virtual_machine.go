@@ -36,7 +36,7 @@ type linuxVirtualMachineValues struct {
 
 	Usage struct {
 		MonthlyHours float64 `mapstructure:"monthly_hours"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeLinuxVirtualMachineValues decodes and returns computeInstanceValues from a Terraform values map.
