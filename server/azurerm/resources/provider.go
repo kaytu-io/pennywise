@@ -199,6 +199,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newStorageShare(vals).Components()
+	case "azurerm_storage_account":
+		vals, err := decodeStorageAccountValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newStorageAccount(vals).Components()
 	case "azurerm_virtual_network_gateway":
 		vals, err := decodeVirtualNetworkGateway(tfRes.Values)
 		if err != nil {

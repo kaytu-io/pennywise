@@ -50,7 +50,7 @@ type storageQueueValues struct {
 	} `mapstructure:"tc_usage"`
 }
 
-// decodeStorageQueueValues decodes and returns publicIPValues from a Terraform values map.
+// decodeStorageQueueValues decodes and returns storageQueueValues from a Terraform values map.
 func decodeStorageQueueValues(tfVals map[string]interface{}) (storageQueueValues, error) {
 	var v storageQueueValues
 	config := &mapstructure.DecoderConfig{
@@ -100,7 +100,6 @@ func (p *Provider) newStorageQueue(vals storageQueueValues) *StorageQueue {
 		monthlyClass2Operations:             vals.Usage.MonthlyClass2Operations,
 		monthlyGeoReplicationDataTransferGB: vals.Usage.MonthlyGeoReplicationDataTransferGB,
 	}
-	fmt.Println("INST", inst)
 	return inst
 }
 
