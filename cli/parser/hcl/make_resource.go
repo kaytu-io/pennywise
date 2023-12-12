@@ -14,8 +14,11 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_lb_outbound_rule": {
 		Refs: []Reference{{RefValue: "loadbalancer_id", RefAttribute: "id"}},
 	},
+	"azurerm_storage_queue": {
+		Refs: []Reference{{RefValue: "storage_account_name", RefAttribute: "azurerm_storage_account.name"}},
+	},
 	"azurerm_virtual_network_gateway_connection": {
-		Refs: []Reference{{RefValue: "0virtual_network_gateway_id", RefAttribute: "id"}},
+		Refs: []Reference{{RefValue: "virtual_network_gateway_id", RefAttribute: "id"}},
 	},
 	"azurerm_virtual_network_peering": {
 		Refs: []Reference{{RefValue: "virtual_network_name", RefAttribute: "name"}, {RefValue: "remote_virtual_network_id", RefAttribute: "id"}},
