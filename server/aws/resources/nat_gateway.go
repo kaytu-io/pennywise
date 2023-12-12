@@ -23,7 +23,7 @@ type NatGateway struct {
 type natGatewayValues struct {
 	Usage struct {
 		MonthlyDataProcessedGB float64 `mapstructure:"monthly_data_processed_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 func decodeNatGatewayValues(tfVals map[string]interface{}) (natGatewayValues, error) {

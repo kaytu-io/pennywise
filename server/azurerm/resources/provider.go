@@ -217,6 +217,24 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newVirtualNetworkGatewayConnection(vals).Component()
+	case "azurerm_key_vault_key":
+		vals, err := decodeKeyVaultKeyValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newKeyVaultKey(vals).Components()
+	case "azurerm_key_vault_certificate":
+		vals, err := decodeKeyVaultCertificateValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newKeyVaultCertificate(vals).Components()
+	case "azurerm_key_vault_managed_hardware_security_module":
+		vals, err := decodeKeyVaultManagedHardwareSecurityModuleValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newKeyVaultManagedHardwareSecurityModule(vals).Components()
 	default:
 		return nil
 	}

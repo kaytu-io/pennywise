@@ -47,7 +47,7 @@ type storageQueueValues struct {
 		MonthlyClass1Operations             *int64 `mapstructure:"monthly_class_1_operations"`
 		MonthlyClass2Operations             *int64 `mapstructure:"monthly_class_2_operations"`
 		MonthlyGeoReplicationDataTransferGB *int64 `mapstructure:"monthly_geo_replication_data_transfer_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeStorageQueueValues decodes and returns storageQueueValues from a Terraform values map.

@@ -24,6 +24,12 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_virtual_network_gateway_connection": {
 		Refs: []Reference{{RefValue: "virtual_network_gateway_id", RefAttribute: "id"}},
 	},
+	"azurerm_key_vault_key": {
+		Refs: []Reference{{RefValue: "key_vault_id", RefAttribute: "id"}},
+	},
+	"azurerm_key_vault_certificate": {
+		Refs: []Reference{{RefValue: "key_vault_id", RefAttribute: "id"}},
+	},
 }
 
 type ResourceFunction func(Resource) (Resource, error)

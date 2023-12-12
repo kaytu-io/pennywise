@@ -25,7 +25,7 @@ type fsxOpenzfsFileSystemValues struct {
 
 	Usage struct {
 		BackupStorageGB float64 `mapstructure:"backup_storage_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeFSxOpenzfsFileSystemValues decodes and returns fsxOpenzfsFileSystemValues from a Terraform values map.

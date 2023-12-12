@@ -49,7 +49,7 @@ type storageShareValues struct {
 		MonthlyOtherOperations  *int64 `mapstructure:"monthly_other_operations"`
 		MonthlyDataRetrievalGB  *int64 `mapstructure:"monthly_data_retrieval_gb"`
 		MetadataAtRestStorageGB *int64 `mapstructure:"metadata_at_rest_storage_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeStorageShareValues decodes and returns publicIPValues from a Terraform values map.

@@ -30,7 +30,7 @@ type privateEndpointValues struct {
 	Usage struct {
 		MonthlyInboundDataProcessedGb  *int64 `mapstructure:"monthly_inbound_data_processed_gb"`
 		MonthlyOutboundDataProcessedGb *int64 `mapstructure:"monthly_outbound_data_processed_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodePrivateEndpointValues decodes and returns privateEndpointValues from a Terraform values map.

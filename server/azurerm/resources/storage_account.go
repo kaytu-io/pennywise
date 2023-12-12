@@ -68,7 +68,7 @@ type storageAccountValues struct {
 		SnapshotsStorageGB                      *float64 `mapstructure:"snapshots_storage_gb"`
 		MetadataAtRestStorageGB                 *float64 `mapstructure:"metadata_at_rest_storage_gb"`
 		EarlyDeletionGB                         *float64 `mapstructure:"early_deletion_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeStorageAccountValues decodes and returns storageAccountValues from a Terraform values map.

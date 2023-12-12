@@ -22,5 +22,6 @@ var (
 		"Application Gateway": {},
 		"NAT Gateway":         {},
 		"VPN Gateway":         {},
+		"Key Vault":           {},
 	}
 )

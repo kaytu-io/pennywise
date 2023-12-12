@@ -47,7 +47,7 @@ type applicationGatewayValues struct {
 	Usage struct {
 		CapacityUnits          *int64 `mapstructure:"capacity_units"`
 		MonthlyDataProcessedGb *int64 `mapstructure:"monthly_data_processed_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeApplicationGatewayValues decodes and returns applicationGatewayValues from a Terraform values map.
