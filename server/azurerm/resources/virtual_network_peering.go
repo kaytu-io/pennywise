@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
@@ -22,11 +21,13 @@ type VirtualNetworkPeering struct {
 	// Usage
 	monthlyDataTransferGB decimal.Decimal
 }
+
 type DestinationLocationStruct struct {
 	Values struct {
 		Location string `mapstructure:"location"`
 	} `mapstructure:"Values"`
 }
+
 type SourceLocationStruct struct {
 	Values struct {
 		Location string `mapstructure:"location"`
@@ -57,41 +58,42 @@ func decodeVirtualNetworkPeeringValues(tfVals map[string]interface{}) (virtualNe
 		return v, err
 	}
 
-	//fmt.Printf("tfvalue : %v \n \n \n", tfVals)
 	if err := decoder.Decode(tfVals); err != nil {
 		return v, err
 	}
 	if v.Usage.MonthlyDataTransferGB == 0 {
 		v.Usage.MonthlyDataTransferGB = 100
 	}
-	fmt.Printf("value : DestinationLocation  : %v / SourceLocation: %v \n ", v.DestinationLocation, v.SourceLocation)
 	return v, nil
 }
 
 func (p *Provider) newVirtualNetworkPeering(vals virtualNetworkPeeringValues) *VirtualNetworkPeering {
+	sourceLocation := getLocationName(vals.SourceLocation.Values.Location)
+	destinationLocation := getLocationName(vals.DestinationLocation.Values.Location)
 	inst := &VirtualNetworkPeering{
 		provider: p,
 
-		sourceLocation:        getLocationName(vals.SourceLocation.Values.Location),
-		destinationLocation:   getLocationName(vals.DestinationLocation.Values.Location),
+		sourceLocation:        sourceLocation,
+		destinationLocation:   destinationLocation,
 		monthlyDataTransferGB: decimal.NewFromFloat(vals.Usage.MonthlyDataTransferGB),
 	}
 	return inst
 }
 
 func (inst *VirtualNetworkPeering) Components() []query.Component {
-
+	firstQuery := inst.egressDataProcessedCostComponent(inst.provider.key)
+	secondQuery := inst.ingressDataProcessedCostComponent(inst.provider.key)
 	components := []query.Component{
-		*inst.egressDataProcessedCostComponent(inst.provider.key),
-		*inst.ingressDataProcessedCostComponent(inst.provider.key),
+		firstQuery,
+		secondQuery,
 	}
 
 	return components
 }
 
-func (inst *VirtualNetworkPeering) egressDataProcessedCostComponent(key string) *query.Component {
+func (inst *VirtualNetworkPeering) egressDataProcessedCostComponent(key string) query.Component {
 	if inst.sourceLocation == inst.destinationLocation {
-		return &query.Component{
+		return query.Component{
 			Name:            "Outbound data transfer",
 			Unit:            "GB",
 			MonthlyQuantity: inst.monthlyDataTransferGB,
@@ -112,7 +114,7 @@ func (inst *VirtualNetworkPeering) egressDataProcessedCostComponent(key string) 
 		}
 	}
 
-	return &query.Component{
+	return query.Component{
 		Name:            "Outbound data transfer",
 		Unit:            "GB",
 		MonthlyQuantity: inst.monthlyDataTransferGB,
@@ -134,9 +136,9 @@ func (inst *VirtualNetworkPeering) egressDataProcessedCostComponent(key string) 
 	}
 }
 
-func (inst *VirtualNetworkPeering) ingressDataProcessedCostComponent(key string) *query.Component {
+func (inst *VirtualNetworkPeering) ingressDataProcessedCostComponent(key string) query.Component {
 	if inst.sourceLocation == inst.destinationLocation {
-		return &query.Component{
+		return query.Component{
 			Name:            "Inbound data transfer",
 			Unit:            "GB",
 			MonthlyQuantity: inst.monthlyDataTransferGB,
@@ -157,7 +159,7 @@ func (inst *VirtualNetworkPeering) ingressDataProcessedCostComponent(key string)
 		}
 	}
 
-	return &query.Component{
+	return query.Component{
 		Name:            "Inbound data transfer",
 		Unit:            "GB",
 		MonthlyQuantity: inst.monthlyDataTransferGB,
@@ -190,7 +192,6 @@ func virtualNetworkPeeringConvertRegion(region string) string {
 	if strings.HasPrefix(strings.ToLower(region), "china") {
 		zone = "CN Zone 1"
 	}
-	fmt.Printf("region : %v / zone : %v \n ", region, zone)
 	return zone
 }
 

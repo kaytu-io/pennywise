@@ -23,5 +23,6 @@ var (
 		"NAT Gateway":              {},
 		"VPN Gateway":              {},
 		"Content Delivery Network": {},
+		"Virtual Network":          {},
 	}
 )

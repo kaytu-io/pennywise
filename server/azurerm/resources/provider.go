@@ -211,6 +211,114 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newCDNEndpoint(vals).Component()
+	case "azurerm_dns_a_record":
+		vals, err := decodeDNSARecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newDNSARecord(vals).component()
+	case "azurerm_dns_aaaa_record":
+		vals, err := decoderDNSAAAARecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newDNSAAAARecord(vals).component()
+	case "azurerm_dns_caa_record":
+		vals, err := decoderDNSCAARecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newDNSCAARecord(vals).component()
+	case "azurerm_dns_cname_record":
+		vals, err := decoderDNSCNAMERecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newDNSCNAMERecord(vals).component()
+	case "azurerm_dns_mx_record":
+		vals, err := decoderDNSMXRecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newDNSMXRecord(vals).component()
+	case "azurerm_dns_ns_record":
+		vals, err := decoderDNSNSRecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newDNSNSRecord(vals).component()
+	case "azurerm_dns_ptr_record":
+		vals, err := decoderDNSPTRRecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newDNSPTRRecord(vals).component()
+	case "azurerm_dns_srv_record":
+		vals, err := decoderDNSSRVRecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newDNSSRVRecord(vals).component()
+	case "azurerm_dns_txt_record":
+		vals, err := decoderDNSTXTRecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newDNSTXTRecord(vals).component()
+	case "azurerm_dns_zone":
+		vals, err := decoderRMDNSZone(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newRMDNSZone(vals).component()
+	case "azurerm_private_dns_a_record":
+		vals, err := decoderPrivateDnsARecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPrivateDnsARecord(vals).component()
+	case "azurerm_private_dns_aaaa_record":
+		vals, err := decoderPrivateDnsAAAARecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newprivateDNSAAAARecord(vals).component()
+	case "azurerm_private_dns_cname_record":
+		vals, err := decoderPrivateDnsCNAMERecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newprivateDNSCNAMERecord(vals).component()
+	case "azurerm_private_dns_mx_record":
+		vals, err := decoderPrivateDnsMXRecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPrivateDNSMXRecord(vals).component()
+	case "azurerm_private_dns_ptr_record":
+		vals, err := decoderPrivateDnsPTRRecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPrivateDNSPTRRecord(vals).component()
+	case "azurerm_private_dns_srv_record":
+		vals, err := decoderPrivateDnsSRVRecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPrivateDNSSRVRecord(vals).component()
+	case "azurerm_private_dns_txt_record":
+		vals, err := decoderPrivateDnsTXTRecord(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPrivateDNSTXTRecord(vals).component()
+	case "azurerm_private_dns_zone":
+		vals, err := decoderPrivateDnsZone(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPrivateDNSZone(vals).component()
 	default:
 		return nil
 	}

@@ -24,10 +24,11 @@ type AzureRMCDNEndpoint struct {
 	location           string
 	globalDeliveryRule []map[string]interface{}
 	deliveryRule       []map[string]interface{}
-	profileNameSKU     *string
+	sku                *string
 	optimizationType   *string
+
 	//usage
-	monthlyOutboundGB          int64
+	monthlyOutboundGB          *int64
 	monthlyRulesEngineRequests *int64
 }
 
@@ -39,8 +40,8 @@ type AzureRMCDNEndpointValue struct {
 	OptimizationType   string                   `mapstructure:"optimization_type"`
 
 	Usage struct {
-		MonthlyOutboundGB          int64 `mapstructure:"monthly_outbound_gb"`
-		MonthlyRulesEngineRequests int64 `mapstructure:"monthly_rules_engine_requests"`
+		MonthlyOutboundGB          *int64 `mapstructure:"monthly_outbound_gb"`
+		MonthlyRulesEngineRequests *int64 `mapstructure:"monthly_rules_engine_requests"`
 	} `mapstructure:"tc_usage"`
 }
 
@@ -53,10 +54,10 @@ func (p *Provider) newCDNEndpoint(vals AzureRMCDNEndpointValue) *AzureRMCDNEndpo
 		location:                   vals.Location,
 		globalDeliveryRule:         vals.GlobalDeliveryRule,
 		deliveryRule:               vals.DeliveryRule,
-		profileNameSKU:             &sku,
+		sku:                        &sku,
 		optimizationType:           &vals.OptimizationType,
 		monthlyOutboundGB:          vals.Usage.MonthlyOutboundGB,
-		monthlyRulesEngineRequests: &vals.Usage.MonthlyRulesEngineRequests,
+		monthlyRulesEngineRequests: vals.Usage.MonthlyRulesEngineRequests,
 	}
 	return inst
 }
@@ -67,8 +68,6 @@ func decodeCDNEndpoint(tfVals map[string]interface{}) (AzureRMCDNEndpointValue, 
 		WeaklyTypedInput: true,
 		Result:           &v,
 	}
-	fmt.Printf("tfvalue : %v \n ", tfVals)
-
 	decoder, err := mapstructure.NewDecoder(config)
 	if err != nil {
 		return v, err
@@ -77,25 +76,24 @@ func decodeCDNEndpoint(tfVals map[string]interface{}) (AzureRMCDNEndpointValue, 
 	if err := decoder.Decode(tfVals); err != nil {
 		return v, err
 	}
-	fmt.Printf("value : %v \n", v)
 	return v, nil
 }
 
 func (inst AzureRMCDNEndpoint) Component() []query.Component {
-	region := inst.location
+	region := getLocationName(inst.location)
+	region = regionToZone(region)
 
 	var costComponents []query.Component
-
 	sku := ""
-	if inst.profileNameSKU != nil {
-		sku = *inst.profileNameSKU
+	if inst.sku != nil {
+		sku = *inst.sku
 	}
 
 	if len(strings.Split(sku, "_")) != 2 || strings.ToLower(sku) == "standard_chinacdn" {
 		return nil
 	}
 
-	costComponents = append(costComponents, cdnOutboundDataCostComponents(region, sku, &inst.monthlyOutboundGB)...)
+	costComponents = append(costComponents, cdnOutboundDataCostComponents(region, sku, inst.monthlyOutboundGB)...)
 
 	if strings.ToLower(sku) == "standard_microsoft" {
 		numberOfRules := 0
@@ -117,7 +115,7 @@ func (inst AzureRMCDNEndpoint) Component() []query.Component {
 				"Standard",
 				"Rule",
 				"5",
-				decimalPtr(decimal.NewFromInt(int64(numberOfRules))),
+				*decimalPtr(decimal.NewFromInt(int64(numberOfRules))),
 			))
 		}
 
@@ -134,7 +132,7 @@ func (inst AzureRMCDNEndpoint) Component() []query.Component {
 				"Standard",
 				"Requests",
 				"0",
-				rulesRequests,
+				*rulesRequests,
 			))
 		}
 	}
@@ -142,7 +140,7 @@ func (inst AzureRMCDNEndpoint) Component() []query.Component {
 	if strings.ToLower(sku) == "standard_akamai" || strings.ToLower(sku) == "standard_verizon" {
 		if inst.optimizationType != nil {
 			if strings.ToLower(*inst.optimizationType) == "dynamicsiteacceleration" {
-				costComponents = append(costComponents, cdnAccelerationDataTransfersCostComponents(region, sku, &inst.monthlyOutboundGB)...)
+				costComponents = append(costComponents, cdnAccelerationDataTransfersCostComponents(region, sku, inst.monthlyOutboundGB)...)
 			}
 		}
 	}
@@ -179,8 +177,6 @@ func cdnOutboundDataCostComponents(region, sku string, monthlyOutboundGBInput *i
 		{name: fmt.Sprintf("%s%s", name, "over 5000TB)"), startUsage: "5000000"},
 	}
 
-	meterName = fmt.Sprintf("%s Data Transfer", skuName)
-
 	var monthlyOutboundGb *decimal.Decimal
 	if monthlyOutboundGBInput != nil {
 		monthlyOutboundGb = decimalPtr(decimal.NewFromInt(*monthlyOutboundGBInput))
@@ -197,7 +193,7 @@ func cdnOutboundDataCostComponents(region, sku string, monthlyOutboundGBInput *i
 					skuName,
 					meterName,
 					d.startUsage,
-					decimalPtr(tiers[i])))
+					*decimalPtr(tiers[i])))
 			}
 		}
 	} else {
@@ -209,9 +205,8 @@ func cdnOutboundDataCostComponents(region, sku string, monthlyOutboundGBInput *i
 			skuName,
 			meterName,
 			data[0].startUsage,
-			nil))
+			*decimalPtr(decimal.NewFromInt(0))))
 	}
-
 	return costComponents
 }
 
@@ -256,7 +251,7 @@ func cdnAccelerationDataTransfersCostComponents(region, sku string, monthlyOutbo
 					skuName,
 					meterName,
 					d.startUsage,
-					decimalPtr(tiers[i])))
+					*decimalPtr(tiers[i])))
 			}
 		}
 	} else {
@@ -268,25 +263,25 @@ func cdnAccelerationDataTransfersCostComponents(region, sku string, monthlyOutbo
 			skuName,
 			meterName,
 			data[0].startUsage,
-			nil))
+			*decimalPtr(decimal.NewFromInt(0))))
 	}
 
 	return costComponents
 }
 
-func cdnCostComponent(name, unit, region, productName, skuName, meterName, startUsage string, quantity *decimal.Decimal) query.Component {
+func cdnCostComponent(name, unit, region, productName, skuName, meterName, startUsage string, quantity decimal.Decimal) query.Component {
 	return query.Component{
 		Name:            name,
 		Unit:            unit,
-		MonthlyQuantity: *quantity,
+		MonthlyQuantity: quantity,
 		ProductFilter: &product.Filter{
 			Location: util.StringPtr(region),
 			Service:  util.StringPtr("Content Delivery Network"),
 			Family:   util.StringPtr("Networking"),
 			AttributeFilters: []*product.AttributeFilter{
-				{Key: "productName", ValueRegex: util.StringPtr(fmt.Sprintf("%s", productName))},
-				{Key: "skuName", ValueRegex: util.StringPtr(fmt.Sprintf("^%s", skuName))},
-				{Key: "meterName", ValueRegex: util.StringPtr(fmt.Sprintf("%s", meterName))},
+				{Key: "product_name", ValueRegex: util.StringPtr(fmt.Sprintf("%s", productName))},
+				{Key: "sku_name", ValueRegex: util.StringPtr(fmt.Sprintf("%s", skuName))},
+				{Key: "meter_name", ValueRegex: util.StringPtr(fmt.Sprintf("%s", meterName))},
 			},
 		},
 		PriceFilter: &price.Filter{
