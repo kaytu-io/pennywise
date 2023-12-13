@@ -102,7 +102,6 @@ func (inst *ContainerRegistry) component() []query.Component {
 	if inst.storageGB != nil {
 		storageGB = decimalPtr(decimal.NewFromFloat(*inst.storageGB))
 		if storageGB.GreaterThan(*includedStorage) {
-			fmt.Println("test storageGB")
 
 			overStorage = storageGB.Sub(*includedStorage)
 			storageGB = &overStorage

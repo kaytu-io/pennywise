@@ -25,5 +25,6 @@ var (
 		"VPN Gateway":              {},
 		"Content Delivery Network": {},
 		"Virtual Network":          {},
+		"Azure Cosmos DB":          {},
 	}
 )

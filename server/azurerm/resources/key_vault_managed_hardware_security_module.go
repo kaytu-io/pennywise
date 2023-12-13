@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
@@ -50,7 +49,6 @@ func (p *Provider) newKeyVaultManagedHardwareSecurityModule(vals keyVaultManaged
 
 		location: vals.Location,
 	}
-	fmt.Println("INST", inst)
 	return inst
 }
 

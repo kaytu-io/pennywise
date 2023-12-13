@@ -60,6 +60,16 @@ var (
 	}
 )
 
+func locationNameMapping(location string) string {
+	newMapping := make(map[string]string)
+
+	for key, value := range locationDisplayToName {
+		newMapping[value] = key
+	}
+
+	return newMapping[location]
+}
+
 // Provider is an implementation of the resources.Provider, used to extract component queries from
 // terraform resources.
 type Provider struct {
@@ -355,6 +365,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newPrivateDNSZone(vals).component()
+	case "azurerm_cosmosdb_table":
+		vals, err := decodeCosmosdbTableValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbTable(vals).Components()
 	default:
 		return nil
 	}

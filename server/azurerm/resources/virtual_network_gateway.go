@@ -59,7 +59,6 @@ func (p *Provider) newVirtualNetworkGateway(vals VirtualNetworkGatewayValue) *Vi
 }
 
 func (inst *VirtualNetworkGateway) Components() []query.Component {
-	fmt.Println("test1")
 	var connection, dataTransfers *decimal.Decimal
 	sku := "Basic"
 	region := inst.location
