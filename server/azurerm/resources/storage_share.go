@@ -54,7 +54,6 @@ type storageShareValues struct {
 
 // decodeStorageShareValues decodes and returns publicIPValues from a Terraform values map.
 func decodeStorageShareValues(tfVals map[string]interface{}) (storageShareValues, error) {
-	//fmt.Println("TFVALS", tfVals)
 	var v storageShareValues
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
@@ -103,7 +102,6 @@ func (p *Provider) newStorageShare(vals storageShareValues) *StorageShare {
 		monthlyDataRetrievalGB:  vals.Usage.MonthlyDataRetrievalGB,
 		metadataAtRestStorageGB: vals.Usage.MetadataAtRestStorageGB,
 	}
-	fmt.Println("INST", inst)
 	return inst
 }
 
