@@ -93,6 +93,30 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_cosmosdb_table": {
 		Refs: []Reference{{RefValue: "account_name", RefAttribute: "azurerm_cosmosdb_account.name"}, {RefValue: "resource_group_name", RefAttribute: "azurerm_resource_group.name"}},
 	},
+	"azurerm_cosmosdb_sql_database": {
+		Refs: []Reference{{RefValue: "account_name", RefAttribute: "azurerm_cosmosdb_account.name"}, {RefValue: "resource_group_name", RefAttribute: "azurerm_resource_group.name"}},
+	},
+	"azurerm_cosmosdb_sql_container": {
+		Refs: []Reference{{RefValue: "account_name", RefAttribute: "azurerm_cosmosdb_account.name"}, {RefValue: "resource_group_name", RefAttribute: "azurerm_resource_group.name"}},
+	},
+	"azurerm_cosmosdb_gremlin_database": {
+		Refs: []Reference{{RefValue: "account_name", RefAttribute: "azurerm_cosmosdb_account.name"}, {RefValue: "resource_group_name", RefAttribute: "azurerm_resource_group.name"}},
+	},
+	"azurerm_cosmosdb_gremlin_graph": {
+		Refs: []Reference{{RefValue: "account_name", RefAttribute: "azurerm_cosmosdb_account.name"}, {RefValue: "resource_group_name", RefAttribute: "azurerm_resource_group.name"}},
+	},
+	"azurerm_cosmosdb_mongo_database": {
+		Refs: []Reference{{RefValue: "account_name", RefAttribute: "azurerm_cosmosdb_account.name"}, {RefValue: "resource_group_name", RefAttribute: "azurerm_resource_group.name"}},
+	},
+	"azurerm_cosmosdb_cassandra_keyspace": {
+		Refs: []Reference{{RefValue: "account_name", RefAttribute: "azurerm_cosmosdb_account.name"}, {RefValue: "resource_group_name", RefAttribute: "azurerm_resource_group.name"}},
+	},
+	"azurerm_cosmosdb_cassandra_table": {
+		Refs: []Reference{{RefValue: "cassandra_keyspace_id", RefAttribute: "azurerm_cosmosdb_cassandra_keyspace.id"}},
+	},
+	"azurerm_cosmosdb_mongo_collection": {
+		Refs: []Reference{{RefValue: "database_name", RefAttribute: "azurerm_cosmosdb_mongo_database.name"}, {RefValue: "account_name", RefAttribute: "azurerm_cosmosdb_account.name"}, {RefValue: "resource_group_name", RefAttribute: "azurerm_resource_group.name"}},
+	},
 }
 
 type ResourceFunction func(Resource) (Resource, error)
@@ -124,6 +148,9 @@ func (p MakeResourceProcess) setRefs(rss []Resource, rs Resource) Resource {
 		for key, refId := range rs.Values {
 			if key == ref.RefValue {
 				if refId == nil {
+					break
+				}
+				if _, ok := refId.(string); !ok {
 					break
 				}
 				res, err := findResource(rss, refId.(string), ref.RefAttribute)
