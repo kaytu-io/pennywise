@@ -371,6 +371,54 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newCosmosdbTable(vals).Components()
+	case "azurerm_cosmosdb_sql_database":
+		vals, err := decodeCosmosdbSqlDatabaseValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbSqlDatabase(vals).Components()
+	case "azurerm_cosmosdb_sql_container":
+		vals, err := decodeCosmosdbSqlContainerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbSqlContainer(vals).Components()
+	case "azurerm_cosmosdb_gremlin_database":
+		vals, err := decodeCosmosdbGremlinDatabaseValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbGremlinDatabase(vals).Components()
+	case "azurerm_cosmosdb_gremlin_graph":
+		vals, err := decodeCosmosdbGremlinGraphValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbGremlinGraph(vals).Components()
+	case "azurerm_cosmosdb_mongo_database":
+		vals, err := decodeCosmosdbMongoDatabaseValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbMongoDatabase(vals).Components()
+	case "azurerm_cosmosdb_cassandra_keyspace":
+		vals, err := decodeCosmosdbCassandraKeyspaceValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbCassandraKeyspace(vals).Components()
+	case "azurerm_cosmosdb_cassandra_table":
+		vals, err := decodeCosmosdbCassandraTableValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbCassandraTable(vals).Components()
+	case "azurerm_cosmosdb_mongo_collection":
+		vals, err := decodeCosmosdbMongoCollectionValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbMongoCollection(vals).Components()
 	default:
 		return nil
 	}
