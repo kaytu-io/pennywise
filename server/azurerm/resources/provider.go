@@ -419,6 +419,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newCosmosdbMongoCollection(vals).Components()
+	case "azurerm_mariadb_server":
+		vals, err := decodeMariadbServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMariadbServer(vals).Components()
 	default:
 		return nil
 	}
