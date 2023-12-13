@@ -4,9 +4,9 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-// cosmosdbTableValues is holds the values that we need to be able
-// to calculate the price of the CosmosdbTable
-type cosmosdbTableValues struct {
+// cosmosdbSqlContainerValues is holds the values that we need to be able
+// to calculate the price of the CosmosdbSqlContainer
+type cosmosdbSqlContainerValues struct {
 	CosmosdbAccountName *CosmosdbAccountName `mapstructure:"account_name"`
 	ResourceGroupName   *ResourceGroupName   `mapstructure:"resource_group_name"`
 	Throughput          *int64               `mapstructure:"throughput"`
@@ -22,9 +22,9 @@ type cosmosdbTableValues struct {
 	} `mapstructure:"pennywise_usage"`
 }
 
-// decodeCosmosdbTableValues decodes and returns cosmosdbTableValues from a Terraform values map.
-func decodeCosmosdbTableValues(tfVals map[string]interface{}) (cosmosdbTableValues, error) {
-	var v cosmosdbTableValues
+// decodeCosmosdbSqlContainerValues decodes and returns cosmosdbSqlContainerValues from a Terraform values map.
+func decodeCosmosdbSqlContainerValues(tfVals map[string]interface{}) (cosmosdbSqlContainerValues, error) {
+	var v cosmosdbSqlContainerValues
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
 		Result:           &v,
@@ -41,8 +41,8 @@ func decodeCosmosdbTableValues(tfVals map[string]interface{}) (cosmosdbTableValu
 	return v, nil
 }
 
-// newCosmosdbTable initializes a new CosmosdbTable from the provider
-func (p *Provider) newCosmosdbTable(vals cosmosdbTableValues) *Cosmosdb {
+// newCosmosdbSqlDatabase initializes a new CosmosdbTable from the provider
+func (p *Provider) newCosmosdbSqlContainer(vals cosmosdbSqlContainerValues) *Cosmosdb {
 	if vals.CosmosdbAccountName == nil {
 		return nil
 	}
