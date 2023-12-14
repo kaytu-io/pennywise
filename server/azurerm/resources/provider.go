@@ -419,6 +419,60 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newCosmosdbMongoCollection(vals).Components()
+	case "azurerm_mariadb_server":
+		vals, err := decodeMariadbServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMariadbServer(vals).Components()
+	case "azurerm_sql_database":
+		vals, err := decodeSqlDatabaseValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newSQLDatabase(vals).Components()
+	case "azurerm_mssql_database":
+		vals, err := decodeMssqlDatabaseValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMssqlDatabase(vals).Components()
+	case "azurerm_sql_managed_instance":
+		vals, err := decodeSqlManagedInstanceValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newSqlManagedInstance(vals).Components()
+	case "azurerm_mssql_managed_instance":
+		vals, err := decodeMssqlManagedInstanceValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMssqlManagedInstance(vals).Components()
+	case "azurerm_mysql_server":
+		vals, err := decodeMysqlServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMysqlServer(vals).Components()
+	case "azurerm_postgresql_server":
+		vals, err := decodePostgresqlServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPostgresqlServer(vals).Components()
+	case "azurerm_postgresql_flexible_server":
+		vals, err := decodePostgresqlFlexibleServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPostgresqlFlexibleServer(vals).Components()
+	case "azurerm_mysql_flexible_server":
+		vals, err := decodeMysqlFlexibleServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMysqlFlexibleServer(vals).Components()
 	default:
 		return nil
 	}
