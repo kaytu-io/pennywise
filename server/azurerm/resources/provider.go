@@ -449,6 +449,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newMssqlManagedInstance(vals).Components()
+	case "azurerm_mysql_server":
+		vals, err := decodeMysqlServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMysqlServer(vals).Components()
 	default:
 		return nil
 	}

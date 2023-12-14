@@ -27,6 +27,7 @@ var (
 		"Virtual Network":            {},
 		"Azure Cosmos DB":            {},
 		"Azure Database for MariaDB": {},
+		"Azure Database for MySQL":   {},
 		"SQL Database":               {},
 		"SQL Managed Instance":       {},
 	}

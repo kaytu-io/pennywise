@@ -16,6 +16,7 @@ import (
 type MariadbServer struct {
 	provider *Provider
 
+	serviceName               string
 	location                  string
 	skuName                   string
 	storageMb                 int64
@@ -57,11 +58,12 @@ func decodeMariadbServerValues(tfVals map[string]interface{}) (mariadbServerValu
 	return v, nil
 }
 
-// newPublicIP initializes a new PublicIP from the provider
+// newMariadbServer initializes a new MariadbServer from the provider
 func (p *Provider) newMariadbServer(vals mariadbServerValues) *MariadbServer {
 	inst := &MariadbServer{
 		provider: p,
 
+		serviceName:               "Azure Database for MariaDB",
 		location:                  vals.Location,
 		skuName:                   vals.SkuName,
 		storageMb:                 vals.StorageMb,
