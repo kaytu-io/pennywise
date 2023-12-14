@@ -117,6 +117,9 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_cosmosdb_mongo_collection": {
 		Refs: []Reference{{RefValue: "database_name", RefAttribute: "azurerm_cosmosdb_mongo_database.name"}, {RefValue: "account_name", RefAttribute: "azurerm_cosmosdb_account.name"}, {RefValue: "resource_group_name", RefAttribute: "azurerm_resource_group.name"}},
 	},
+	"azurerm_mssql_database": {
+		Refs: []Reference{{RefValue: "server_id", RefAttribute: "id"}},
+	},
 }
 
 type ResourceFunction func(Resource) (Resource, error)

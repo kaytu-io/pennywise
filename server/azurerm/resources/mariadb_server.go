@@ -12,7 +12,7 @@ import (
 )
 
 // MariadbServer is the entity that holds the logic to calculate price
-// of the azurerm_public_ip
+// of the azurerm_mariadb_server
 type MariadbServer struct {
 	provider *Provider
 
@@ -35,7 +35,7 @@ type mariadbServerValues struct {
 
 	Usage struct {
 		AdditionalBackupStorageGb *int64 `mapstructure:"additional_backup_storage_gb"`
-	}
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeMariadbServerValues decodes and returns mariadbServerValues from a Terraform values map.

@@ -27,5 +27,6 @@ var (
 		"Virtual Network":            {},
 		"Azure Cosmos DB":            {},
 		"Azure Database for MariaDB": {},
+		"SQL Database":               {},
 	}
 )
