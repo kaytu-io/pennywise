@@ -455,6 +455,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newMysqlServer(vals).Components()
+	case "azurerm_postgresql_server":
+		vals, err := decodePostgresqlServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPostgresqlServer(vals).Components()
 	default:
 		return nil
 	}

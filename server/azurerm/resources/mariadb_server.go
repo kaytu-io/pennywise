@@ -95,7 +95,7 @@ func (inst *MariadbServer) Components() []query.Component {
 	productNameRegex := fmt.Sprintf(".*%s - Compute %s.*", tierName, family)
 	skuName := fmt.Sprintf("%s vCore", cores)
 
-	components = append(components, inst.databaseComputeInstance(fmt.Sprintf("Compute (%s)", inst.skuName), "Azure Database for MariaDB", productNameRegex, skuName))
+	components = append(components, inst.databaseComputeInstance(fmt.Sprintf("Compute (%s)", inst.skuName), productNameRegex, skuName))
 
 	storageGB := inst.storageMb / 1024
 
@@ -105,7 +105,7 @@ func (inst *MariadbServer) Components() []query.Component {
 	}
 	productNameRegex = fmt.Sprintf(".*%s - Storage.*", tierName)
 
-	components = append(components, inst.databaseStorageComponent("Azure Database for MariaDB", productNameRegex, storageGB))
+	components = append(components, inst.databaseStorageComponent(productNameRegex, storageGB))
 
 	var backupStorageGB decimal.Decimal
 	if inst.additionalBackupStorageGb != nil {
@@ -119,12 +119,12 @@ func (inst *MariadbServer) Components() []query.Component {
 		}
 	}
 
-	components = append(components, inst.databaseBackupStorageComponent("Azure Database for MariaDB", skuName, backupStorageGB))
+	components = append(components, inst.databaseBackupStorageComponent(skuName, backupStorageGB))
 
 	return components
 }
 
-func (inst *MariadbServer) databaseComputeInstance(name, serviceName, productNameRegex, skuName string) query.Component {
+func (inst *MariadbServer) databaseComputeInstance(name, productNameRegex, skuName string) query.Component {
 	return query.Component{
 		Name:           name,
 		Unit:           "hours",
@@ -132,7 +132,7 @@ func (inst *MariadbServer) databaseComputeInstance(name, serviceName, productNam
 		ProductFilter: &product.Filter{
 			Provider: util.StringPtr(inst.provider.key),
 			Location: util.StringPtr(inst.location),
-			Service:  util.StringPtr(serviceName),
+			Service:  util.StringPtr(inst.serviceName),
 			Family:   util.StringPtr("Databases"),
 			AttributeFilters: []*product.AttributeFilter{
 				{Key: "product_name", ValueRegex: util.StringPtr(productNameRegex)},
@@ -147,7 +147,7 @@ func (inst *MariadbServer) databaseComputeInstance(name, serviceName, productNam
 	}
 }
 
-func (inst *MariadbServer) databaseStorageComponent(serviceName, productNameRegex string, storageGB int64) query.Component {
+func (inst *MariadbServer) databaseStorageComponent(productNameRegex string, storageGB int64) query.Component {
 	return query.Component{
 		Name:            "Storage",
 		Unit:            "GB",
@@ -155,7 +155,7 @@ func (inst *MariadbServer) databaseStorageComponent(serviceName, productNameRege
 		ProductFilter: &product.Filter{
 			Provider: util.StringPtr(inst.provider.key),
 			Location: util.StringPtr(inst.location),
-			Service:  util.StringPtr(serviceName),
+			Service:  util.StringPtr(inst.serviceName),
 			Family:   util.StringPtr("Databases"),
 			AttributeFilters: []*product.AttributeFilter{
 				{Key: "product_name", ValueRegex: util.StringPtr(productNameRegex)},
@@ -164,7 +164,7 @@ func (inst *MariadbServer) databaseStorageComponent(serviceName, productNameRege
 	}
 }
 
-func (inst *MariadbServer) databaseBackupStorageComponent(serviceName, skuName string, backupStorageGB decimal.Decimal) query.Component {
+func (inst *MariadbServer) databaseBackupStorageComponent(skuName string, backupStorageGB decimal.Decimal) query.Component {
 	return query.Component{
 		Name:            "Additional backup storage",
 		Unit:            "GB",
@@ -172,7 +172,7 @@ func (inst *MariadbServer) databaseBackupStorageComponent(serviceName, skuName s
 		ProductFilter: &product.Filter{
 			Provider: util.StringPtr(inst.provider.key),
 			Location: util.StringPtr(inst.location),
-			Service:  util.StringPtr(serviceName),
+			Service:  util.StringPtr(inst.serviceName),
 			Family:   util.StringPtr("Databases"),
 			AttributeFilters: []*product.AttributeFilter{
 				{Key: "product_name", ValueRegex: util.StringPtr(".*Single Server - Backup Storage.*")},
