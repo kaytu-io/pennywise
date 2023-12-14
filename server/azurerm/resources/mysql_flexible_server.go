@@ -12,9 +12,9 @@ import (
 	"strings"
 )
 
-// PostgresqlFlexibleServer is the entity that holds the logic to calculate price
-// of the azurerm_postgresql_flexible_server
-type PostgresqlFlexibleServer struct {
+// MysqlFlexibleServer is the entity that holds the logic to calculate price
+// of the azurerm_mysql_flexible_server
+type MysqlFlexibleServer struct {
 	provider *Provider
 
 	location        string
@@ -23,25 +23,29 @@ type PostgresqlFlexibleServer struct {
 	instanceType    string
 	instanceVersion string
 	storage         int64
+	iops            int64
 
 	// Usage
 	additionalBackupStorageGb *float64
 }
 
-// postgresqlFlexibleServerValues is holds the values that we need to be able
-// to calculate the price of the PostgresqlFlexibleServer
-type postgresqlFlexibleServerValues struct {
-	Location  string `mapstructure:"location"`
-	SkuName   string `mapstructure:"sku_name"`
-	StorageMb int64  `mapstructure:"storage_mb"`
+// mysqlFlexibleServerValues is holds the values that we need to be able
+// to calculate the price of the MysqlFlexibleServer
+type mysqlFlexibleServerValues struct {
+	Location string `mapstructure:"location"`
+	SkuName  string `mapstructure:"sku_name"`
+	Storage  []struct {
+		Iops   *int64 `mapstructure:"iops"`
+		SizeGb *int64 `mapstructure:"size_gb"`
+	} `mapstructure:"storage"`
 
 	Usage struct {
 		AdditionalBackupStorageGb *float64 `mapstructure:"additional_backup_storage_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
 
-func decodePostgresqlFlexibleServerValues(tfVals map[string]interface{}) (postgresqlFlexibleServerValues, error) {
-	var v postgresqlFlexibleServerValues
+func decodeMysqlFlexibleServerValues(tfVals map[string]interface{}) (mysqlFlexibleServerValues, error) {
+	var v mysqlFlexibleServerValues
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
 		Result:           &v,
@@ -58,7 +62,7 @@ func decodePostgresqlFlexibleServerValues(tfVals map[string]interface{}) (postgr
 	return v, nil
 }
 
-func (p *Provider) newPostgresqlFlexibleServer(vals postgresqlFlexibleServerValues) *PostgresqlFlexibleServer {
+func (p *Provider) newMysqlFlexibleServer(vals mysqlFlexibleServerValues) *MysqlFlexibleServer {
 	var tier, size, version string
 
 	s := strings.Split(vals.SkuName, "_")
@@ -88,7 +92,18 @@ func (p *Provider) newPostgresqlFlexibleServer(vals postgresqlFlexibleServerValu
 		}
 	}
 
-	inst := &PostgresqlFlexibleServer{
+	storage := int64(0)
+	iops := int64(0)
+	if len(vals.Storage) > 0 {
+		if vals.Storage[0].SizeGb != nil {
+			storage = *vals.Storage[0].SizeGb
+		}
+		if vals.Storage[0].Iops != nil {
+			iops = *vals.Storage[0].Iops
+		}
+	}
+
+	inst := &MysqlFlexibleServer{
 		provider: p,
 
 		location:        getLocationName(vals.Location),
@@ -96,23 +111,33 @@ func (p *Provider) newPostgresqlFlexibleServer(vals postgresqlFlexibleServerValu
 		tier:            tier,
 		instanceType:    size,
 		instanceVersion: version,
-		storage:         vals.StorageMb,
+		storage:         storage,
+		iops:            iops,
 
 		additionalBackupStorageGb: vals.Usage.AdditionalBackupStorageGb,
 	}
 	return inst
 }
 
-func (inst *PostgresqlFlexibleServer) Components() []query.Component {
+func (inst *MysqlFlexibleServer) Components() []query.Component {
 	var components []query.Component
 
-	components = append(components, inst.computeCostComponent(), inst.backupCostComponent(), inst.storageCostComponent())
+	components = append(components, inst.computeCostComponent(), inst.backupCostComponent(), inst.storageCostComponent(), inst.iopsCostComponent())
 
 	return components
 }
 
-func (inst *PostgresqlFlexibleServer) computeCostComponent() query.Component {
+func (inst *MysqlFlexibleServer) computeCostComponent() query.Component {
 	attrs := getFlexibleServerFilterAttributes(inst.tier, inst.instanceType, inst.instanceVersion)
+
+	tierName := attrs.TierName
+	if tierName == "Memory Optimized" {
+		tierName = "Business Critical"
+	}
+
+	if tierName == "Business Critical" && attrs.Series == "Edsv4" {
+		attrs.Series = ""
+	}
 
 	return query.Component{
 		Name:           fmt.Sprintf("Compute (%s)", inst.sku),
@@ -121,10 +146,10 @@ func (inst *PostgresqlFlexibleServer) computeCostComponent() query.Component {
 		ProductFilter: &product.Filter{
 			Provider: util.StringPtr(inst.provider.key),
 			Location: util.StringPtr(inst.location),
-			Service:  util.StringPtr("Azure Database for PostgreSQL"),
+			Service:  util.StringPtr("Azure Database for MySQL"),
 			Family:   util.StringPtr("Databases"),
 			AttributeFilters: []*product.AttributeFilter{
-				{Key: "product_name", ValueRegex: util.StringPtr(fmt.Sprintf(".*%s.*", attrs.TierName))},
+				{Key: "product_name", ValueRegex: util.StringPtr(fmt.Sprintf(".*%s.*", tierName))},
 				{Key: "product_name", ValueRegex: util.StringPtr(fmt.Sprintf(".*%s.*", attrs.Series))},
 				{Key: "sku_name", ValueRegex: util.StringPtr(fmt.Sprintf("^(?i)%s$", attrs.SKUName))},
 				{Key: "meter_name", ValueRegex: util.StringPtr(fmt.Sprintf("^(?i)%s$", attrs.MeterName))},
@@ -138,10 +163,12 @@ func (inst *PostgresqlFlexibleServer) computeCostComponent() query.Component {
 	}
 }
 
-func (inst *PostgresqlFlexibleServer) storageCostComponent() query.Component {
+func (inst *MysqlFlexibleServer) storageCostComponent() query.Component {
 	var quantity decimal.Decimal
-	if inst.storage > 0 {
-		quantity = decimal.NewFromInt(inst.storage / 1024)
+	if inst.storage == 0 {
+		quantity = decimal.NewFromInt(20)
+	} else {
+		quantity = decimal.NewFromInt(inst.storage)
 	}
 
 	return query.Component{
@@ -151,17 +178,48 @@ func (inst *PostgresqlFlexibleServer) storageCostComponent() query.Component {
 		ProductFilter: &product.Filter{
 			Provider: util.StringPtr(inst.provider.key),
 			Location: util.StringPtr(inst.location),
-			Service:  util.StringPtr("Azure Database for PostgreSQL"),
+			Service:  util.StringPtr("Azure Database for MySQL"),
 			Family:   util.StringPtr("Databases"),
 			AttributeFilters: []*product.AttributeFilter{
-				{Key: "product_name", Value: util.StringPtr("Az DB for PostgreSQL Flexible Server Storage")},
+				{Key: "product_name", Value: util.StringPtr("Az DB for MySQL Flexible Server Storage")},
 				{Key: "meter_name", Value: util.StringPtr("Storage Data Stored")},
 			},
 		},
 	}
 }
 
-func (inst *PostgresqlFlexibleServer) backupCostComponent() query.Component {
+func (inst *MysqlFlexibleServer) iopsCostComponent() query.Component {
+	var freeIOPS int64 = 360
+
+	iops := inst.iops
+	if iops == 0 {
+		iops = freeIOPS
+	}
+
+	additionalIOPS := iops - freeIOPS
+
+	if additionalIOPS < 0 {
+		additionalIOPS = 0
+	}
+
+	return query.Component{
+		Name:            "Additional IOPS",
+		Unit:            "IOPS",
+		MonthlyQuantity: decimal.NewFromInt(additionalIOPS),
+		ProductFilter: &product.Filter{
+			Provider: util.StringPtr(inst.provider.key),
+			Location: util.StringPtr(inst.location),
+			Service:  util.StringPtr("Azure Database for MySQL"),
+			Family:   util.StringPtr("Databases"),
+			AttributeFilters: []*product.AttributeFilter{
+				{Key: "product_name", Value: util.StringPtr("Az DB for MySQL Flexible Server Storage")},
+				{Key: "sku_name", Value: util.StringPtr("Additional IOPS")},
+			},
+		},
+	}
+}
+
+func (inst *MysqlFlexibleServer) backupCostComponent() query.Component {
 	var quantity decimal.Decimal
 	if inst.additionalBackupStorageGb != nil {
 		quantity = decimal.NewFromFloat(*inst.additionalBackupStorageGb)
@@ -174,51 +232,12 @@ func (inst *PostgresqlFlexibleServer) backupCostComponent() query.Component {
 		ProductFilter: &product.Filter{
 			Provider: util.StringPtr(inst.provider.key),
 			Location: util.StringPtr(inst.location),
-			Service:  util.StringPtr("Azure Database for PostgreSQL"),
+			Service:  util.StringPtr("Azure Database for MySQL"),
 			Family:   util.StringPtr("Databases"),
 			AttributeFilters: []*product.AttributeFilter{
-				{Key: "product_name", Value: util.StringPtr("Azure Database for PostgreSQL Flexible Server Backup Storage")},
+				{Key: "product_name", Value: util.StringPtr("Az DB for MySQL Flex Svr Backup Storage")},
 				{Key: "meter_name", Value: util.StringPtr("Backup Storage LRS Data Stored")},
 			},
 		},
-	}
-}
-
-type flexibleServerFilterAttributes struct {
-	SKUName   string
-	TierName  string
-	MeterName string
-	Series    string
-}
-
-func getFlexibleServerFilterAttributes(tier, instanceType, instanceVersion string) flexibleServerFilterAttributes {
-	var skuName, meterName, series string
-
-	tierName := map[string]string{
-		"b":  "Burstable",
-		"gp": "General Purpose",
-		"mo": "Memory Optimized",
-	}[tier]
-
-	if tier == "b" {
-		meterName = instanceType
-		skuName = instanceType
-		series = "BS"
-	} else {
-		meterName = "vCore"
-
-		coreRegex := regexp.MustCompile(`(\d+)`)
-		match := coreRegex.FindStringSubmatch(instanceType)
-		cores := match[1]
-		skuName = fmt.Sprintf("%s vCore", cores)
-
-		series = coreRegex.ReplaceAllString(instanceType, "") + instanceVersion
-	}
-
-	return flexibleServerFilterAttributes{
-		SKUName:   skuName,
-		TierName:  tierName,
-		MeterName: meterName,
-		Series:    series,
 	}
 }
