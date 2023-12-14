@@ -144,7 +144,7 @@ var (
 	sqlTierMapping = map[string]string{
 		"gp":   "General Purpose",
 		"gp_s": "General Purpose - Serverless",
-		"hs":   "Hyperscale",
+		"hs":   "Hyperscale", // TODO: SingleDB or not
 		"bc":   "Business Critical",
 	}
 

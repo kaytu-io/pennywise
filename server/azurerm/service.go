@@ -28,5 +28,6 @@ var (
 		"Azure Cosmos DB":            {},
 		"Azure Database for MariaDB": {},
 		"SQL Database":               {},
+		"SQL Managed Instance":       {},
 	}
 )

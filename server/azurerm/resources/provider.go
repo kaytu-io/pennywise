@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
 )
@@ -435,10 +434,15 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 	case "azurerm_mssql_database":
 		vals, err := decodeMssqlDatabaseValues(tfRes.Values)
 		if err != nil {
-			fmt.Println("ERROR", err.Error())
 			return nil
 		}
 		return p.newMssqlDatabase(vals).Components()
+	case "azurerm_sql_managed_instance":
+		vals, err := decodeSqlManagedInstanceValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newSqlManagedInstance(vals).Components()
 	default:
 		return nil
 	}
