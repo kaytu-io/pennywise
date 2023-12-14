@@ -461,6 +461,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newPostgresqlServer(vals).Components()
+	case "azurerm_postgresql_flexible_server":
+		vals, err := decodePostgresqlFlexibleServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPostgresqlFlexibleServer(vals).Components()
 	default:
 		return nil
 	}
