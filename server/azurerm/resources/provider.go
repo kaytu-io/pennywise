@@ -443,6 +443,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newSqlManagedInstance(vals).Components()
+	case "azurerm_mssql_managed_instance":
+		vals, err := decodeMssqlManagedInstanceValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMssqlManagedInstance(vals).Components()
 	default:
 		return nil
 	}

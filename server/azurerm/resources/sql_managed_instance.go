@@ -22,6 +22,7 @@ type SqlManagedInstance struct {
 	licenseType        string
 	storageAccountType string
 	storageSizeInGb    int64
+	mssql              bool
 
 	// Usage
 	longTermRetentionStorageGB *int64
@@ -81,6 +82,7 @@ func (p *Provider) newSqlManagedInstance(vals sqlManagedInstanceValues) *SqlMana
 		licenseType:        vals.LicenseType,
 		storageAccountType: vals.StorageAccountType,
 		storageSizeInGb:    vals.StorageSizeInGb,
+		mssql:              false,
 	}
 	return inst
 }
@@ -88,11 +90,17 @@ func (p *Provider) newSqlManagedInstance(vals sqlManagedInstanceValues) *SqlMana
 func (inst *SqlManagedInstance) Components() []query.Component {
 	var components []query.Component
 
-	components = append(components, inst.managedInstanceComponent(), inst.sqlMIStorageCostComponent(), inst.sqlMIBackupCostComponent(), inst.sqlMILongTermRetentionStorageGBCostComponent())
+	components = append(components, inst.managedInstanceComponent())
+
+	if !inst.mssql || ((inst.storageSizeInGb - 32) > 0) {
+		components = append(components, inst.sqlMIStorageCostComponent(), inst.sqlMIBackupCostComponent())
+	}
 
 	if inst.licenseType == "LicenseIncluded" {
 		components = append(components, inst.sqlMILicenseCostComponent())
 	}
+
+	components = append(components, inst.sqlMILongTermRetentionStorageGBCostComponent())
 
 	return components
 }
@@ -144,7 +152,7 @@ func (inst *SqlManagedInstance) meteredName() *string {
 
 func (inst *SqlManagedInstance) sqlMIStorageCostComponent() query.Component {
 	return query.Component{
-		Name:            "Storage",
+		Name:            "Additional Storage",
 		Unit:            "GB",
 		MonthlyQuantity: decimal.NewFromInt(inst.storageSizeInGb - 32),
 		ProductFilter: &product.Filter{
