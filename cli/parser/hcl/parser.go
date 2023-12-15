@@ -48,6 +48,10 @@ func ParseHclResources(path string, usage usagePackage.Usage) (string, []Resourc
 			resources[i] = makeResource.setRefs(resources, res)
 			resources[i] = makeResource.runFunctions(res)
 		}
+		// Embedded references
+		if makeResource, ok := makeResourceProcesses[res.Type]; ok {
+			resources[i] = makeResource.setRefs(resources, res)
+		}
 		resources[i] = addUsage(res, usage)
 	}
 
