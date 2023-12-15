@@ -41,6 +41,7 @@ func decoderDNSNSRecord(tfVals map[string]interface{}) (dnsNSRecordValues, error
 
 func (p *Provider) newDNSNSRecord(vals dnsNSRecordValues) *DNSNSRecord {
 	inst := &DNSNSRecord{
+		provider:       p,
 		location:       vals.ResourceGroupName.Values.Location,
 		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
@@ -48,5 +49,6 @@ func (p *Provider) newDNSNSRecord(vals dnsNSRecordValues) *DNSNSRecord {
 }
 
 func (inst *DNSNSRecord) component() []query.Component {
-	return DNSQueriesCostComponent(inst.location, inst.monthlyQueries)
+	region := getLocationName(inst.location)
+	return DNSQueriesCostComponent(inst.provider.key, region, inst.monthlyQueries)
 }

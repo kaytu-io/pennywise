@@ -11,6 +11,7 @@ import (
 )
 
 type ContainerRegistry struct {
+	provider                *Provider
 	location                string
 	geoReplicationLocations int
 	sKU                     string
@@ -33,6 +34,7 @@ type ContainerRegistryValue struct {
 
 func (p *Provider) newContainerRegistry(vals ContainerRegistryValue) *ContainerRegistry {
 	inst := &ContainerRegistry{
+		provider:                p,
 		location:                vals.Location,
 		sKU:                     vals.SKU,
 		geoReplicationLocations: len(vals.GeoReplication),

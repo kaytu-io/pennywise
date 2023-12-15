@@ -31,5 +31,6 @@ var (
 		"Azure Database for PostgreSQL": {},
 		"SQL Database":                  {},
 		"SQL Managed Instance":          {},
+		"Azure Kubernetes Service":      {},
 	}
 )

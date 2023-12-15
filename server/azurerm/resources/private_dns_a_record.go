@@ -48,9 +48,10 @@ func decoderPrivateDnsARecord(tfVals map[string]interface{}) (privateDNSARecordV
 }
 
 func (inst *PrivateDNSARecord) component() []query.Component {
-	return privateDNSARecord(inst.location, inst.monthlyQueries)
+	region := getLocationName(inst.location)
+	return privateDNSARecord(inst.provider.key, region, inst.monthlyQueries)
 }
 
-func privateDNSARecord(region string, monthlyQueries *int64) []query.Component {
-	return DNSQueriesCostComponent(region, monthlyQueries)
+func privateDNSARecord(key string, region string, monthlyQueries *int64) []query.Component {
+	return DNSQueriesCostComponent(key, region, monthlyQueries)
 }
