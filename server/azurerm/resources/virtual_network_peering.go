@@ -42,7 +42,7 @@ type virtualNetworkPeeringValues struct {
 
 	Usage struct {
 		MonthlyDataTransferGB float64 `mapstructure:"monthly_data_transfer_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeVirtualNetworkPeeringValues decodes and returns computeInstanceValues from a Terraform values map.

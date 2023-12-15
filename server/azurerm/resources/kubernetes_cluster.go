@@ -70,7 +70,7 @@ type kubernetesClusterValues struct {
 		LoadBalancer struct {
 			MonthlyDataProcessedGB *int64 `mapstructure:"monthly_data_processed_gb"`
 		} `mapstructure:"load_balancer"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decoderKubernetesCluster decodes and returns kubernetesClusterValues from a Terraform values map.

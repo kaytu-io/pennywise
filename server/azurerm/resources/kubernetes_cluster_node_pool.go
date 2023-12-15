@@ -43,7 +43,7 @@ type kubernetesClusterNodePoolValues struct {
 	Usage struct {
 		Nodes      *int64   `json:"nodes"`
 		MonthlyHrs *float64 `json:"monthly_hrs"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decoderKubernetesCluster decodes and returns kubernetesClusterValues from a Terraform values map.

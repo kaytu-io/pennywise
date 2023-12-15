@@ -18,7 +18,7 @@ type dnsCNAMERecordValues struct {
 
 	Usage struct {
 		MonthlyQueries int64 `mapstructure:"monthly_queries"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 func decoderDNSCNAMERecord(tfVals map[string]interface{}) (dnsCNAMERecordValues, error) {

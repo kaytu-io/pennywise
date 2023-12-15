@@ -19,7 +19,7 @@ type privateDNSAAAARecordValues struct {
 
 	Usage struct {
 		MonthlyQueries int64 `mapstructure:"monthly_queries"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 func (p *Provider) newprivateDNSAAAARecord(vals privateDNSAAAARecordValues) *PrivateDNSAAAARecord {
