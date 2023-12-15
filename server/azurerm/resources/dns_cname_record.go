@@ -41,6 +41,7 @@ func decoderDNSCNAMERecord(tfVals map[string]interface{}) (dnsCNAMERecordValues,
 
 func (p *Provider) newDNSCNAMERecord(vals dnsCNAMERecordValues) *DNSCNAMERecord {
 	inst := &DNSCNAMERecord{
+		provider:       p,
 		location:       vals.ResourceGroupName.Values.Location,
 		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
@@ -48,5 +49,6 @@ func (p *Provider) newDNSCNAMERecord(vals dnsCNAMERecordValues) *DNSCNAMERecord 
 }
 
 func (inst *DNSCNAMERecord) component() []query.Component {
-	return DNSQueriesCostComponent(inst.location, inst.monthlyQueries)
+	region := getLocationName(inst.location)
+	return DNSQueriesCostComponent(inst.provider.key, region, inst.monthlyQueries)
 }

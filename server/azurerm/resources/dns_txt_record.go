@@ -40,6 +40,8 @@ func decoderDNSTXTRecord(tfVals map[string]interface{}) (dnsTEXTRecordValues, er
 
 func (p *Provider) newDNSTXTRecord(vals dnsTEXTRecordValues) *DNSTEXTRecord {
 	inst := &DNSTEXTRecord{
+
+		provider:       p,
 		location:       vals.ResourceGroupName.Values.Location,
 		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
@@ -47,5 +49,6 @@ func (p *Provider) newDNSTXTRecord(vals dnsTEXTRecordValues) *DNSTEXTRecord {
 }
 
 func (inst *DNSTEXTRecord) component() []query.Component {
-	return DNSQueriesCostComponent(inst.location, inst.monthlyQueries)
+	region := getLocationName(inst.location)
+	return DNSQueriesCostComponent(inst.provider.key, region, inst.monthlyQueries)
 }

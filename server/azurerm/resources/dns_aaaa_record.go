@@ -42,6 +42,7 @@ func decoderDNSAAAARecord(tfVals map[string]interface{}) (dnsAAAARecordValues, e
 
 func (p *Provider) newDNSAAAARecord(vals dnsAAAARecordValues) *DNSAAAARecord {
 	inst := &DNSAAAARecord{
+		provider:       p,
 		location:       vals.ResourceGroupName.Values.Location,
 		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
@@ -49,5 +50,6 @@ func (p *Provider) newDNSAAAARecord(vals dnsAAAARecordValues) *DNSAAAARecord {
 }
 
 func (inst *DNSAAAARecord) component() []query.Component {
-	return DNSQueriesCostComponent(inst.location, inst.monthlyQueries)
+	region := getLocationName(inst.location)
+	return DNSQueriesCostComponent(inst.provider.key, region, inst.monthlyQueries)
 }

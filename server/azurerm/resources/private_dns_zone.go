@@ -1,12 +1,15 @@
 package resources
 
 import (
+	_ "fmt"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/mitchellh/mapstructure"
 	"strings"
 )
 
 type PrivateDNSZone struct {
+	provider *Provider
+
 	location string
 }
 
@@ -16,6 +19,7 @@ type privateDNSZoneValue struct {
 
 func (p *Provider) newPrivateDNSZone(vals privateDNSZoneValue) *PrivateDNSZone {
 	inst := &PrivateDNSZone{
+		provider: p,
 		location: vals.ResourceGroupName.Values.Location,
 	}
 	return inst
@@ -27,7 +31,6 @@ func decoderPrivateDnsZone(tfVals map[string]interface{}) (privateDNSZoneValue, 
 		WeaklyTypedInput: true,
 		Result:           &v,
 	}
-
 	decoder, err := mapstructure.NewDecoder(config)
 	if err != nil {
 		return v, err
@@ -41,12 +44,13 @@ func decoderPrivateDnsZone(tfVals map[string]interface{}) (privateDNSZoneValue, 
 
 func (inst *PrivateDNSZone) component() []query.Component {
 	costComponent := make([]query.Component, 0)
-	costComponent = append(costComponent, PrivateDNSZoneCostComponent(inst.location))
+	region := getLocationName(inst.location)
+	costComponent = append(costComponent, PrivateDNSZoneCostComponent(inst.provider.key, region))
 
 	return costComponent
 }
 
-func PrivateDNSZoneCostComponent(region string) query.Component {
+func PrivateDNSZoneCostComponent(key string, region string) query.Component {
 	region = getLocationName(region)
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
@@ -62,5 +66,5 @@ func PrivateDNSZoneCostComponent(region string) query.Component {
 		region = "Zone 1"
 	}
 
-	return hostedPublicZoneCostComponent(region)
+	return hostedPublicZoneCostComponent(key, region)
 }

@@ -22,6 +22,7 @@ type RMDNSZoneValue struct {
 
 func (p *Provider) newRMDNSZone(vals RMDNSZoneValue) *RMDNSZone {
 	inst := &RMDNSZone{
+		provider: p,
 		location: vals.ResourceGroupName.Values.Location,
 	}
 	return inst
@@ -59,22 +60,23 @@ func (inst *RMDNSZone) component() []query.Component {
 	}
 
 	costComponents := make([]query.Component, 0)
-	costComponents = append(costComponents, hostedPublicZoneCostComponent(region))
+	costComponents = append(costComponents, hostedPublicZoneCostComponent(inst.provider.key, region))
 
 	return costComponents
 }
 
-func hostedPublicZoneCostComponent(region string) query.Component {
+func hostedPublicZoneCostComponent(key string, region string) query.Component {
 	return query.Component{
 		Name:            "Hosted zone",
 		Unit:            "months",
 		MonthlyQuantity: decimal.NewFromInt(1),
 		ProductFilter: &product.Filter{
+			Provider: util.StringPtr(key),
 			Location: util.StringPtr(region),
 			Service:  util.StringPtr("Azure DNS"),
 			Family:   util.StringPtr("Networking"),
 			AttributeFilters: []*product.AttributeFilter{
-				{Key: "meter_name", ValueRegex: util.StringPtr("Public Zone")},
+				{Key: "meter_name", ValueRegex: util.StringPtr("Public Zone(s)?")},
 			},
 		},
 		PriceFilter: &price.Filter{

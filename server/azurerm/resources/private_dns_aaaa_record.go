@@ -24,6 +24,8 @@ type privateDNSAAAARecordValues struct {
 
 func (p *Provider) newprivateDNSAAAARecord(vals privateDNSAAAARecordValues) *PrivateDNSAAAARecord {
 	inst := &PrivateDNSAAAARecord{
+
+		provider:       p,
 		location:       vals.ResourceGroupName.Values.Location,
 		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
@@ -49,9 +51,10 @@ func decoderPrivateDnsAAAARecord(tfVals map[string]interface{}) (privateDNSAAAAR
 }
 
 func (inst *PrivateDNSAAAARecord) component() []query.Component {
-	return privateDNSAAAARecord(inst.location, inst.monthlyQueries)
+	region := getLocationName(inst.location)
+	return privateDNSAAAARecord(inst.provider.key, region, inst.monthlyQueries)
 }
 
-func privateDNSAAAARecord(region string, monthlyQueries *int64) []query.Component {
-	return DNSQueriesCostComponent(region, monthlyQueries)
+func privateDNSAAAARecord(key, region string, monthlyQueries *int64) []query.Component {
+	return DNSQueriesCostComponent(key, region, monthlyQueries)
 }

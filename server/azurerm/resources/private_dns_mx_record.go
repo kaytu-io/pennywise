@@ -23,6 +23,7 @@ type privateDNSMXRecordValues struct {
 
 func (p *Provider) newPrivateDNSMXRecord(vals privateDNSMXRecordValues) *PrivateDNSMXRecord {
 	inst := &PrivateDNSMXRecord{
+		provider:       p,
 		location:       vals.ResourceGroupName.Values.Location,
 		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
@@ -48,9 +49,10 @@ func decoderPrivateDnsMXRecord(tfVals map[string]interface{}) (privateDNSMXRecor
 }
 
 func (inst *PrivateDNSMXRecord) component() []query.Component {
-	return privateDNSMXRecord(inst.location, inst.monthlyQueries)
+	region := getLocationName(inst.location)
+	return privateDNSMXRecord(inst.provider.key, region, inst.monthlyQueries)
 }
 
-func privateDNSMXRecord(region string, monthlyQueries *int64) []query.Component {
-	return DNSQueriesCostComponent(region, monthlyQueries)
+func privateDNSMXRecord(key, region string, monthlyQueries *int64) []query.Component {
+	return DNSQueriesCostComponent(key, region, monthlyQueries)
 }

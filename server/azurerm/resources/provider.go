@@ -325,6 +325,18 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newPrivateDNSZone(vals).component()
+	case "azurerm_kubernetes_cluster":
+		vals, err := decoderKubernetesCluster(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.NewAzureRMKubernetesCluster(vals).Components()
+	case "azurerm_kubernetes_cluster_node_pool":
+		vals, err := decoderKubernetesClusterNodePool(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newAzureRMKubernetesClusterNodePool(vals).Components()
 	default:
 		return nil
 	}

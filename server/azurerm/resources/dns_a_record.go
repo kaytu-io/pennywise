@@ -52,6 +52,7 @@ func decodeDNSARecord(tfVals map[string]interface{}) (dnsARecordValues, error) {
 
 func (p *Provider) newDNSARecord(vals dnsARecordValues) *DNSARecord {
 	inst := &DNSARecord{
+		provider:       p,
 		location:       vals.ResourceGroupName.Values.Location,
 		monthlyQueries: vals.Usage.MonthlyQueries,
 	}
@@ -59,11 +60,11 @@ func (p *Provider) newDNSARecord(vals dnsARecordValues) *DNSARecord {
 }
 
 func (inst *DNSARecord) component() []query.Component {
-
-	return DNSQueriesCostComponent(inst.location, inst.monthlyQueries)
+	region := getLocationName(inst.location)
+	return DNSQueriesCostComponent(inst.provider.key, region, inst.monthlyQueries)
 }
 
-func DNSQueriesCostComponent(region string, monthlyQueries *int64) []query.Component {
+func DNSQueriesCostComponent(key, region string, monthlyQueries *int64) []query.Component {
 	region = getLocationName(region)
 
 	var monthlyQueriesDec decimal.Decimal
@@ -89,24 +90,25 @@ func DNSQueriesCostComponent(region string, monthlyQueries *int64) []query.Compo
 
 		firstBqueries := requestQuantities[0].Div(decimal.NewFromInt(1000000))
 		overBqueries := requestQuantities[1].Div(decimal.NewFromInt(1000000))
-		costComponents = append(costComponents, dnsQueriesFirstCostComponent(region, "DNS queries (first 1B)", "0", &firstBqueries))
+		costComponents = append(costComponents, dnsQueriesFirstCostComponent(key, region, "DNS queries (first 1B)", "0", &firstBqueries))
 
 		if requestQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, dnsQueriesFirstCostComponent(region, "DNS queries (over 1B)", "1000", &overBqueries))
+			costComponents = append(costComponents, dnsQueriesFirstCostComponent(key, region, "DNS queries (over 1B)", "1000", &overBqueries))
 		}
 	} else {
 		var unknown decimal.Decimal
-		costComponents = append(costComponents, dnsQueriesFirstCostComponent(region, "DNS queries (first 1B)", "0", &unknown))
+		costComponents = append(costComponents, dnsQueriesFirstCostComponent(key, region, "DNS queries (first 1B)", "0", &unknown))
 	}
 	return costComponents
 }
 
-func dnsQueriesFirstCostComponent(region, name, startUsage string, monthlyQueries *decimal.Decimal) query.Component {
+func dnsQueriesFirstCostComponent(key, region, name, startUsage string, monthlyQueries *decimal.Decimal) query.Component {
 	return query.Component{
 		Name:            name,
 		Unit:            "1M queries",
 		MonthlyQuantity: *monthlyQueries,
 		ProductFilter: &product.Filter{
+			Provider: util.StringPtr(key),
 			Location: util.StringPtr(region),
 			Service:  util.StringPtr("Azure DNS"),
 			Family:   util.StringPtr("Networking"),
