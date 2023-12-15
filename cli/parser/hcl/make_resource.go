@@ -120,6 +120,12 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_mssql_database": {
 		Refs: []Reference{{RefValue: "server_id", RefAttribute: "id"}},
 	},
+	"azurerm_kubernetes_cluster_node_pool": {
+		Refs: []Reference{{RefValue: "kubernetes_cluster_id", RefAttribute: "id"}},
+	},
+	"azurerm_kubernetes_cluster": {
+		Refs: []Reference{{RefValue: "resource_group_name", RefAttribute: "name"}},
+	},
 }
 
 type ResourceFunction func(Resource) (Resource, error)
