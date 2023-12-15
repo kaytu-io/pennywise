@@ -97,15 +97,6 @@ func decoderKubernetesCluster(tfVals map[string]interface{}) (kubernetesClusterV
 	return v, nil
 }
 
-func contains(wordsThatWantToCheck []string, text string) bool {
-	for _, a := range wordsThatWantToCheck {
-		if strings.Contains(a, text) {
-			return true
-		}
-	}
-	return false
-}
-
 func (p *Provider) NewAzureRMKubernetesCluster(vals kubernetesClusterValues) *KubernetesCluster {
 	var DefaultNodePool DefaultNodePoolStruct
 	var AddonProfile AddonProfileStruct
