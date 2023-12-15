@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
@@ -21,7 +22,7 @@ type WindowsVirtualMachine struct {
 	osDisk      []OsDisk
 
 	// Usage
-	monthlyHours decimal.Decimal
+	monthlyHours *decimal.Decimal
 }
 
 // windowsVirtualMachineValues is holds the values that we need to be able
@@ -37,7 +38,7 @@ type windowsVirtualMachineValues struct {
 	} `mapstructure:"os_disk"`
 
 	Usage struct {
-		MonthlyHours float64 `mapstructure:"monthly_hours"`
+		MonthlyHours *float64 `mapstructure:"monthly_hours"`
 	} `mapstructure:"pennywise_usage"`
 }
 
@@ -73,7 +74,7 @@ func (p *Provider) newWindowsVirtualMachine(vals windowsVirtualMachineValues) *W
 		size:         vals.Size,
 		licenseType:  vals.LicenseType,
 		osDisk:       osDisks,
-		monthlyHours: decimal.NewFromFloat(vals.Usage.MonthlyHours),
+		monthlyHours: util.FloatToDecimal(vals.Usage.MonthlyHours),
 	}
 
 	return inst
@@ -87,7 +88,7 @@ func (inst *WindowsVirtualMachine) Components() []query.Component {
 	return components
 }
 
-// linuxVirtualMachineComponent returns the query needed to be able to calculate the price
+// windowsVirtualMachineComponent returns the query needed to be able to calculate the price
 func (inst *WindowsVirtualMachine) windowsVirtualMachineComponent() query.Component {
 	purchaseOption := "Consumption"
 	if strings.ToLower(inst.licenseType) == "windows_client" || strings.ToLower(inst.licenseType) == "windows_server" {
@@ -96,13 +97,16 @@ func (inst *WindowsVirtualMachine) windowsVirtualMachineComponent() query.Compon
 	return windowsVirtualMachineComponent(inst.provider.key, inst.location, inst.size, purchaseOption, inst.monthlyHours)
 }
 
-// linuxVirtualMachineComponent is the abstraction of the same LinuxVirtualMachine.linuxVirtualMachineComponent
+// windowsVirtualMachineComponent is the abstraction of the same LinuxVirtualMachine.linuxVirtualMachineComponent
 // so it can be reused
-func windowsVirtualMachineComponent(key, location, size, purchaseOption string, qty decimal.Decimal) query.Component {
+func windowsVirtualMachineComponent(key, location, size, purchaseOption string, qty *decimal.Decimal) query.Component {
+	if qty == nil {
+		qty = util.DecimalPtr(decimal.NewFromInt(730))
+	}
 	return query.Component{
-		Name:            "Compute",
+		Name:            fmt.Sprintf("Compute %s", size),
 		Unit:            "Monthly Hours",
-		MonthlyQuantity: qty,
+		MonthlyQuantity: *qty,
 		ProductFilter: &product.Filter{
 			Provider: util.StringPtr(key),
 			Service:  util.StringPtr("Virtual Machines"),

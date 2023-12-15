@@ -18,7 +18,7 @@ type privateDNSPTRRecordValues struct {
 
 	Usage struct {
 		MonthlyQueries int64 `mapstructure:"monthly_queries"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 func (p *Provider) newPrivateDNSPTRRecord(vals privateDNSPTRRecordValues) *PrivateDNSPTRRecord {

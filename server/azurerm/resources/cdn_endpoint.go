@@ -42,7 +42,7 @@ type AzureRMCDNEndpointValue struct {
 	Usage struct {
 		MonthlyOutboundGB          *int64 `mapstructure:"monthly_outbound_gb"`
 		MonthlyRulesEngineRequests *int64 `mapstructure:"monthly_rules_engine_requests"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 func (p *Provider) newCDNEndpoint(vals AzureRMCDNEndpointValue) *AzureRMCDNEndpoint {
@@ -87,7 +87,6 @@ func (inst AzureRMCDNEndpoint) Component() []query.Component {
 	var costComponents []query.Component
 	sku := ""
 	if inst.sku != nil {
-		fmt.Printf("sku : %v \n ", *inst.sku)
 		sku = *inst.sku
 	}
 
@@ -177,8 +176,8 @@ func cdnOutboundDataCostComponents(key string, region, sku string, monthlyOutbou
 		{name: fmt.Sprintf("%s%s", name, "next 100TB)"), startUsage: "50000"},
 		{name: fmt.Sprintf("%s%s", name, "next 350TB)"), startUsage: "150000"},
 		{name: fmt.Sprintf("%s%s", name, "next 500TB)"), startUsage: "500000"},
-		{name: fmt.Sprintf("%s%s", name, "next 4000TB)"), startUsage: "1000000"},
-		{name: fmt.Sprintf("%s%s", name, "over 5000TB)"), startUsage: "5000000"},
+		{name: fmt.Sprintf("%s%s", name, "next 4000TB)"), startUsage: "1e+06"},
+		{name: fmt.Sprintf("%s%s", name, "over 5000TB)"), startUsage: "5e+06"},
 	}
 	meterName = fmt.Sprintf("%s Data Transfer", skuName)
 
@@ -245,7 +244,7 @@ func cdnAccelerationDataTransfersCostComponents(key, region, sku string, monthly
 		{name: fmt.Sprintf("%s%s", name, "(next 100TB)"), startUsage: "50000"},
 		{name: fmt.Sprintf("%s%s", name, "(next 350TB)"), startUsage: "150000"},
 		{name: fmt.Sprintf("%s%s", name, "(next 500TB)"), startUsage: "500000"},
-		{name: fmt.Sprintf("%s%s", name, "(over 1000TB)"), startUsage: "1000000"},
+		{name: fmt.Sprintf("%s%s", name, "(over 1000TB)"), startUsage: "1e+06"},
 	}
 
 	var productName, skuName, meterName string

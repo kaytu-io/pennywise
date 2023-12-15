@@ -19,7 +19,7 @@ type dnsCAARecordValues struct {
 
 	Usage struct {
 		MonthlyQueries int64 `mapstructure:"monthly_queries"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 func decoderDNSCAARecord(tfVals map[string]interface{}) (dnsCAARecordValues, error) {

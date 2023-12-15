@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
 )
@@ -476,6 +477,7 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 	case "azurerm_kubernetes_cluster":
 		vals, err := decoderKubernetesCluster(tfRes.Values)
 		if err != nil {
+			fmt.Println("ERROR", err.Error())
 			return nil
 		}
 		return p.NewAzureRMKubernetesCluster(vals).Components()

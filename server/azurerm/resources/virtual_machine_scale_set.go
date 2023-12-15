@@ -145,7 +145,7 @@ func (inst *VirtualMachineScaleSet) Components() []query.Component {
 		}
 
 		if os == "Linux" {
-			components = append(components, linuxVirtualMachineComponent(inst.provider.key, inst.location, inst.sku[0].Name, decimal.NewFromFloat(730)))
+			components = append(components, linuxVirtualMachineComponent(inst.provider.key, inst.location, inst.sku[0].Name, inst.monthlyHours))
 		}
 
 		if os == "Windows" {
@@ -157,7 +157,7 @@ func (inst *VirtualMachineScaleSet) Components() []query.Component {
 			if strings.ToLower(licenseType) == "windows_client" || strings.ToLower(licenseType) == "windows_server" {
 				purchaseOption = "DevTestConsumption"
 			}
-			components = append(components, windowsVirtualMachineComponent(inst.provider.key, inst.location, inst.sku[0].Name, purchaseOption, decimal.NewFromFloat(730)))
+			components = append(components, windowsVirtualMachineComponent(inst.provider.key, inst.location, inst.sku[0].Name, purchaseOption, inst.monthlyHours))
 		}
 	}
 	var osDiskMonthlyOperations float64

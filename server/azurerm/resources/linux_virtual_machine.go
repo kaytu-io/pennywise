@@ -20,7 +20,7 @@ type LinuxVirtualMachine struct {
 	osDisk   []OsDisk
 
 	// Usage
-	monthlyHours decimal.Decimal
+	monthlyHours *decimal.Decimal
 }
 
 // linuxVirtualMachineValues is holds the values that we need to be able
@@ -35,7 +35,7 @@ type linuxVirtualMachineValues struct {
 	} `mapstructure:"os_disk"`
 
 	Usage struct {
-		MonthlyHours float64 `mapstructure:"monthly_hours"`
+		MonthlyHours *float64 `mapstructure:"monthly_hours"`
 	} `mapstructure:"pennywise_usage"`
 }
 
@@ -71,7 +71,7 @@ func (p *Provider) newLinuxVirtualMachine(vals linuxVirtualMachineValues) *Linux
 		location:     getLocationName(vals.Location),
 		size:         vals.Size,
 		osDisk:       osDisks,
-		monthlyHours: decimal.NewFromFloat(vals.Usage.MonthlyHours),
+		monthlyHours: util.FloatToDecimal(vals.Usage.MonthlyHours),
 	}
 
 	return inst
@@ -93,11 +93,14 @@ func (inst *LinuxVirtualMachine) linuxVirtualMachineComponent() query.Component 
 
 // linuxVirtualMachineComponent is the abstraction of the same LinuxVirtualMachine.linuxVirtualMachineComponent
 // so it can be reused
-func linuxVirtualMachineComponent(key, location, size string, qty decimal.Decimal) query.Component {
+func linuxVirtualMachineComponent(key, location, size string, qty *decimal.Decimal) query.Component {
+	if qty == nil {
+		qty = util.DecimalPtr(decimal.NewFromInt(730))
+	}
 	return query.Component{
-		Name:            "Compute",
+		Name:            fmt.Sprintf("Compute %s", size),
 		Unit:            "Monthly Hours",
-		MonthlyQuantity: qty,
+		MonthlyQuantity: *qty,
 		ProductFilter: &product.Filter{
 			Provider: util.StringPtr(key),
 			Service:  util.StringPtr("Virtual Machines"),

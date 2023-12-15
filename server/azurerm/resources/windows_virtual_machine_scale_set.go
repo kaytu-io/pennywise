@@ -101,7 +101,7 @@ func (inst *WindowsVirtualMachineScaleSet) Components() []query.Component {
 	var components []query.Component
 
 	for i := int64(0); i < inst.instances; i++ {
-		components = append(components, windowsVirtualMachineComponent(inst.provider.key, inst.location, inst.sku, purchaseOption, decimal.NewFromFloat(730)))
+		components = append(components, windowsVirtualMachineComponent(inst.provider.key, inst.location, inst.sku, purchaseOption, inst.monthlyHours))
 		if len(inst.additionalCapabilities) > 0 {
 			if inst.additionalCapabilities[0].UltraSsdEnabled {
 				components = append(components, ultraSSDReservationCostComponent(inst.provider.key, inst.location))

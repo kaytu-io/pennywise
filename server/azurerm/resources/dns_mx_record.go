@@ -18,7 +18,7 @@ type dnsMAXRecordValues struct {
 
 	Usage struct {
 		MonthlyQueries int64 `mapstructure:"monthly_queries"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 func decoderDNSMXRecord(tfVals map[string]interface{}) (dnsMAXRecordValues, error) {

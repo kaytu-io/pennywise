@@ -18,7 +18,7 @@ type dnsPTRRecordValues struct {
 
 	Usage struct {
 		MonthlyQueries int64 `mapstructure:"monthly_queries"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 func decoderDNSPTRRecord(tfVals map[string]interface{}) (dnsPTRRecordValues, error) {

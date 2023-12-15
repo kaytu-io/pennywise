@@ -45,8 +45,6 @@ func decodeVirtualNetworkGatewayConnection(tfVals map[string]interface{}) (Virtu
 	if err := decoder.Decode(tfVals); err != nil {
 		return v, err
 	}
-	fmt.Printf("tfvalue : %v \n ", tfVals)
-	fmt.Printf("value : %v \n", v)
 	return v, nil
 }
 
