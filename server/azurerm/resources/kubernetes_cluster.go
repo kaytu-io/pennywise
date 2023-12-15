@@ -17,29 +17,31 @@ type KubernetesCluster struct {
 	location                      string
 	httpApplicationRoutingEnabled bool
 
-	nodeCount  *int64
-	minCount   *int64
-	osSku      *string
-	osType     *string
-	vmSize     string
-	osDiskType *string
+	nodeCount    *int64
+	minCount     *int64
+	osSku        *string
+	osType       *string
+	vmSize       string
+	osDiskType   *string
+	osDiskSizeGB *int
 
 	loadBalancerSku                          *string
 	addonProfileHttpApplicationRoutingEnable *bool
 
 	// Usage
-	LoadBalancerMonthlyDataProcessedGB *int64
+	loadBalancerMonthlyDataProcessedGB *int64
 	defaultNodePoolNodes               *int64
 	monthlyHrs                         *float64
 }
 
 type DefaultNodePoolStruct struct {
-	MinCount   *int64  `mapstructure:"min_count"`
-	NodeCount  *int64  `mapstructure:"node_count"`
-	OSSku      *string `mapstructure:"os_sku"`
-	OSType     *string `mapstructure:"os_type"`
-	VmSize     string  `mapstructure:"vm_size"`
-	OSDiskType *string `mapstructure:"os_disk_type"`
+	MinCount     *int64  `mapstructure:"min_count"`
+	NodeCount    *int64  `mapstructure:"node_count"`
+	OSSku        *string `mapstructure:"os_sku"`
+	OSType       *string `mapstructure:"os_type"`
+	VmSize       string  `mapstructure:"vm_size"`
+	OSDiskType   *string `mapstructure:"os_disk_type"`
+	OsDiskSizeGB *int    `mapstructure:"os_disk_size_gb"`
 }
 
 type AddonProfileStruct struct {
@@ -56,19 +58,14 @@ type kubernetesClusterValues struct {
 	DefaultNodePool []DefaultNodePoolStruct `mapstructure:"default_node_pool"`
 	AddonProfile    []AddonProfileStruct    `mapstructure:"addon_profile"`
 
-	NetworkProfile struct {
+	NetworkProfile []struct {
 		LoadBalancerSku *string `mapstructure:"load_balancer_sku"`
 	} `mapstructure:"network_profile"`
 
 	Usage struct {
-		DefaultNodePool struct {
-			Nodes      *int64   `mapstructure:"nodes"`
-			MonthlyHrs *float64 `mapstructure:"monthly_hrs"`
-		} `mapstructure:"default_node_pool"`
-
-		LoadBalancer struct {
-			MonthlyDataProcessedGB *int64 `mapstructure:"monthly_data_processed_gb"`
-		} `mapstructure:"load_balancer"`
+		Nodes                  *int64   `mapstructure:"nodes"`
+		MonthlyHrs             *float64 `mapstructure:"monthly_hrs"`
+		MonthlyDataProcessedGB *int64   `mapstructure:"monthly_data_processed_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
 
@@ -101,6 +98,10 @@ func (p *Provider) NewAzureRMKubernetesCluster(vals kubernetesClusterValues) *Ku
 		AddonProfile = vals.AddonProfile[0]
 	}
 
+	var loadBalancerSku *string
+	if len(vals.NetworkProfile) > 0 {
+		loadBalancerSku = vals.NetworkProfile[0].LoadBalancerSku
+	}
 	inst := &KubernetesCluster{
 		provider:                                 p,
 		skuTier:                                  vals.SkuTier,
@@ -112,13 +113,14 @@ func (p *Provider) NewAzureRMKubernetesCluster(vals kubernetesClusterValues) *Ku
 		osType:                                   DefaultNodePool.OSType,
 		vmSize:                                   DefaultNodePool.VmSize,
 		osDiskType:                               DefaultNodePool.OSDiskType,
+		osDiskSizeGB:                             DefaultNodePool.OsDiskSizeGB,
 		addonProfileHttpApplicationRoutingEnable: AddonProfile.HttpApplicationRouting.Enable,
-		loadBalancerSku:                          vals.NetworkProfile.LoadBalancerSku,
+		loadBalancerSku:                          loadBalancerSku,
 
 		//usage
-		defaultNodePoolNodes:               vals.Usage.DefaultNodePool.Nodes,
-		monthlyHrs:                         vals.Usage.DefaultNodePool.MonthlyHrs,
-		LoadBalancerMonthlyDataProcessedGB: vals.Usage.LoadBalancer.MonthlyDataProcessedGB,
+		defaultNodePoolNodes:               vals.Usage.Nodes,
+		monthlyHrs:                         vals.Usage.MonthlyHrs,
+		loadBalancerMonthlyDataProcessedGB: vals.Usage.MonthlyDataProcessedGB,
 	}
 	return inst
 }
@@ -147,7 +149,7 @@ func (inst KubernetesCluster) Components() []query.Component {
 				Service:  util.StringPtr("Azure Kubernetes Service"),
 				Family:   util.StringPtr("Compute"),
 				AttributeFilters: []*product.AttributeFilter{
-					{Key: "meterName", Value: util.StringPtr("Standard Uptime SLA")},
+					{Key: "meter_name", Value: util.StringPtr("Standard Uptime SLA")},
 				},
 			},
 			PriceFilter: &price.Filter{
@@ -172,15 +174,15 @@ func (inst KubernetesCluster) Components() []query.Component {
 	}
 
 	// TODO: check the input values if we had os_disk_type_db put its value as NodePool input
-	costComponents = append(costComponents, aksClusterNodePool(inst.provider.key, nil, inst.osDiskType,
+	costComponents = append(costComponents, aksClusterNodePool(inst.provider.key, inst.osDiskSizeGB, inst.osDiskType,
 		inst.osSku, inst.osType, inst.vmSize, region, nodeCount, inst.monthlyHrs)...)
 
 	if inst.loadBalancerSku != nil {
-		if strings.ToLower(*inst.loadBalancerSku) != "standard" {
+		if strings.ToLower(*inst.loadBalancerSku) == "standard" {
 			region = convertRegion(region)
 			var monthlyDataProcessedGb decimal.Decimal
-			if inst.LoadBalancerMonthlyDataProcessedGB != nil {
-				monthlyDataProcessedGb = decimal.NewFromInt(*inst.LoadBalancerMonthlyDataProcessedGB)
+			if inst.loadBalancerMonthlyDataProcessedGB != nil {
+				monthlyDataProcessedGb = decimal.NewFromInt(*inst.loadBalancerMonthlyDataProcessedGB)
 			}
 			costComponents = append(costComponents, regionalDataProceedComponent(inst.provider.key, region, monthlyDataProcessedGb))
 		}
