@@ -27,7 +27,7 @@ type VirtualNetworkGatewayValue struct {
 	Usage struct {
 		P2sConnection         int64 `mapstructure:"p2s_connection"`
 		MonthlyDataTransferGB int64 `mapstructure:"monthly_data_transfer_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 func decodeVirtualNetworkGateway(tfVals map[string]interface{}) (VirtualNetworkGatewayValue, error) {
@@ -59,7 +59,6 @@ func (p *Provider) newVirtualNetworkGateway(vals VirtualNetworkGatewayValue) *Vi
 }
 
 func (inst *VirtualNetworkGateway) Components() []query.Component {
-	fmt.Println("test1")
 	var connection, dataTransfers *decimal.Decimal
 	sku := "Basic"
 	region := inst.location

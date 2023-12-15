@@ -18,7 +18,7 @@ type fsxWindowsFileSystemValues struct {
 
 	Usage struct {
 		BackupStorageGB float64 `mapstructure:"backup_storage_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeFSxWindowsFileSystemValues decodes and returns fsxWindowsFileSystemValues from a Terraform values map.

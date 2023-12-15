@@ -29,7 +29,7 @@ type ContainerRegistryValue struct {
 	Usage struct {
 		StorageGB           float64 `mapstructure:"storage_gb"`
 		MonthlyBuildVCPUHrs float64 `mapstructure:"monthly_build_vcpu_hrs"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 func (p *Provider) newContainerRegistry(vals ContainerRegistryValue) *ContainerRegistry {
@@ -104,7 +104,6 @@ func (inst *ContainerRegistry) component() []query.Component {
 	if inst.storageGB != nil {
 		storageGB = decimalPtr(decimal.NewFromFloat(*inst.storageGB))
 		if storageGB.GreaterThan(*includedStorage) {
-			fmt.Println("test storageGB")
 
 			overStorage = storageGB.Sub(*includedStorage)
 			storageGB = &overStorage

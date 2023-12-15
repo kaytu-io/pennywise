@@ -39,7 +39,7 @@ type managedDiskValues struct {
 
 	Usage struct {
 		MonthlyDiskOperations float64 `mapstructure:"monthly_disk_operations"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeManagedStorageValues decodes and returns computeInstanceValues from a Terraform values map.

@@ -33,7 +33,7 @@ type loadBalancerValues struct {
 
 	Usage struct {
 		MonthlyDataProceed float64 `mapstructure:"monthly_data_proceed"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeLoadBalancerValues decodes and returns loadBalancerValues from a Terraform values map.

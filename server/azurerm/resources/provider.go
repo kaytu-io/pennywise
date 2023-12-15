@@ -60,6 +60,16 @@ var (
 	}
 )
 
+func locationNameMapping(location string) string {
+	newMapping := make(map[string]string)
+
+	for key, value := range locationDisplayToName {
+		newMapping[value] = key
+	}
+
+	return newMapping[location]
+}
+
 // Provider is an implementation of the resources.Provider, used to extract component queries from
 // terraform resources.
 type Provider struct {
@@ -193,6 +203,18 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newStorageQueue(vals).Components()
+	case "azurerm_storage_share":
+		vals, err := decodeStorageShareValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newStorageShare(vals).Components()
+	case "azurerm_storage_account":
+		vals, err := decodeStorageAccountValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newStorageAccount(vals).Components()
 	case "azurerm_virtual_network_gateway":
 		vals, err := decodeVirtualNetworkGateway(tfRes.Values)
 		if err != nil {
@@ -205,6 +227,24 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newVirtualNetworkGatewayConnection(vals).Component()
+	case "azurerm_key_vault_key":
+		vals, err := decodeKeyVaultKeyValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newKeyVaultKey(vals).Components()
+	case "azurerm_key_vault_certificate":
+		vals, err := decodeKeyVaultCertificateValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newKeyVaultCertificate(vals).Components()
+	case "azurerm_key_vault_managed_hardware_security_module":
+		vals, err := decodeKeyVaultManagedHardwareSecurityModuleValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newKeyVaultManagedHardwareSecurityModule(vals).Components()
 	case "azurerm_virtual_network_peering":
 		vals, err := decodeVirtualNetworkPeeringValues(tfRes.Values)
 		if err != nil {
@@ -325,6 +365,114 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newPrivateDNSZone(vals).component()
+	case "azurerm_cosmosdb_table":
+		vals, err := decodeCosmosdbTableValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbTable(vals).Components()
+	case "azurerm_cosmosdb_sql_database":
+		vals, err := decodeCosmosdbSqlDatabaseValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbSqlDatabase(vals).Components()
+	case "azurerm_cosmosdb_sql_container":
+		vals, err := decodeCosmosdbSqlContainerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbSqlContainer(vals).Components()
+	case "azurerm_cosmosdb_gremlin_database":
+		vals, err := decodeCosmosdbGremlinDatabaseValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbGremlinDatabase(vals).Components()
+	case "azurerm_cosmosdb_gremlin_graph":
+		vals, err := decodeCosmosdbGremlinGraphValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbGremlinGraph(vals).Components()
+	case "azurerm_cosmosdb_mongo_database":
+		vals, err := decodeCosmosdbMongoDatabaseValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbMongoDatabase(vals).Components()
+	case "azurerm_cosmosdb_cassandra_keyspace":
+		vals, err := decodeCosmosdbCassandraKeyspaceValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbCassandraKeyspace(vals).Components()
+	case "azurerm_cosmosdb_cassandra_table":
+		vals, err := decodeCosmosdbCassandraTableValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbCassandraTable(vals).Components()
+	case "azurerm_cosmosdb_mongo_collection":
+		vals, err := decodeCosmosdbMongoCollectionValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newCosmosdbMongoCollection(vals).Components()
+	case "azurerm_mariadb_server":
+		vals, err := decodeMariadbServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMariadbServer(vals).Components()
+	case "azurerm_sql_database":
+		vals, err := decodeSqlDatabaseValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newSQLDatabase(vals).Components()
+	case "azurerm_mssql_database":
+		vals, err := decodeMssqlDatabaseValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMssqlDatabase(vals).Components()
+	case "azurerm_sql_managed_instance":
+		vals, err := decodeSqlManagedInstanceValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newSqlManagedInstance(vals).Components()
+	case "azurerm_mssql_managed_instance":
+		vals, err := decodeMssqlManagedInstanceValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMssqlManagedInstance(vals).Components()
+	case "azurerm_mysql_server":
+		vals, err := decodeMysqlServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMysqlServer(vals).Components()
+	case "azurerm_postgresql_server":
+		vals, err := decodePostgresqlServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPostgresqlServer(vals).Components()
+	case "azurerm_postgresql_flexible_server":
+		vals, err := decodePostgresqlFlexibleServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newPostgresqlFlexibleServer(vals).Components()
+	case "azurerm_mysql_flexible_server":
+		vals, err := decodeMysqlFlexibleServerValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newMysqlFlexibleServer(vals).Components()
 	case "azurerm_kubernetes_cluster":
 		vals, err := decoderKubernetesCluster(tfRes.Values)
 		if err != nil {

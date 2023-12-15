@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
@@ -40,7 +39,7 @@ type linuxVirtualMachineScaleSetValues struct {
 	Usage struct {
 		MonthlyHours            *float64 `mapstructure:"monthly_hours"`
 		OsDiskMonthlyOperations *float64 `mapstructure:"os_disk_monthly_operations"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeLinuxVirtualMachineScaleSetValues decodes and returns computeInstanceValues from a Terraform values map.
@@ -106,7 +105,6 @@ func (inst *LinuxVirtualMachineScaleSet) Components() []query.Component {
 			}
 		}
 		if len(inst.osDisk) > 0 {
-			fmt.Println("OSDISK", inst.osDisk)
 			components = append(components, osDiskSubResource(inst.provider, inst.location, inst.osDisk, inst.osDiskMonthlyOperations)...)
 		}
 	}

@@ -17,7 +17,7 @@ type fsxLustreFileSystemValues struct {
 
 	Usage struct {
 		BackupStorageGB float64 `mapstructure:"backup_storage_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeFSxLustreFileSystemValues decodes and returns fsxLustreFileSystemValues from a Terraform values map.

@@ -54,7 +54,7 @@ type virtualMachineScaleSetValues struct {
 		OsDiskMonthlyOperations   *float64 `mapstructure:"os_disk_monthly_operations"`
 		DataDiskMonthlyOperations *float64 `mapstructure:"data_disk_monthly_operations"`
 		Instances                 *int64   `mapstructure:"instances"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeVirtualMachineScaleSetValues decodes and returns computeInstanceValues from a Terraform values map.

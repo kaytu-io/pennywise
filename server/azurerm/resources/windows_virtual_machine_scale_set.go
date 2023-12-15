@@ -38,7 +38,7 @@ type windowsVirtualMachineScaleSetValues struct {
 	Usage struct {
 		MonthlyHours            *float64 `mapstructure:"monthly_hours"`
 		OsDiskMonthlyOperations *float64 `mapstructure:"os_disk_monthly_operations"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeWindowsVirtualMachineScaleSetValues decodes and returns computeInstanceValues from a Terraform values map.

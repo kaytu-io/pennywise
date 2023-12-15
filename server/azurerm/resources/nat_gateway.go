@@ -27,7 +27,7 @@ type natGatewayValues struct {
 
 	Usage struct {
 		MonthlyDataProcessedGb *int64 `mapstructure:"monthly_data_processed_gb"`
-	} `mapstructure:"tc_usage"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeNatGatewayValues decodes and returns natGatewayValues from a Terraform values map.
