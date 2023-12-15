@@ -61,7 +61,7 @@ func ParseHclResources(path string, usage usagePackage.Usage) (string, []Resourc
 func addUsage(res Resource, usage usagePackage.Usage) Resource {
 	newValues := res.Values
 
-	newValues[usagePackage.Key] = usage.GetUsage(res.Type)
+	newValues[usagePackage.Key] = usage.GetUsage(res.Type, res.Address)
 	return Resource{
 		Address: res.Address,
 		Mode:    res.Mode,

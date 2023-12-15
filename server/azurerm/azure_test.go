@@ -38,7 +38,6 @@ func TestAzure(t *testing.T) {
 }
 
 func (ts *AzureTestSuite) SetupSuite() {
-	//db, _, err := sqlmock.New()
 	dataSource := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?multiStatements=true", MySQLUser, MySQLPassword, MySQLHost, MySQLPort, MySQLDb)
 	db, err := sql.Open("mysql", dataSource)
 
@@ -141,10 +140,10 @@ func (ts *AzureTestSuite) getDirCosts(projectDir string, usage usage.Usage) *cos
 func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	//ts.IngestService("Virtual Machines", "eastus")
-	//fmt.Println("Virtual Network data ingested")
-	//ts.IngestService("Storage", "eastus")
-	//fmt.Println("Storage data ingested")
+	ts.IngestService("Virtual Machines", "eastus")
+	fmt.Println("Virtual Machine data ingested")
+	ts.IngestService("Storage", "eastus")
+	fmt.Println("Storage data ingested")
 
 	usg := usage.Usage{"azurerm_private_endpoint": map[string]interface{}{
 		"monthly_inbound_data_processed_gb":  100,

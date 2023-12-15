@@ -270,7 +270,7 @@ func (p *Plan) extractModuleResources(module *Module, resourceProviders map[stri
 			}
 		}
 		rss[tfres.Address] = tfres
-		tfres.Values[usage.Key] = p.usage.GetUsage(tfres.Type)
+		tfres.Values[usage.Key] = p.usage.GetUsage(tfres.Type, tfres.Address)
 	}
 
 	for _, rs := range rss {
