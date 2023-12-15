@@ -10,8 +10,10 @@ import (
 	"github.com/kaytu-io/pennywise/server/client"
 	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -31,10 +33,21 @@ var terraformCommand = &cobra.Command{
 			if err != nil {
 				return fmt.Errorf("error while reading usage file %s", err)
 			}
-			err = json.NewDecoder(usageFile).Decode(&usage)
+			defer usageFile.Close()
+
+			ext := filepath.Ext(*usagePath)
+			switch ext {
+			case ".json":
+				err = json.NewDecoder(usageFile).Decode(&usage)
+			case ".yaml", ".yml":
+				err = yaml.NewDecoder(usageFile).Decode(&usage)
+			default:
+				return fmt.Errorf("unsupported file format %s for usage file", ext)
+			}
 			if err != nil {
 				return fmt.Errorf("error while parsing usage file %s", err)
 			}
+
 		} else {
 			usage = usagePackage.Default
 		}
