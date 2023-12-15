@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
@@ -84,16 +83,10 @@ func decoderKubernetesCluster(tfVals map[string]interface{}) (kubernetesClusterV
 	if err != nil {
 		return v, err
 	}
-	fmt.Printf("tfvalue : %v \n \n ", tfVals)
 
 	if err := decoder.Decode(tfVals); err != nil {
 		return v, err
 	}
-	if v.SkuTier != nil {
-		fmt.Printf("value(sku tier ) : %v \n", *v.SkuTier)
-	}
-	fmt.Printf("value(NetworkProfile ) : %v \n", v.NetworkProfile)
-	fmt.Printf("-------------------------------------------------- \n")
 	return v, nil
 }
 

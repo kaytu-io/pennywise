@@ -32,9 +32,9 @@ type VirtualMachine struct {
 	storageImageReference []StorageImageReference `mapstructure:"storage_image_reference"`
 
 	// Usage
-	monthlyOsDiskOperations   decimal.Decimal
-	monthlyDataDiskOperations decimal.Decimal
-	monthlyHours              decimal.Decimal
+	monthlyOsDiskOperations   *decimal.Decimal
+	monthlyDataDiskOperations *decimal.Decimal
+	monthlyHours              *decimal.Decimal
 }
 
 type StorageImageReference struct {
@@ -59,9 +59,9 @@ type virtualMachineValues struct {
 	StorageImageReference []StorageImageReference `mapstructure:"storage_image_reference"`
 
 	Usage struct {
-		MonthlyOsDiskOperations   float64 `mapstructure:"monthly_os_disk_operations"`
-		MonthlyDataDiskOperations float64 `mapstructure:"monthly_data_disk_operations"`
-		MonthlyHours              float64 `mapstructure:"monthly_hours"`
+		MonthlyOsDiskOperations   *float64 `mapstructure:"monthly_os_disk_operations"`
+		MonthlyDataDiskOperations *float64 `mapstructure:"monthly_data_disk_operations"`
+		MonthlyHours              *float64 `mapstructure:"monthly_hours"`
 	} `mapstructure:"pennywise_usage"`
 }
 
@@ -94,9 +94,9 @@ func (p *Provider) newVirtualMachine(vals virtualMachineValues) *VirtualMachine 
 		licenseType:               vals.LicenseType,
 		storageOsDisk:             vals.StorageOsDisk,
 		storageDataDisk:           vals.StorageDataDisk,
-		monthlyOsDiskOperations:   decimal.NewFromFloat(vals.Usage.MonthlyOsDiskOperations),
-		monthlyDataDiskOperations: decimal.NewFromFloat(vals.Usage.MonthlyDataDiskOperations),
-		monthlyHours:              decimal.NewFromFloat(vals.Usage.MonthlyHours),
+		monthlyOsDiskOperations:   util.FloatToDecimal(vals.Usage.MonthlyOsDiskOperations),
+		monthlyDataDiskOperations: util.FloatToDecimal(vals.Usage.MonthlyDataDiskOperations),
+		monthlyHours:              util.FloatToDecimal(vals.Usage.MonthlyHours),
 		storageImageReference:     vals.StorageImageReference,
 	}
 	return inst
@@ -120,13 +120,13 @@ func (inst *VirtualMachine) Components() []query.Component {
 
 	if os == "Windows" {
 		windowsInst := inst.provider.newWindowsVirtualMachine(windowsVirtualMachineValues{Size: inst.vmSize, Location: inst.location, LicenseType: inst.licenseType, Usage: struct {
-			MonthlyHours float64 `mapstructure:"monthly_hours"`
-		}{MonthlyHours: inst.monthlyHours.InexactFloat64()}})
+			MonthlyHours *float64 `mapstructure:"monthly_hours"`
+		}{MonthlyHours: util.DecimalToFloat(inst.monthlyHours)}})
 		components = []query.Component{windowsInst.windowsVirtualMachineComponent()}
 	} else if os == "Linux" {
 		linuxInst := inst.provider.newLinuxVirtualMachine(linuxVirtualMachineValues{Size: inst.vmSize, Location: inst.location, Usage: struct {
-			MonthlyHours float64 `mapstructure:"monthly_hours"`
-		}{MonthlyHours: inst.monthlyHours.InexactFloat64()}})
+			MonthlyHours *float64 `mapstructure:"monthly_hours"`
+		}{MonthlyHours: util.DecimalToFloat(inst.monthlyHours)}})
 		components = []query.Component{linuxInst.linuxVirtualMachineComponent()}
 	}
 	components = append(components, ultraSSDReservationCostComponent(inst.provider.key, inst.location))

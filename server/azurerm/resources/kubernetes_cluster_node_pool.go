@@ -3,6 +3,7 @@ package resources
 import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"regexp"
@@ -41,8 +42,8 @@ type kubernetesClusterNodePoolValues struct {
 	OsDiskSizeGB *int    `mapstructure:"os_disk_size_gb"`
 
 	Usage struct {
-		Nodes      *int64   `json:"nodes"`
-		MonthlyHrs *float64 `json:"monthly_hrs"`
+		Nodes      *int64   `mapstructure:"nodes"`
+		MonthlyHrs *float64 `mapstructure:"monthly_hrs"`
 	} `mapstructure:"pennywise_usage"`
 }
 
@@ -107,49 +108,46 @@ func aksClusterNodePool(key string, osDiskSizeGB *int, OSDiskType *string, osSku
 	vmsSize string, region string, nodeCount decimal.Decimal, monthlyHrsUsage *float64) []query.Component {
 	var costComponents []query.Component
 
-	var monthlyHrs decimal.Decimal
-	if monthlyHrsUsage != nil {
-		monthlyHrs = decimal.NewFromFloat(*monthlyHrsUsage)
-	}
-
-	instanceType := vmsSize
-
-	os := "Linux"
-	if osSku != nil {
-		os = *osSku
-	}
-
-	if osType != nil {
-		if strings.HasSuffix(strings.ToLower(*osType), "windows") {
-			os = "Windows"
+	for i := int64(0); i < nodeCount.CoefficientInt64(); i++ {
+		var monthlyHrs *decimal.Decimal
+		if monthlyHrsUsage != nil {
+			monthlyHrs = util.DecimalPtr(decimal.NewFromFloat(*monthlyHrsUsage))
 		}
-	}
 
-	if strings.EqualFold(os, "windows") {
-		purchaseOption := "Consumption"
-		fmt.Println("test compute 1")
-		costComponents = append(costComponents, windowsVirtualMachineComponent(key, region, instanceType, purchaseOption, monthlyHrs))
-	} else {
-		fmt.Println("test compute 2")
+		instanceType := vmsSize
 
-		costComponents = append(costComponents, linuxVirtualMachineComponent(key, region, instanceType, monthlyHrs))
-	}
-	MultiplyQuantities(&costComponents, nodeCount)
-
-	osDiskType := "Managed"
-	if OSDiskType != nil {
-		osDiskType = *OSDiskType
-	}
-
-	if strings.ToLower(osDiskType) == "managed" {
-		diskSize := 128
-		if osDiskSizeGB != nil {
-			diskSize = *osDiskSizeGB
+		os := "Linux"
+		if osSku != nil {
+			os = *osSku
 		}
-		osDisk := aksOSDiskSubResource(key, region, instanceType, diskSize)
-		if osDisk != nil {
-			costComponents = append(costComponents, *osDisk)
-			MultiplyQuantities(&costComponents, nodeCount)
+
+		if osType != nil {
+			if strings.HasSuffix(strings.ToLower(*osType), "windows") {
+				os = "Windows"
+			}
+		}
+
+		if strings.Contains(strings.ToLower(os), "windows") {
+			purchaseOption := "Consumption"
+			costComponents = append(costComponents, windowsVirtualMachineComponent(key, region, instanceType, purchaseOption, monthlyHrs))
+		} else {
+			costComponents = append(costComponents, linuxVirtualMachineComponent(key, region, instanceType, monthlyHrs))
+		}
+
+		osDiskType := "Managed"
+		if OSDiskType != nil {
+			osDiskType = *OSDiskType
+		}
+
+		if strings.ToLower(osDiskType) == "managed" {
+			diskSize := 128
+			if osDiskSizeGB != nil {
+				diskSize = *osDiskSizeGB
+			}
+			osDisk := aksOSDiskSubResource(key, region, instanceType, diskSize)
+			if osDisk != nil {
+				costComponents = append(costComponents, *osDisk)
+			}
 		}
 	}
 
@@ -203,15 +201,4 @@ func aksGetStorageType(instanceType string) string {
 	}
 
 	return "Standard"
-}
-
-func MultiplyQuantities(components *[]query.Component, multiplier decimal.Decimal) {
-	for _, costComponent := range *components {
-		if costComponent.HourlyQuantity != decimal.Zero {
-			costComponent.HourlyQuantity = costComponent.HourlyQuantity.Mul(multiplier)
-		}
-		if costComponent.MonthlyQuantity != decimal.Zero {
-			costComponent.MonthlyQuantity = costComponent.MonthlyQuantity.Mul(multiplier)
-		}
-	}
 }

@@ -97,7 +97,7 @@ func (inst *LinuxVirtualMachineScaleSet) Components() []query.Component {
 	var components []query.Component
 
 	for i := int64(0); i < inst.instances; i++ {
-		components = append(components, linuxVirtualMachineComponent(inst.provider.key, inst.location, inst.sku, decimal.NewFromFloat(730)))
+		components = append(components, linuxVirtualMachineComponent(inst.provider.key, inst.location, inst.sku, inst.monthlyHours))
 
 		if len(inst.additionalCapabilities) > 0 {
 			if inst.additionalCapabilities[0].UltraSsdEnabled {

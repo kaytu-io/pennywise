@@ -87,7 +87,6 @@ func (inst AzureRMCDNEndpoint) Component() []query.Component {
 	var costComponents []query.Component
 	sku := ""
 	if inst.sku != nil {
-		fmt.Printf("sku : %v \n ", *inst.sku)
 		sku = *inst.sku
 	}
 
