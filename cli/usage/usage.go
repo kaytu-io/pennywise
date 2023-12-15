@@ -58,13 +58,17 @@ var Default = Usage{
 }
 
 // Usage is the struct defining all the configure usages
-type Usage map[string]interface{}
+type Usage map[string]map[string]interface{}
 
 // GetUsage will return the usage from the resource rt (ex: aws_instance)
-func (u Usage) GetUsage(rt string) map[string]interface{} {
-	us, ok := u[rt]
+func (u Usage) GetUsage(rt string, addr string) map[string]interface{} {
+	us, ok := u[addr]
 	if ok {
-		return us.(map[string]interface{})
+		return us
+	}
+	us, ok = u[rt]
+	if ok {
+		return us
 	}
 
 	return nil

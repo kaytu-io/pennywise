@@ -1,0 +1,44 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Set up MySQL Connection Variables
+        run: |
+          echo "MYSQL_HOST=localhost" >> $GITHUB_ENV
+          echo "MYSQL_PORT=3306" >> $GITHUB_ENV
+          echo "MYSQL_DB=test_db" >> $GITHUB_ENV
+          echo "MYSQL_USERNAME=test_user" >> $GITHUB_ENV
+          echo "MYSQL_PASSWORD=test_password" >> $GITHUB_ENV
+
+      - name: Run Golang Tests
+        run: |
+          cd server/azurerm
+          go test -v .
