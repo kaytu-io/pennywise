@@ -2,6 +2,7 @@ package azurerm
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kaytu-io/pennywise/cli/parser/hcl"
@@ -15,7 +16,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/net/context"
+	"gopkg.in/yaml.v2"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -54,6 +57,34 @@ func (ts *AzureTestSuite) IngestService(service, region string) {
 	err = ingester2.IngestPricing(context.Background(), ts.backend, ingester)
 	require.NoError(ts.T(), err)
 
+}
+
+func (ts *AzureTestSuite) getUsage(usagePath string) (*usage.Usage, error) {
+	var usg usage.Usage
+	if usagePath != "" {
+		usageFile, err := os.Open(usagePath)
+		if err != nil {
+			return nil, fmt.Errorf("error while reading usage file %s", err)
+		}
+		defer usageFile.Close()
+
+		ext := filepath.Ext(usagePath)
+		switch ext {
+		case ".json":
+			err = json.NewDecoder(usageFile).Decode(&usg)
+		case ".yaml", ".yml":
+			err = yaml.NewDecoder(usageFile).Decode(&usg)
+		default:
+			return nil, fmt.Errorf("unsupported file format %s for usage file", ext)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("error while parsing usage file %s", err)
+		}
+
+	} else {
+		usg = usage.Default
+	}
+	return &usg, nil
 }
 
 func (ts *AzureTestSuite) getDirCosts(projectDir string, usage usage.Usage) *cost.State {
@@ -145,10 +176,14 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage data ingested")
 
-	usg := usage.Usage{"azurerm_private_endpoint": map[string]interface{}{
-		"monthly_inbound_data_processed_gb":  100,
-		"monthly_outbound_data_processed_gb": 100,
-	}}
-	cost := ts.getDirCosts("../testdata/azure/linux_virtual_machine_scale_set", usg)
+	//usg := usage.Usage{"azurerm_private_endpoint": map[string]interface{}{
+	//	"monthly_inbound_data_processed_gb":  100,
+	//	"monthly_outbound_data_processed_gb": 100,
+	//}}
+
+	usg, err := ts.getUsage("../testdata/azure/linux_virtual_machine_scale_set/usage.json")
+	require.NoError(ts.T(), err)
+
+	cost := ts.getDirCosts("../testdata/azure/linux_virtual_machine_scale_set", *usg)
 	fmt.Println(cost.CostString())
 }

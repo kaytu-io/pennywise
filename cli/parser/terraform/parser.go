@@ -224,15 +224,11 @@ func (p *Plan) extractModuleResources(module *Module, resourceProviders map[stri
 			}
 
 			vv, ok := tfres.Values[k]
-			// If the Values is not present we just set it
 			if !ok {
 				tfres.Values[k] = v
 				continue
 			}
-			// We try to see if the values are set in the original
-			// resource (tfres) or on the one from the Provider (pwrv)
-			// to know when there is a conflict (both set) which one
-			// should be used.
+
 			switch tv := v.(type) {
 			case map[string]interface{}:
 				for tk, ntv := range tv {
