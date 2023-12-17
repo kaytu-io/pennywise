@@ -37,7 +37,7 @@ type linuxVirtualMachineScaleSetValues struct {
 	OsDisk                 []OsDisk                                     `mapstructure:"os_disk"`
 
 	Usage struct {
-		MonthlyHours            *float64 `mapstructure:"monthly_hours"`
+		MonthlyHours            *float64 `mapstructure:"monthly_hrs"`
 		OsDiskMonthlyOperations *float64 `mapstructure:"os_disk_monthly_operations"`
 	} `mapstructure:"pennywise_usage"`
 }
