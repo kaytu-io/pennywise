@@ -6,6 +6,9 @@ import (
 )
 
 var makeResourceProcesses = map[string]MakeResourceProcess{
+	// AWS
+
+	// Azure
 	"azurerm_snapshot": {
 		Refs: []Reference{{RefValue: "source_uri", RefAttribute: "id"}},
 	},
