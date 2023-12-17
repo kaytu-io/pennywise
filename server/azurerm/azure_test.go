@@ -24,10 +24,10 @@ import (
 
 var (
 	MySQLHost     = os.Getenv("MYSQL_HOST")
-	MySQLPort     = "3306"
-	MySQLDb       = "test_terracost2"
-	MySQLUser     = "test-cost-estimator"
-	MySQLPassword = "password"
+	MySQLPort     = os.Getenv("MYSQL_PORT")
+	MySQLDb       = os.Getenv("MYSQL_DB")
+	MySQLUser     = os.Getenv("MYSQL_USERNAME")
+	MySQLPassword = os.Getenv("MYSQL_PASSWORD")
 )
 
 type AzureTestSuite struct {
@@ -116,56 +116,6 @@ func (ts *AzureTestSuite) getDirCosts(projectDir string, usg usage.Usage) *cost.
 
 	return state
 }
-
-//
-//func (ts *AzureTestSuite) TestLoadBalancer() {
-//	ts.SetupSuite()
-//	fmt.Println("Suite Setup")
-//	ts.IngestService("Load Balancer", "")
-//	fmt.Println("Load Balancer data ingested")
-//
-//	lbUsage := usage.Usage{"azurerm_lb": map[string]interface{}{
-//		"monthly_data_proceed": 1000,
-//	}}
-//	cost := ts.getDirCosts("../testdata/azure/load_balancer", lbUsage)
-//	fmt.Println(cost.CostString())
-//}
-//
-//func (ts *AzureTestSuite) TestPublicIp() {
-//	ts.SetupSuite()
-//	fmt.Println("Suite Setup")
-//	ts.IngestService("Virtual Network", "")
-//	fmt.Println("Virtual Network data ingested")
-//
-//	usg := usage.Usage{}
-//	cost := ts.getDirCosts("../testdata/azure/public_ip", usg)
-//	fmt.Println(cost.CostString())
-//}
-//
-//func (ts *AzureTestSuite) TestPublicIpPrefix() {
-//	ts.SetupSuite()
-//	fmt.Println("Suite Setup")
-//	ts.IngestService("Virtual Network", "")
-//	fmt.Println("Virtual Network data ingested")
-//
-//	usg := usage.Usage{}
-//	cost := ts.getDirCosts("../testdata/azure/public_ip_prefix", usg)
-//	fmt.Println(cost.CostString())
-//}
-//
-//func (ts *AzureTestSuite) TestPrivateEndpoint() {
-//	ts.SetupSuite()
-//	fmt.Println("Suite Setup")
-//	ts.IngestService("Virtual Network", "")
-//	fmt.Println("Virtual Network data ingested")
-//
-//	usg := usage.Usage{"azurerm_private_endpoint": map[string]interface{}{
-//		"monthly_inbound_data_processed_gb":  100,
-//		"monthly_outbound_data_processed_gb": 100,
-//	}}
-//	cost := ts.getDirCosts("../testdata/azure/private_endpoint", usg)
-//	fmt.Println(cost.CostString())
-//}
 
 func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 	ts.SetupSuite()
@@ -257,6 +207,49 @@ func (ts *AzureTestSuite) TestVirtualMachineScaleSet() {
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../testdata/azure/virtual_machine_scale_set", *usg)
+	fmt.Println(cost.CostString())
+}
+
+func (ts *AzureTestSuite) TestVirtualNetworkGateway() {
+	ts.SetupSuite()
+	fmt.Println("Suite Setup")
+	ts.IngestService("Virtual Machines", "eastus")
+	fmt.Println("Virtual Machine data ingested")
+
+	ts.IngestService("VPN Gateway", "eastus")
+	fmt.Println("VPN Gateway ingested")
+
+	usg, err := ts.getUsage("../testdata/azure/virtual_network_gateway/usage.yml")
+	require.NoError(ts.T(), err)
+
+	cost := ts.getDirCosts("../testdata/azure/virtual_network_gateway", *usg)
+	fmt.Println(cost.CostString())
+}
+
+func (ts *AzureTestSuite) TestVirtualNetworkGatewayConnection() {
+	ts.SetupSuite()
+	fmt.Println("Suite Setup")
+
+	ts.IngestService("VPN Gateway", "eastus")
+	fmt.Println("VPN Gateway data ingested")
+
+	cost := ts.getDirCosts("../testdata/azure/virtual_network_gateway_connection", nil)
+	fmt.Println(cost.CostString())
+}
+
+func (ts *AzureTestSuite) TestVirtualNetworkPeering() {
+	ts.SetupSuite()
+	fmt.Println("Suite Setup")
+	ts.IngestService("VPN Gateway", "eastus")
+	fmt.Println("VPN Gateway ingested")
+
+	ts.IngestService("Virtual Network", "eastus")
+	fmt.Println("Virtual Network ingested")
+
+	usg, err := ts.getUsage("../testdata/azure/virtual_network_peering/usage.yml")
+	require.NoError(ts.T(), err)
+
+	cost := ts.getDirCosts("../testdata/azure/virtual_network_peering", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -951,5 +944,44 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../testdata/sql_managed_instance", *usg)
+	fmt.Println(cost.CostString())
+}
+
+func (ts *AzureTestSuite) TestStorageAccount() {
+	ts.SetupSuite()
+	fmt.Println("Suite Setup")
+	ts.IngestService("Storage", "eastus")
+	fmt.Println("Storage ingested")
+
+	usg, err := ts.getUsage("../testdata/azure/storage_account/usage.yaml")
+	require.NoError(ts.T(), err)
+
+	cost := ts.getDirCosts("../testdata/storage_account", *usg)
+	fmt.Println(cost.CostString())
+}
+
+func (ts *AzureTestSuite) TestStorageQueue() {
+	ts.SetupSuite()
+	fmt.Println("Suite Setup")
+	ts.IngestService("Storage", "eastus")
+	fmt.Println("Storage ingested")
+
+	usg, err := ts.getUsage("../testdata/azure/storage_queue/usage.yaml")
+	require.NoError(ts.T(), err)
+
+	cost := ts.getDirCosts("../testdata/storage_queue", *usg)
+	fmt.Println(cost.CostString())
+}
+
+func (ts *AzureTestSuite) TestStorageShare() {
+	ts.SetupSuite()
+	fmt.Println("Suite Setup")
+	ts.IngestService("Storage", "eastus")
+	fmt.Println("Storage ingested")
+
+	usg, err := ts.getUsage("../testdata/azure/storage_share/usage.yaml")
+	require.NoError(ts.T(), err)
+
+	cost := ts.getDirCosts("../testdata/storage_share", *usg)
 	fmt.Println(cost.CostString())
 }
