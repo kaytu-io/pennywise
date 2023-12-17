@@ -176,11 +176,6 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage data ingested")
 
-	//usg := usage.Usage{"azurerm_private_endpoint": map[string]interface{}{
-	//	"monthly_inbound_data_processed_gb":  100,
-	//	"monthly_outbound_data_processed_gb": 100,
-	//}}
-
 	usg, err := ts.getUsage("../testdata/azure/linux_virtual_machine_scale_set/usage.json")
 	require.NoError(ts.T(), err)
 
