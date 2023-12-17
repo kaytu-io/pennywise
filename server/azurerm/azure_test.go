@@ -86,8 +86,8 @@ func (ts *AzureTestSuite) getUsage(usagePath string) (*usage.Usage, error) {
 	return &usg, nil
 }
 
-func (ts *AzureTestSuite) getDirCosts(projectDir string, usage usage.Usage) *cost.State {
-	providerName, hclResources, err := hcl.ParseHclResources(projectDir, usage)
+func (ts *AzureTestSuite) getDirCosts(projectDir string, usg usage.Usage) *cost.State {
+	providerName, hclResources, err := hcl.ParseHclResources(projectDir, usg)
 	require.NoError(ts.T(), err)
 
 	var qResources []query.Resource
