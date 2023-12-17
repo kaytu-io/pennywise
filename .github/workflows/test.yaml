@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feat-aws-tests
 
 jobs:
   build-and-test:
@@ -37,7 +38,7 @@ jobs:
           echo "MYSQL_DB=test_db" >> $GITHUB_ENV
           echo "MYSQL_USERNAME=test_user" >> $GITHUB_ENV
           echo "MYSQL_PASSWORD=test_password" >> $GITHUB_ENV
-
+      - run: git config --global url.https://${{ secrets.GH_TOKEN }}@github.com/kaytu-io.insteadOf https://github.com/kaytu-io
       - name: Run Golang Tests
         run: |
           cd server/azurerm
