@@ -19,7 +19,10 @@ var (
 // calculates the costs of the resources and show them.
 // It uses the Backend to retrieve the pricing data.
 func EstimateTerraformPlanJson(plan io.Reader, u usage.Usage) error {
-	providerInitializers := getDefaultProviders()
+	providerInitializers := []terraform.ProviderInitializer{
+		aws.TerraformProviderInitializer,
+		azurerm.TerraformProviderInitializer,
+	}
 
 	tfplan := terraform.NewPlan(providerInitializers...)
 	if err := tfplan.Read(plan); err != nil {
@@ -43,15 +46,4 @@ func EstimateTerraformPlanJson(plan io.Reader, u usage.Usage) error {
 		return err
 	}
 	return nil
-}
-
-// defaultProviders are the currently known and supported terraform providers
-var defaultProviders = []terraform.ProviderInitializer{
-	aws.TerraformProviderInitializer,
-	azurerm.TerraformProviderInitializer,
-}
-
-// getDefaultProviders will return the default supported providers of terracost
-func getDefaultProviders() []terraform.ProviderInitializer {
-	return defaultProviders
 }
