@@ -191,10 +191,10 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	//ts.IngestService("Virtual Machines", "eastus")
-	//fmt.Println("Virtual Machine data ingested")
-	//ts.IngestService("Storage", "eastus")
-	//fmt.Println("Storage data ingested")
+	ts.IngestService("Virtual Machines", "eastus")
+	fmt.Println("Virtual Machine data ingested")
+	ts.IngestService("Storage", "eastus")
+	fmt.Println("Storage data ingested")
 
 	usg, err := ts.getUsage("../testdata/azure/linux_virtual_machine_scale_set/usage.yaml")
 	require.NoError(ts.T(), err)
