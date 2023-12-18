@@ -47,7 +47,7 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 	}
 	for _, res := range req.Resources {
 		if res.ProviderName == "azurerm" {
-			provider, err := azurermres.NewProvider(azurerm.ProviderName)
+			provider, err := azurermres.NewProvider(azurermres.ProviderName)
 			if err != nil {
 				return ctx.JSON(http.StatusInternalServerError, err.Error())
 			}
@@ -91,7 +91,7 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	if req.ProviderName == "azurerm" {
-		provider, err := azurermres.NewProvider(azurerm.ProviderName)
+		provider, err := azurermres.NewProvider(azurermres.ProviderName)
 		if err != nil {
 			return ctx.JSON(http.StatusInternalServerError, err.Error())
 		}
