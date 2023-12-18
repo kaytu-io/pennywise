@@ -27,8 +27,6 @@ require (
 
 )
 
-require github.com/iancoleman/strcase v0.3.0 // indirect
-
 require (
 	cloud.google.com/go v0.111.0 // indirect
 	cloud.google.com/go/compute v1.23.3 // indirect
@@ -60,7 +58,7 @@ require (
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/apparentlymart/go-versions v1.0.2 // indirect
 	github.com/aws/aws-sdk-go v1.49.4 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.24.0
+	github.com/aws/aws-sdk-go-v2 v1.24.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.5.4 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.26.1 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.12 // indirect
@@ -71,7 +69,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.2.9 // indirect
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.36.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.32.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.26.6
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.26.6 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.141.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/eks v1.35.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.4 // indirect
