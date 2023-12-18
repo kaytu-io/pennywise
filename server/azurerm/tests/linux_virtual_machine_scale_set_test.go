@@ -10,10 +10,10 @@ import (
 func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	//ts.IngestService("Virtual Machines", "eastus")
-	//fmt.Println("Virtual Machine data ingested")
-	//ts.IngestService("Storage", "eastus")
-	//fmt.Println("Storage data ingested")
+	ts.IngestService("Virtual Machines", "eastus")
+	fmt.Println("Virtual Machine data ingested")
+	ts.IngestService("Storage", "eastus")
+	fmt.Println("Storage data ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/linux_virtual_machine_scale_set/usage.yaml")
 	require.NoError(ts.T(), err)
@@ -193,6 +193,6 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 
 	ts.Equal(len(expectedCostComponents), len(costComponents))
 	for _, comp := range expectedCostComponents {
-		ts.True(componentExists(comp, costComponents))
+		ts.True(componentExists(comp, costComponents), fmt.Sprintf("Could not match component %s: %v", comp.Name, comp))
 	}
 }

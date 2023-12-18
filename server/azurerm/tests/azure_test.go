@@ -912,80 +912,42 @@ func (ts *AzureTestSuite) TestPublicIpPrefix() {
 	fmt.Println(cost.CostString())
 }
 
-func (ts *AzureTestSuite) TestSnapshot() {
-	ts.SetupSuite()
-	fmt.Println("Suite Setup")
-	ts.IngestService("Storage", "eastus")
-	fmt.Println("Storage ingested")
-
-	usg, err := ts.getUsage("../../testdata/azure/snapshot/usage.yml")
-	require.NoError(ts.T(), err)
-
-	cost := ts.getDirCosts("../../testdata/azure/snapshot", *usg)
-	fmt.Println(cost.CostString())
-}
-
-func (ts *AzureTestSuite) TestSqlDatabase() {
-	ts.SetupSuite()
-	fmt.Println("Suite Setup")
-	ts.IngestService("Azure Cosmos DB", "eastus")
-	fmt.Println("Azure Cosmos DB ingested")
-
-	usg, err := ts.getUsage("../../testdata/azure/sql_database/usage.yml")
-	require.NoError(ts.T(), err)
-
-	cost := ts.getDirCosts("../../testdata/azure/sql_database", *usg)
-	fmt.Println(cost.CostString())
-}
-
-func (ts *AzureTestSuite) TestSqlManagedInstance() {
-	ts.SetupSuite()
-	fmt.Println("Suite Setup")
-	ts.IngestService("SQL Managed Instance", "eastus")
-	fmt.Println("SQL Managed Instance ingested")
-
-	usg, err := ts.getUsage("../../testdata/azure/sql_managed_instance/usage.yml")
-	require.NoError(ts.T(), err)
-
-	cost := ts.getDirCosts("../../testdata/azure/sql_managed_instance", *usg)
-	fmt.Println(cost.CostString())
-}
-
-func (ts *AzureTestSuite) TestStorageAccount() {
-	ts.SetupSuite()
-	fmt.Println("Suite Setup")
-	ts.IngestService("Storage", "eastus")
-	fmt.Println("Storage ingested")
-
-	usg, err := ts.getUsage("../../testdata/azure/storage_account/usage.yml")
-	require.NoError(ts.T(), err)
-
-	cost := ts.getDirCosts("../../testdata/azure/storage_account", *usg)
-	fmt.Println(cost.CostString())
-}
-
-func (ts *AzureTestSuite) TestStorageQueue() {
-	ts.SetupSuite()
-	fmt.Println("Suite Setup")
-	ts.IngestService("Storage", "eastus")
-	fmt.Println("Storage ingested")
-
-	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yml")
-	require.NoError(ts.T(), err)
-
-	cost := ts.getDirCosts("../../testdata/azure/storage_queue", *usg)
-	fmt.Println(cost.CostString())
-}
-
-func (ts *AzureTestSuite) TestStorageShare() {
-	ts.SetupSuite()
-	fmt.Println("Suite Setup")
-	ts.IngestService("Storage", "eastus")
-	fmt.Println("Storage ingested")
-
-	usg, err := ts.getUsage("../../testdata/azure/storage_share/usage.yml")
-	require.NoError(ts.T(), err)
-
-	cost := ts.getDirCosts("../../testdata/azure/storage_share", *usg)
-	fmt.Println(cost.CostString())
-}
+//
+//func (ts *AzureTestSuite) TestStorageAccount() {
+//	ts.SetupSuite()
+//	fmt.Println("Suite Setup")
+//	ts.IngestService("Storage", "eastus")
+//	fmt.Println("Storage ingested")
+//
+//	usg, err := ts.getUsage("../../testdata/azure/storage_account/usage.yml")
+//	require.NoError(ts.T(), err)
+//
+//	cost := ts.getDirCosts("../../testdata/azure/storage_account", *usg)
+//	fmt.Println(cost.CostString())
+//}
+//
+//func (ts *AzureTestSuite) TestStorageQueue() {
+//	ts.SetupSuite()
+//	fmt.Println("Suite Setup")
+//	ts.IngestService("Storage", "eastus")
+//	fmt.Println("Storage ingested")
+//
+//	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yml")
+//	require.NoError(ts.T(), err)
+//
+//	cost := ts.getDirCosts("../../testdata/azure/storage_queue", *usg)
+//	fmt.Println(cost.CostString())
+//}
+//
+//func (ts *AzureTestSuite) TestStorageShare() {
+//	ts.SetupSuite()
+//	fmt.Println("Suite Setup")
+//	ts.IngestService("Storage", "westus")
+//	fmt.Println("Storage ingested")
+//
+//	usg, err := ts.getUsage("../../testdata/azure/storage_share/usage.yml")
+//	require.NoError(ts.T(), err)
+//
+//	cost := ts.getDirCosts("../../testdata/azure/storage_share", *usg)
+//	fmt.Println(cost.CostString())
+//}

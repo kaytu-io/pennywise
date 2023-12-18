@@ -76,10 +76,10 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 
 			component := Component{
 				Name:            comp.Name,
-				MonthlyQuantity: comp.MonthlyQuantity,
-				HourlyQuantity:  comp.HourlyQuantity,
+				MonthlyQuantity: comp.MonthlyQuantity.Round(3),
+				HourlyQuantity:  comp.HourlyQuantity.Round(3),
 				Unit:            comp.Unit,
-				Rate:            Cost{Decimal: prices[0].Value, Currency: prices[0].Currency},
+				Rate:            Cost{Decimal: prices[0].Value.Round(3), Currency: prices[0].Currency},
 				Details:         comp.Details,
 				Usage:           comp.Usage,
 			}
