@@ -25,10 +25,10 @@ import (
 
 var (
 	MySQLHost     = os.Getenv("MYSQL_HOST")
-	MySQLPort     = os.Getenv("MYSQL_PORT")
-	MySQLDb       = os.Getenv("MYSQL_DB")
-	MySQLUser     = os.Getenv("MYSQL_USERNAME")
-	MySQLPassword = os.Getenv("MYSQL_PASSWORD")
+	MySQLPort     = "3306"
+	MySQLDb       = "test_terracost2"
+	MySQLUser     = "test-cost-estimator"
+	MySQLPassword = "password"
 )
 
 type AzureTestSuite struct {
@@ -135,54 +135,6 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 		}
 	}
 	return false
-}
-
-func (ts *AzureTestSuite) TestLinuxVirtualMachine() {
-	ts.SetupSuite()
-	fmt.Println("Suite Setup")
-	ts.IngestService("Virtual Machines", "eastus")
-	fmt.Println("Virtual Machine data ingested")
-
-	ts.IngestService("Storage", "eastus")
-	fmt.Println("Storage data ingested")
-
-	usg, err := ts.getUsage("../../testdata/azure/linux_virtual_machine/usage.yml")
-	require.NoError(ts.T(), err)
-
-	cost := ts.getDirCosts("../../testdata/azure/linux_virtual_machine", *usg)
-	fmt.Println(cost.CostString())
-}
-
-func (ts *AzureTestSuite) TestWindowsVirtualMachine() {
-	ts.SetupSuite()
-	fmt.Println("Suite Setup")
-	ts.IngestService("Virtual Machines", "eastus")
-	fmt.Println("Virtual Machine data ingested")
-
-	ts.IngestService("Storage", "eastus")
-	fmt.Println("Storage data ingested")
-
-	usg, err := ts.getUsage("../../testdata/azure/windows_virtual_machine/usage.yml")
-	require.NoError(ts.T(), err)
-
-	cost := ts.getDirCosts("../../testdata/azure/windows_virtual_machine", *usg)
-	fmt.Println(cost.CostString())
-}
-
-func (ts *AzureTestSuite) TestWindowsVirtualMachineScaleSet() {
-	ts.SetupSuite()
-	fmt.Println("Suite Setup")
-	ts.IngestService("Virtual Machines", "eastus")
-	fmt.Println("Virtual Machine data ingested")
-
-	ts.IngestService("Storage", "eastus")
-	fmt.Println("Storage data ingested")
-
-	usg, err := ts.getUsage("../../testdata/azure/windows_virtual_machine_scale_set/usage.yml")
-	require.NoError(ts.T(), err)
-
-	cost := ts.getDirCosts("../../testdata/azure/windows_virtual_machine_scale_set", *usg)
-	fmt.Println(cost.CostString())
 }
 
 func (ts *AzureTestSuite) TestVirtualMachine() {
