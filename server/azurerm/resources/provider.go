@@ -255,6 +255,7 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 	case "azurerm_cdn_endpoint":
 		vals, err := decodeCDNEndpoint(tfRes.Values)
 		if err != nil {
+			fmt.Println(err.Error())
 			return nil
 		}
 		return p.newCDNEndpoint(vals).Component()

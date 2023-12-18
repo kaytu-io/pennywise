@@ -1,4 +1,4 @@
-package resources
+package tests
 
 import (
 	"fmt"
@@ -10,16 +10,15 @@ import (
 func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("Virtual Machines", "eastus")
-	fmt.Println("Virtual Machine data ingested")
+	//ts.IngestService("Virtual Machines", "eastus")
+	//fmt.Println("Virtual Machine data ingested")
+	//ts.IngestService("Storage", "eastus")
+	//fmt.Println("Storage data ingested")
 
-	ts.IngestService("Storage", "eastus")
-	fmt.Println("Storage data ingested")
-
-	usg, err := ts.getUsage("../testdata/azure/linux_virtual_machine_scale_set/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/linux_virtual_machine_scale_set/usage.yaml")
 	require.NoError(ts.T(), err)
 
-	state := ts.getDirCosts("../testdata/azure/linux_virtual_machine_scale_set", *usg)
+	state := ts.getDirCosts("../../testdata/azure/linux_virtual_machine_scale_set", *usg)
 	costComponents := state.GetCostComponents()
 	expectedCostComponents := []cost.Component{
 		{
