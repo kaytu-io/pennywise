@@ -731,6 +731,8 @@ github.com/kaytu-io/infracost v0.0.0-20231207093503-26dcf0b76143 h1:QdtT5xIPnvZ/
 github.com/kaytu-io/infracost v0.0.0-20231207093503-26dcf0b76143/go.mod h1:fAX40ddPkC+xBG63N8CPMzWuq4wvP4qhtzhJLEp7ppI=
 github.com/kaytu-io/pennywise/cli v0.0.0-20231208171710-81bf59b7f37a h1:fERwjHSkCNE/CyEhi/NdLnTOXio+N8oox37n4C7REkw=
 github.com/kaytu-io/pennywise/cli v0.0.0-20231208171710-81bf59b7f37a/go.mod h1:MJuqCdcktlcB2RipxPLZTPdNqwj4e+Y5JVc1+xIGaPA=
+github.com/kaytu-io/pennywise/cli v0.0.0-20231218105942-6224147bda00 h1:yE+6AxS35sG072WetMRE/qtKWNTv+W0rMODnfBDDyIE=
+github.com/kaytu-io/pennywise/cli v0.0.0-20231218105942-6224147bda00/go.mod h1:MJuqCdcktlcB2RipxPLZTPdNqwj4e+Y5JVc1+xIGaPA=
 github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 h1:Z9n2FFNUXsshfwJMBgNA0RU6/i7WVaAegv3PtuIHPMs=
 github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51/go.mod h1:CzGEWj7cYgsdH8dAjBGEr58BoE7ScuLd+fwFZ44+/x8=
 github.com/kelseyhightower/envconfig v1.4.0 h1:Im6hONhd3pLkfDFsbRgu68RDNkGF1r3dvMUtDTo2cv8=
