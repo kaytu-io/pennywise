@@ -1,0 +1,8 @@
+{
+  "azurerm_dns_a_record.over1B": {
+    "monthly_queries": 1500000000
+  },
+  "azurerm_dns_a_record.first1B": {
+    "monthly_queries": 1000000000
+  }
+}

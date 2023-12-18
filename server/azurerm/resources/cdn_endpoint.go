@@ -213,19 +213,6 @@ func cdnOutboundDataCostComponents(key string, region, sku string, monthlyOutbou
 			data[0].startUsage,
 			decimal.Zero))
 	}
-	//for _, v := range costComponents {
-	//	fmt.Printf("monthly : %v \n", v.MonthlyQuantity)
-	//
-	//	fmt.Printf("location : %v \n", *v.ProductFilter.Location)
-	//	for _, v1 := range v.PriceFilter.AttributeFilters {
-	//		fmt.Printf("start usage : %v \n ", *v1.Value)
-	//	}
-	//
-	//	for k1, v1 := range v.ProductFilter.AttributeFilters {
-	//		fmt.Printf("key : %v , value : key : %v /value : %v \n", k1, v1.Key, *v1.ValueRegex)
-	//	}
-	//	fmt.Printf("\n\n")
-	//}
 	return costComponents
 }
 

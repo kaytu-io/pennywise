@@ -1,14 +1,3 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.0.2"
-    }
-  }
-
-  required_version = ">= 1.1.0"
-}
-
 provider "azurerm" {
   region = "eastus"
 }
@@ -160,6 +149,62 @@ resource "azurerm_linux_virtual_machine" "standard_a2_v2_custom_disk" {
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_LRS"
     disk_size_gb         = 1000
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "16.04-LTS"
+    version   = "latest"
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "standard_a2_ultra_enabled" {
+  name                = "standard_a2_ultra_enabled"
+  resource_group_name = "fake_resource_group"
+  location            = "eastus"
+
+  size           = "Standard_A2_v2"
+  admin_username = "fakeuser"
+  admin_password = "Password1234!"
+
+  network_interface_ids = [
+    "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "StandardSSD_LRS"
+  }
+
+  additional_capabilities {
+    ultra_ssd_enabled = true
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "16.04-LTS"
+    version   = "latest"
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "basic_b1_withMonthlyHours" {
+  name                = "basic_b1"
+  resource_group_name = "fake_resource_group"
+  location            = "eastus"
+
+  size           = "Standard_B1s"
+  admin_username = "fakeuser"
+  admin_password = "Password1234!"
+
+  network_interface_ids = [
+    "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
   }
 
   source_image_reference {

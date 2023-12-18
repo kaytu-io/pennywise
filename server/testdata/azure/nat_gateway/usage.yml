@@ -1,0 +1,2 @@
+azurerm_nat_gateway.my_gateway:
+  monthly_data_processed_gb: 10
