@@ -5,19 +5,19 @@ go 1.21.3
 require (
 	github.com/brpaz/echozap v1.1.3
 	github.com/cycloidio/sqlr v1.0.0
-	github.com/dmarkham/enumer v1.5.3
-	github.com/go-sql-driver/mysql v1.6.0
+	github.com/dmarkham/enumer v1.5.9
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/kaytu-io/infracost v0.0.0-20231207093503-26dcf0b76143
 	github.com/kaytu-io/pennywise/cli v0.0.0-20231218085627-1119cf1b667d
 	github.com/labstack/echo/v4 v4.11.3
-	github.com/lopezator/migrator v0.3.0
+	github.com/lopezator/migrator v0.3.1
 	github.com/machinebox/progress v0.2.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/shopspring/decimal v1.3.1
 	github.com/spf13/afero v1.11.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
-	go.uber.org/zap v1.10.0
+	go.uber.org/zap v1.26.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/net v0.19.0
 	golang.org/x/text v0.14.0
@@ -189,7 +189,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.0-rc2.0.20221005185240-3a7f492d3f1b // indirect
 	github.com/otiai10/copy v1.14.0 // indirect
 	github.com/owenrumney/go-sarif v1.1.1 // indirect
-	github.com/pascaldekloe/name v1.0.0 // indirect
+	github.com/pascaldekloe/name v1.0.1 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -233,7 +233,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.21.0 // indirect
 	go.opentelemetry.io/otel/trace v1.21.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	go.uber.org/multierr v1.2.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.16.0 // indirect
 	golang.org/x/exp v0.0.0-20231214170342-aacd6d4b4611 // indirect
 	golang.org/x/mod v0.14.0 // indirect
@@ -263,5 +263,3 @@ replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
 
 replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20231103101711-77c5e7d4d795
-
-replace github.com/kaytu-io/infracost => /home/arta/data/codes/Work/Kaytu/infracost
