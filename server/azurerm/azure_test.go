@@ -13,6 +13,7 @@ import (
 	"github.com/kaytu-io/pennywise/server/internal/mysql"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/net/context"
@@ -117,6 +118,75 @@ func (ts *AzureTestSuite) getDirCosts(projectDir string, usg usage.Usage) *cost.
 	return state
 }
 
+func checkComponents(result, expected cost.Component) bool {
+	if result.Name == expected.Name && result.MonthlyQuantity.Equal(expected.MonthlyQuantity) &&
+		result.HourlyQuantity.Equal(expected.HourlyQuantity) && result.Unit == expected.Unit && result.Rate.Decimal.Equal(expected.Rate.Decimal) &&
+		result.Rate.Currency == expected.Rate.Currency && result.Usage == expected.Usage && result.Error == expected.Error {
+		return true
+	} else {
+		return false
+	}
+}
+
+func componentExists(component cost.Component, comps []cost.Component) bool {
+	for _, comp := range comps {
+		if checkComponents(comp, component) {
+			return true
+		}
+	}
+	return false
+}
+
+//
+//func (ts *AzureTestSuite) TestLoadBalancer() {
+//	ts.SetupSuite()
+//	fmt.Println("Suite Setup")
+//	ts.IngestService("Load Balancer", "")
+//	fmt.Println("Load Balancer data ingested")
+//
+//	lbUsage := usage.Usage{"azurerm_lb": map[string]interface{}{
+//		"monthly_data_proceed": 1000,
+//	}}
+//	cost := ts.getDirCosts("../testdata/azure/load_balancer", lbUsage)
+//	fmt.Println(cost.CostString())
+//}
+//
+//func (ts *AzureTestSuite) TestPublicIp() {
+//	ts.SetupSuite()
+//	fmt.Println("Suite Setup")
+//	ts.IngestService("Virtual Network", "")
+//	fmt.Println("Virtual Network data ingested")
+//
+//	usg := usage.Usage{}
+//	cost := ts.getDirCosts("../testdata/azure/public_ip", usg)
+//	fmt.Println(cost.CostString())
+//}
+//
+//func (ts *AzureTestSuite) TestPublicIpPrefix() {
+//	ts.SetupSuite()
+//	fmt.Println("Suite Setup")
+//	ts.IngestService("Virtual Network", "")
+//	fmt.Println("Virtual Network data ingested")
+//
+//	usg := usage.Usage{}
+//	cost := ts.getDirCosts("../testdata/azure/public_ip_prefix", usg)
+//	fmt.Println(cost.CostString())
+//}
+//
+//func (ts *AzureTestSuite) TestPrivateEndpoint() {
+//	ts.SetupSuite()
+//	fmt.Println("Suite Setup")
+//	ts.IngestService("Virtual Network", "")
+//	fmt.Println("Virtual Network data ingested")
+//
+//	usg := usage.Usage{"azurerm_private_endpoint": map[string]interface{}{
+//		"monthly_inbound_data_processed_gb":  100,
+//		"monthly_outbound_data_processed_gb": 100,
+//	}}
+//	cost := ts.getDirCosts("../testdata/azure/private_endpoint", usg)
+//	fmt.Println(cost.CostString())
+//}
+
 func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
@@ -129,8 +199,183 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 	usg, err := ts.getUsage("../testdata/azure/linux_virtual_machine_scale_set/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/azure/linux_virtual_machine_scale_set", *usg)
-	fmt.Println(cost.CostString())
+	state := ts.getDirCosts("../testdata/azure/linux_virtual_machine_scale_set", *usg)
+	costComponents := state.GetCostComponents()
+	expectedCostComponents := []cost.Component{
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+	}
+
+	ts.Equal(len(expectedCostComponents), len(costComponents))
+	for _, comp := range expectedCostComponents {
+		ts.True(componentExists(comp, costComponents))
+	}
 }
 
 func (ts *AzureTestSuite) TestLinuxVirtualMachine() {
