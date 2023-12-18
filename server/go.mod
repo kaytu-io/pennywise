@@ -7,7 +7,7 @@ require (
 	github.com/cycloidio/sqlr v1.0.0
 	github.com/dmarkham/enumer v1.5.3
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/kaytu-io/pennywise/cli v0.0.0-20231208171710-81bf59b7f37a
+	github.com/kaytu-io/pennywise/cli v0.0.0-20231218105942-6224147bda00
 	github.com/labstack/echo/v4 v4.11.3
 	github.com/lopezator/migrator v0.3.0
 	github.com/machinebox/progress v0.2.0
