@@ -491,7 +491,7 @@ func (ts *AzureTestSuite) TestPrivateEndpoint() {
 	ts.IngestService("Virtual Network", "eastus")
 	fmt.Println("Virtual Network ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/private_endpoint/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/private_endpoint/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../testdata/private_endpoint", *usg)
@@ -504,7 +504,7 @@ func (ts *AzureTestSuite) TestApplicationGateway() {
 	ts.IngestService("Application Gateway", "eastus")
 	fmt.Println("Application Gateway data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/application_gateway/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/application_gateway/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/application_gateway", *usg)
@@ -517,7 +517,7 @@ func (ts *AzureTestSuite) TestCDNEndpoint() {
 	ts.IngestService("Content Delivery Network", "eastus")
 	fmt.Println("Content Delivery Network data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cdn_endpoint/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/cdn_endpoint/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/cdn_endpoint", *usg)
@@ -530,7 +530,7 @@ func (ts *AzureTestSuite) TestContainerRegistry() {
 	ts.IngestService("Container Registry", "eastus")
 	fmt.Println("Container Registry data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/container_registry/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/container_registry/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/container_registry", *usg)
@@ -543,7 +543,7 @@ func (ts *AzureTestSuite) TestCosmosdbCassandraKeyspace() {
 	ts.IngestService("Azure Cosmos DB", "eastus")
 	fmt.Println("Azure Cosmos DB data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_cassandra_keyspace/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_cassandra_keyspace/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/cosmosdb_cassandra_keyspace", *usg)
@@ -556,7 +556,7 @@ func (ts *AzureTestSuite) TestCosmosdbCassandraTable() {
 	ts.IngestService("Azure Cosmos DB", "eastus")
 	fmt.Println("Azure Cosmos DB data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_cassandra_table/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_cassandra_table/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/cosmosdb_cassandra_table", *usg)
@@ -569,7 +569,7 @@ func (ts *AzureTestSuite) TestCosmosdbGremlinDatabase() {
 	ts.IngestService("Azure Cosmos DB", "eastus")
 	fmt.Println("Azure Cosmos DB data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_gremlin_database/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_gremlin_database/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/cosmosdb_gremlin_database", *usg)
@@ -582,7 +582,7 @@ func (ts *AzureTestSuite) TestCosmosdbGremlinGraph() {
 	ts.IngestService("Azure Cosmos DB", "eastus")
 	fmt.Println("Azure Cosmos DB data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_gremlin_graph/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_gremlin_graph/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/cosmosdb_gremlin_graph", *usg)
@@ -595,7 +595,7 @@ func (ts *AzureTestSuite) TestCosmosdbMongoCollection() {
 	ts.IngestService("Azure Cosmos DB", "eastus")
 	fmt.Println("Azure Cosmos DB data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_mongo_collection/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_mongo_collection/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/cosmosdb_mongo_collection", *usg)
@@ -608,7 +608,7 @@ func (ts *AzureTestSuite) TestCosmosdbMongoDatabase() {
 	ts.IngestService("Azure Cosmos DB", "eastus")
 	fmt.Println("Azure Cosmos DB data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_mongo_database/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_mongo_database/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/cosmosdb_mongo_database", *usg)
@@ -621,7 +621,7 @@ func (ts *AzureTestSuite) TestCosmosdbSqlContainer() {
 	ts.IngestService("Azure Cosmos DB", "eastus")
 	fmt.Println("Azure Cosmos DB data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_sql_container/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_sql_container/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/cosmosdb_sql_container", *usg)
@@ -634,7 +634,7 @@ func (ts *AzureTestSuite) TestCosmosdbSqlDatabase() {
 	ts.IngestService("Azure Cosmos DB", "eastus")
 	fmt.Println("Azure Cosmos DB data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_sql_database/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_sql_database/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/cosmosdb_sql_database", *usg)
@@ -647,7 +647,7 @@ func (ts *AzureTestSuite) TestCosmosdbTable() {
 	ts.IngestService("Azure Cosmos DB", "eastus")
 	fmt.Println("Azure Cosmos DB data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_table/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_table/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/cosmosdb_table", *usg)
@@ -660,7 +660,7 @@ func (ts *AzureTestSuite) TestImage() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/image/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/image/usage.yml")
 	require.NoError(ts.T(), err)
 
 	cost := ts.getDirCosts("../../testdata/azure/image", *usg)
@@ -673,10 +673,10 @@ func (ts *AzureTestSuite) TestKeyVaultCertificate() {
 	ts.IngestService("Key Vault", "eastus")
 	fmt.Println("Key Vault ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/key_vault_certificate/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/key_vault_certificate/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/key_vault_certificate", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/key_vault_certificate", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -686,10 +686,10 @@ func (ts *AzureTestSuite) TestKeyVaultKey() {
 	ts.IngestService("Key Vault", "eastus")
 	fmt.Println("Key Vault ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/key_vault_key/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/key_vault_key/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/key_vault_key", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/key_vault_key", *usg)
 	fmt.Println(cost.CostString())
 }
 func (ts *AzureTestSuite) TestKeyVaultManagedHardwareSecurityModule() {
@@ -698,7 +698,7 @@ func (ts *AzureTestSuite) TestKeyVaultManagedHardwareSecurityModule() {
 	ts.IngestService("Key Vault", "eastus")
 	fmt.Println("Key Vault ingested")
 
-	cost := ts.getDirCosts("../testdata/key_vault_managed_hardware_security_module", nil)
+	cost := ts.getDirCosts("../../testdata/azure/key_vault_managed_hardware_security_module", nil)
 	fmt.Println(cost.CostString())
 }
 func (ts *AzureTestSuite) TestKubernetesCluster() {
@@ -719,10 +719,10 @@ func (ts *AzureTestSuite) TestKubernetesCluster() {
 	ts.IngestService("Azure DNS", "eastus")
 	fmt.Println("Azure DNS ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/kubernetes_cluster/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/kubernetes_cluster/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/kubernetes_cluster", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/kubernetes_cluster", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -735,10 +735,10 @@ func (ts *AzureTestSuite) TestKubernetesClusterNodePool() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/kubernetes_cluster_node_pool/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/kubernetes_cluster_node_pool/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/kubernetes_cluster_node_pool", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/kubernetes_cluster_node_pool", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -748,10 +748,10 @@ func (ts *AzureTestSuite) TestLoadBalancer() {
 	ts.IngestService("Load Balancer", "eastus")
 	fmt.Println("Load Balancer ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/load_balancer/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/load_balancer/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/load_balancer", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/load_balancer", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -761,7 +761,7 @@ func (ts *AzureTestSuite) TestLoadBalancerRule() {
 	ts.IngestService("Load Balancer", "eastus")
 	fmt.Println("Load Balancer ingested")
 
-	cost := ts.getDirCosts("../testdata/lb_rule", nil)
+	cost := ts.getDirCosts("../../testdata/azure/lb_rule", nil)
 	fmt.Println(cost.CostString())
 }
 
@@ -771,7 +771,7 @@ func (ts *AzureTestSuite) TestLoadBalancerOutboundRule() {
 	ts.IngestService("Load Balancer", "eastus")
 	fmt.Println("Load Balancer ingested")
 
-	cost := ts.getDirCosts("../testdata/lb_outbound_rule", nil)
+	cost := ts.getDirCosts("../../testdata/azure/lb_outbound_rule", nil)
 	fmt.Println(cost.CostString())
 }
 
@@ -781,10 +781,10 @@ func (ts *AzureTestSuite) TestManagedDisk() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/managed_disk/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/managed_disk/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/managed_disk", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/managed_disk", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -794,10 +794,10 @@ func (ts *AzureTestSuite) TestMariadbServer() {
 	ts.IngestService("Databases", "eastus")
 	fmt.Println("Databases ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/mariadb_server/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/mariadb_server/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/mariadb_server", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/mariadb_server", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -807,10 +807,10 @@ func (ts *AzureTestSuite) TestMssqlDatabase() {
 	ts.IngestService("SQL Database", "eastus")
 	fmt.Println("SQL Database ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/mssql_database/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/mssql_database/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/mssql_database", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/mssql_database", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -820,10 +820,10 @@ func (ts *AzureTestSuite) TestMssqlManagedInstance() {
 	ts.IngestService("SQL Database", "eastus")
 	fmt.Println("SQL Database ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/mssql_managed_instance/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/mssql_managed_instance/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/mssql_managed_instance", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/mssql_managed_instance", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -833,10 +833,10 @@ func (ts *AzureTestSuite) TestMysqlFlexibleServer() {
 	ts.IngestService("Azure Database for MySQL", "eastus")
 	fmt.Println("Azure Database for MySQL ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/mysql_flexible_server/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/mysql_flexible_server/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/mysql_flexible_server", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/mysql_flexible_server", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -846,10 +846,10 @@ func (ts *AzureTestSuite) TestMysqlServer() {
 	ts.IngestService("Databases", "eastus")
 	fmt.Println("Databases ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/mysql_server/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/mysql_server/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/mysql_server", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/mysql_server", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -859,10 +859,10 @@ func (ts *AzureTestSuite) TestNatGateway() {
 	ts.IngestService("NAT Gateway", "eastus")
 	fmt.Println("NAT Gateway ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/nat_gateway/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/nat_gateway/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/nat_gateway", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/nat_gateway", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -872,10 +872,10 @@ func (ts *AzureTestSuite) TestPostgresqlFlexibleServer() {
 	ts.IngestService("Azure Database for PostgreSQL", "eastus")
 	fmt.Println("Azure Database for PostgreSQL ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/postgresql_flexible_server/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/postgresql_flexible_server/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/postgresql_flexible_server", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/postgresql_flexible_server", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -885,10 +885,10 @@ func (ts *AzureTestSuite) TestPostgresqlServer() {
 	ts.IngestService("Databases", "eastus")
 	fmt.Println("Databases ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/postgresql_server/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/postgresql_server/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/postgresql_server", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/postgresql_server", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -898,7 +898,7 @@ func (ts *AzureTestSuite) TestPublicIp() {
 	ts.IngestService("Virtual Network", "eastus")
 	fmt.Println("Virtual Network ingested")
 
-	cost := ts.getDirCosts("../testdata/public_ip", nil)
+	cost := ts.getDirCosts("../../testdata/azure/public_ip", nil)
 	fmt.Println(cost.CostString())
 }
 
@@ -908,7 +908,7 @@ func (ts *AzureTestSuite) TestPublicIpPrefix() {
 	ts.IngestService("Virtual Network", "eastus")
 	fmt.Println("Virtual Network ingested")
 
-	cost := ts.getDirCosts("../testdata/public_ip_prefix", nil)
+	cost := ts.getDirCosts("../../testdata/azure/public_ip_prefix", nil)
 	fmt.Println(cost.CostString())
 }
 
@@ -918,10 +918,10 @@ func (ts *AzureTestSuite) TestSnapshot() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/snapshot/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/snapshot/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/snapshot", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/snapshot", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -931,10 +931,10 @@ func (ts *AzureTestSuite) TestSqlDatabase() {
 	ts.IngestService("Azure Cosmos DB", "eastus")
 	fmt.Println("Azure Cosmos DB ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/sql_database/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/sql_database/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/sql_database", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/sql_database", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -944,10 +944,10 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 	ts.IngestService("SQL Managed Instance", "eastus")
 	fmt.Println("SQL Managed Instance ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/sql_managed_instance/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/sql_managed_instance/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/sql_managed_instance", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/sql_managed_instance", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -957,10 +957,10 @@ func (ts *AzureTestSuite) TestStorageAccount() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/storage_account/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/storage_account/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/storage_account", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/storage_account", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -970,10 +970,10 @@ func (ts *AzureTestSuite) TestStorageQueue() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/storage_queue", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/storage_queue", *usg)
 	fmt.Println(cost.CostString())
 }
 
@@ -983,9 +983,9 @@ func (ts *AzureTestSuite) TestStorageShare() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/storage_share/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/storage_share/usage.yml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/storage_share", *usg)
+	cost := ts.getDirCosts("../../testdata/azure/storage_share", *usg)
 	fmt.Println(cost.CostString())
 }
