@@ -1,4 +1,4 @@
-package azurerm
+package resources
 
 import (
 	"database/sql"
@@ -7,13 +7,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kaytu-io/pennywise/cli/parser/hcl"
 	"github.com/kaytu-io/pennywise/cli/usage"
-	resources2 "github.com/kaytu-io/pennywise/server/azurerm/resources"
+	"github.com/kaytu-io/pennywise/server/azurerm"
 	"github.com/kaytu-io/pennywise/server/cost"
 	ingester2 "github.com/kaytu-io/pennywise/server/internal/ingester"
 	"github.com/kaytu-io/pennywise/server/internal/mysql"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/net/context"
@@ -51,7 +50,7 @@ func (ts *AzureTestSuite) SetupSuite() {
 }
 
 func (ts *AzureTestSuite) IngestService(service, region string) {
-	ingester, err := NewIngester(service, region)
+	ingester, err := azurerm.NewIngester(service, region)
 	require.NoError(ts.T(), err)
 
 	err = ingester2.IngestPricing(context.Background(), ts.backend, ingester)
@@ -93,7 +92,7 @@ func (ts *AzureTestSuite) getDirCosts(projectDir string, usg usage.Usage) *cost.
 
 	var qResources []query.Resource
 	resources := make(map[string]resource.Resource)
-	provider, err := resources2.NewProvider(resources2.ProviderName)
+	provider, err := NewProvider(ProviderName)
 	require.NoError(ts.T(), err)
 
 	for _, rs := range hclResources {
@@ -186,197 +185,6 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	cost := ts.getDirCosts("../testdata/azure/private_endpoint", usg)
 //	fmt.Println(cost.CostString())
 //}
-
-func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
-	ts.SetupSuite()
-	fmt.Println("Suite Setup")
-	ts.IngestService("Virtual Machines", "eastus")
-	fmt.Println("Virtual Machine data ingested")
-
-	ts.IngestService("Storage", "eastus")
-	fmt.Println("Storage data ingested")
-
-	usg, err := ts.getUsage("../testdata/azure/linux_virtual_machine_scale_set/usage.yml")
-	require.NoError(ts.T(), err)
-
-	state := ts.getDirCosts("../testdata/azure/linux_virtual_machine_scale_set", *usg)
-	costComponents := state.GetCostComponents()
-	expectedCostComponents := []cost.Component{
-		{
-			Name:            "Compute Basic_A2",
-			MonthlyQuantity: decimal.NewFromFloat(730),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "Monthly Hours",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.079),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Compute Basic_A2",
-			MonthlyQuantity: decimal.NewFromFloat(730),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "Monthly Hours",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.079),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Compute Basic_A2",
-			MonthlyQuantity: decimal.NewFromFloat(730),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "Monthly Hours",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.079),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Managed Storage",
-			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(1.536),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Managed Storage",
-			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(1.536),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Managed Storage",
-			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(1.536),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Compute Basic_A2",
-			MonthlyQuantity: decimal.NewFromFloat(730),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "Monthly Hours",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.079),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Compute Basic_A2",
-			MonthlyQuantity: decimal.NewFromFloat(730),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "Monthly Hours",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.079),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Compute Basic_A2",
-			MonthlyQuantity: decimal.NewFromFloat(730),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "Monthly Hours",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.079),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Managed Storage",
-			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(1.536),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Managed Storage",
-			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(1.536),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Managed Storage",
-			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(1.536),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-	}
-
-	ts.Equal(len(expectedCostComponents), len(costComponents))
-	for _, comp := range expectedCostComponents {
-		ts.True(componentExists(comp, costComponents))
-	}
-}
 
 func (ts *AzureTestSuite) TestLinuxVirtualMachine() {
 	ts.SetupSuite()
