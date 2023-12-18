@@ -3,7 +3,6 @@ module github.com/kaytu-io/pennywise/server
 go 1.21.3
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/brpaz/echozap v1.1.3
 	github.com/cycloidio/sqlr v1.0.0
 	github.com/dmarkham/enumer v1.5.3

@@ -109,6 +109,16 @@ func (s *State) Cost() (Cost, error) {
 	return total, nil
 }
 
+func (s *State) GetCostComponents() []Component {
+	var components []Component
+	for _, res := range s.Resources {
+		for _, comp := range res.Components {
+			components = append(components, comp...)
+		}
+	}
+	return components
+}
+
 func (s *State) CostString() (string, error) {
 	cost, err := s.Cost()
 	if err != nil {

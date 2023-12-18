@@ -13,6 +13,7 @@ import (
 	"github.com/kaytu-io/pennywise/server/internal/mysql"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/net/context"
@@ -118,6 +119,25 @@ func (ts *AzureTestSuite) getDirCosts(projectDir string, usg usage.Usage) *cost.
 	return state
 }
 
+func checkComponents(result, expected cost.Component) bool {
+	if result.Name == expected.Name && result.MonthlyQuantity.Equal(expected.MonthlyQuantity) &&
+		result.HourlyQuantity.Equal(expected.HourlyQuantity) && result.Unit == expected.Unit && result.Rate.Decimal.Equal(expected.Rate.Decimal) &&
+		result.Rate.Currency == expected.Rate.Currency && result.Usage == expected.Usage && result.Error == expected.Error {
+		return true
+	} else {
+		return false
+	}
+}
+
+func componentExists(component cost.Component, comps []cost.Component) bool {
+	for _, comp := range comps {
+		if checkComponents(comp, component) {
+			return true
+		}
+	}
+	return false
+}
+
 //
 //func (ts *AzureTestSuite) TestLoadBalancer() {
 //	ts.SetupSuite()
@@ -176,14 +196,184 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage data ingested")
 
-	//usg := usage.Usage{"azurerm_private_endpoint": map[string]interface{}{
-	//	"monthly_inbound_data_processed_gb":  100,
-	//	"monthly_outbound_data_processed_gb": 100,
-	//}}
-
-	usg, err := ts.getUsage("../testdata/azure/linux_virtual_machine_scale_set/usage.json")
+	usg, err := ts.getUsage("../testdata/azure/linux_virtual_machine_scale_set/usage.yaml")
 	require.NoError(ts.T(), err)
 
-	cost := ts.getDirCosts("../testdata/azure/linux_virtual_machine_scale_set", *usg)
-	fmt.Println(cost.CostString())
+	state := ts.getDirCosts("../testdata/azure/linux_virtual_machine_scale_set", *usg)
+	costComponents := state.GetCostComponents()
+	expectedCostComponents := []cost.Component{
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Basic_A2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.079),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.Zero,
+			Unit:            "",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+	}
+
+	ts.Equal(len(expectedCostComponents), len(costComponents))
+	for _, comp := range expectedCostComponents {
+		ts.True(componentExists(comp, costComponents))
+	}
 }
