@@ -149,7 +149,10 @@ func (inst *VirtualMachine) Components() []query.Component {
 		})
 		components = append(components, managedStorage.Components()...)
 	}
-
+	var monthlyDiskOperations *decimal.Decimal
+	if inst.monthlyDataDiskOperations != nil {
+		monthlyDiskOperations = inst.monthlyDataDiskOperations
+	}
 	if len(inst.storageDataDisk) > 0 {
 		for _, disk := range inst.storageDataDisk {
 			managedStorage := inst.provider.newManagedStorage(managedDiskValues{
@@ -161,8 +164,8 @@ func (inst *VirtualMachine) Components() []query.Component {
 				DiskMbpsReadWrite:  0,
 
 				Usage: struct {
-					MonthlyDiskOperations float64 `mapstructure:"monthly_disk_operations"`
-				}{MonthlyDiskOperations: inst.monthlyDataDiskOperations.InexactFloat64()},
+					MonthlyDiskOperations *float64 `mapstructure:"monthly_disk_operations"`
+				}{MonthlyDiskOperations: util.DecimalToFloat(monthlyDiskOperations)},
 			})
 			components = append(components, managedStorage.Components()...)
 		}
@@ -206,8 +209,8 @@ func osDiskSubResource(provider *Provider, location string, osDisk []OsDisk, mon
 		Location:           location,
 		DiskSizeGb:         osDisk[0].DiskSizeGb,
 		Usage: struct {
-			MonthlyDiskOperations float64 `mapstructure:"monthly_disk_operations"`
-		}{MonthlyDiskOperations: diskOperations},
+			MonthlyDiskOperations *float64 `mapstructure:"monthly_disk_operations"`
+		}{MonthlyDiskOperations: &diskOperations},
 	})
 	return managedStorage.Components()
 }
