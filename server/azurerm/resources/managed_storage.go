@@ -24,7 +24,7 @@ type ManagedDisk struct {
 	diskIopsReadWrite  float64
 
 	// Usage
-	monthlyDiskOperations decimal.Decimal
+	monthlyDiskOperations *decimal.Decimal
 }
 
 // managedDiskValues is holds the values that we need to be able
@@ -38,7 +38,7 @@ type managedDiskValues struct {
 	DiskIopsReadWrite  float64 `mapstructure:"disk_iops_read_write"`
 
 	Usage struct {
-		MonthlyDiskOperations float64 `mapstructure:"monthly_disk_operations"`
+		MonthlyDiskOperations *float64 `mapstructure:"monthly_disk_operations"`
 	} `mapstructure:"pennywise_usage"`
 }
 
@@ -72,7 +72,7 @@ func (p *Provider) newManagedStorage(vals managedDiskValues) *ManagedDisk {
 		burstingEnabled:       vals.BurstingEnabled,
 		diskMbpsReadWrite:     vals.DiskMbpsReadWrite,
 		diskIopsReadWrite:     vals.DiskIopsReadWrite,
-		monthlyDiskOperations: decimal.NewFromFloat(vals.Usage.MonthlyDiskOperations),
+		monthlyDiskOperations: util.FloatToDecimal(vals.Usage.MonthlyDiskOperations),
 	}
 
 	return inst
@@ -124,7 +124,9 @@ func (inst *ManagedDisk) Components() []query.Component {
 	if strings.ToLower(sku[0]) == "standard" || strings.ToLower(sku[0]) == "standardssd" {
 		var opsQty decimal.Decimal
 
-		opsQty = inst.monthlyDiskOperations.Div(decimal.NewFromInt(10000))
+		if inst.monthlyDiskOperations != nil {
+			opsQty = inst.monthlyDiskOperations.Div(decimal.NewFromInt(10000))
+		}
 		inst.diskOperationsComponent(inst.provider.key, inst.location, inst.storageAccountType, opsQty)
 	}
 	return components
