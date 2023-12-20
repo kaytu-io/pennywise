@@ -570,7 +570,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Storage", "eastus")
 //	fmt.Println("Storage ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/storage_account/usage.yaml")
+//	usg, err := ts.getUsage("../../testdata/azure/storage_account/usage.yml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/storage_account", *usg)
@@ -583,7 +583,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Storage", "eastus")
 //	fmt.Println("Storage ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yaml")
+//	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/storage_queue", *usg)
@@ -596,7 +596,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Storage", "westus")
 //	fmt.Println("Storage ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/storage_share/usage.yaml")
+//	usg, err := ts.getUsage("../../testdata/azure/storage_share/usage.yml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/storage_share", *usg)

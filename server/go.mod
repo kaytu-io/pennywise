@@ -7,6 +7,7 @@ require (
 	github.com/cycloidio/sqlr v1.0.0
 	github.com/dmarkham/enumer v1.5.3
 	github.com/go-sql-driver/mysql v1.6.0
+	github.com/kaytu-io/infracost v0.0.0-20231207093503-26dcf0b76143
 	github.com/kaytu-io/pennywise/cli v0.0.0-20231218105942-6224147bda00
 	github.com/labstack/echo/v4 v4.11.3
 	github.com/lopezator/migrator v0.3.0
@@ -156,7 +157,6 @@ require (
 	github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87 // indirect
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
-	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
@@ -166,7 +166,6 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/jstemmer/go-junit-report v1.0.0 // indirect
-	github.com/kaytu-io/infracost v0.0.0-20231207093503-26dcf0b76143 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
@@ -261,7 +260,5 @@ replace github.com/hashicorp/terraform => github.com/cycloidio/terraform v1.1.9-
 replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e
 
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
-
-replace github.com/kaytu-io/pennywise/cli => /home/saber-ubuntu/GolandProjects/pennywise/cli
 
 replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20231103101711-77c5e7d4d795
