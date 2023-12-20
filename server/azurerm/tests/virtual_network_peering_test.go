@@ -10,28 +10,17 @@ import (
 func (ts *AzureTestSuite) TestVirtualNetworkPeering() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("VPN Gateway", "West Europe")
+
+	ts.IngestService("VPN Gateway", "Zone 2")
 	fmt.Println("VPN Gateway ingested")
 
-	ts.IngestService("Virtual Network", "West Europe")
-	fmt.Println("Virtual Network ingested")
-
-	ts.IngestService("VPN Gateway", "North Europe")
-	fmt.Println("VPN Gateway ingested")
-
-	ts.IngestService("Virtual Network", "North Europe")
-	fmt.Println("Virtual Network ingested")
-
-	ts.IngestService("VPN Gateway", "Japan West")
-	fmt.Println("VPN Gateway ingested")
-
-	ts.IngestService("Virtual Network", "Japan West")
-	fmt.Println("Virtual Network ingested")
-
-	ts.IngestService("VPN Gateway", "Global")
+	ts.IngestService("VPN Gateway", "Zone 1")
 	fmt.Println("VPN Gateway ingested")
 
 	ts.IngestService("Virtual Network", "Global")
+	fmt.Println("Virtual Network ingested")
+
+	ts.IngestService("Virtual Network", "Zone 1")
 	fmt.Println("Virtual Network ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/virtual_network_peering/usage.yml")

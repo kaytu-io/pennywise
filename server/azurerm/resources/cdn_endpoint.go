@@ -27,8 +27,10 @@ type AzureRMCDNEndpoint struct {
 	sku                *string
 	optimizationType   *string
 
-	//usage
-	monthlyOutboundGB          *int64
+	//usage:
+	// receives the monthly number of outbound data transfers in GB
+	monthlyOutboundGB *int64
+	// receives the monthly number of rules engine requests
 	monthlyRulesEngineRequests *int64
 }
 

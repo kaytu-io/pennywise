@@ -9,7 +9,7 @@ import (
 func (ts *AzureTestSuite) TestDNSZoneRecord() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("Azure DNS", "westus")
+	ts.IngestService("Azure DNS", "Zone 1")
 	fmt.Println("Azure DNS data ingested")
 
 	stat := ts.getDirCosts("../../testdata/azure/dns_zone_record", nil)

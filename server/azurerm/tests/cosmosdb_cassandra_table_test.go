@@ -11,32 +11,21 @@ func (ts *AzureTestSuite) TestCosmosdbCassandraTable() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
 
-	//ts.IngestService("Azure Cosmos DB", "eastus")
-	//fmt.Println("Azure Cosmos DB data ingested")
-	//
-	//ts.IngestService("Azure Cosmos DB", "westus")
-	//fmt.Println("Azure Cosmos DB data ingested")
-	//
-	//ts.IngestService("Azure Cosmos DB", "centralus")
-	//fmt.Println("Azure Cosmos DB data ingested")
+	ts.IngestService("Azure Cosmos DB", "eastus")
+	fmt.Println("Azure Cosmos DB data ingested")
+
+	ts.IngestService("Azure Cosmos DB", "westus")
+	fmt.Println("Azure Cosmos DB data ingested")
+
+	ts.IngestService("Azure Cosmos DB", "centralus")
+	fmt.Println("Azure Cosmos DB data ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_cassandra_table/usage.yml")
 	require.NoError(ts.T(), err)
 
 	stat := ts.getDirCosts("../../testdata/azure/cosmosdb_cassandra_table", *usg)
 	costComponent := stat.GetCostComponents()
-	for k, v := range costComponent {
-		fmt.Printf("cost component : %v \n", k)
-		fmt.Printf("name : %v \n ", v.Name)
-		fmt.Printf("unit : %v \n ", v.Unit)
-		fmt.Printf("rate : %v \n ", v.Rate)
-		fmt.Printf("Details : %v \n ", v.Details)
-		fmt.Printf("Usage : %v \n ", v.Usage)
-		fmt.Printf("MonthlyQuantity : %v \n ", v.MonthlyQuantity)
-		fmt.Printf("HourlyQuantity : %v \n ", v.HourlyQuantity)
-		fmt.Printf("Error : %v \n ", v.Error)
-		fmt.Printf("\n")
-	}
+
 	expectedCostComponent := []cost.Component{
 		{
 			Name:            "Transactional storage (Central US)",

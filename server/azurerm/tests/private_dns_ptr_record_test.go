@@ -10,8 +10,8 @@ import (
 func (ts *AzureTestSuite) TestPrivateDNSPTRRecord() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	//ts.IngestService("Azure DNS", "West Europe")
-	//fmt.Println("Azure DNS data ingested")
+	ts.IngestService("Azure DNS", "Zone 1")
+	fmt.Println("Azure DNS data ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/private_dns_ptr_record/usage.json")
 	require.NoError(ts.T(), err)

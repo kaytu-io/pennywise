@@ -27,7 +27,9 @@ type ContainerRegistryValue struct {
 	GeoReplication map[string]interface{} `mapstructure:"georeplications"`
 
 	Usage struct {
-		StorageGB           float64 `mapstructure:"storage_gb"`
+		// receives Total size of bucket in GB
+		StorageGB float64 `mapstructure:"storage_gb"`
+		// receives the number of hours of use of a container registry instance uses
 		MonthlyBuildVCPUHrs float64 `mapstructure:"monthly_build_vcpu_hrs"`
 	} `mapstructure:"pennywise_usage"`
 }

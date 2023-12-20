@@ -13,12 +13,18 @@ type cosmosdbTableValues struct {
 	AutoscaleSetting    []AutoscaleSetting   `mapstructure:"autoscale_settings"`
 
 	Usage struct {
-		MonthlyServerlessRequestUnits           *int64   `mapstructure:"monthly_serverless_request_units"`
-		MaxRequestUnitsUtilizationPercentage    *float64 `mapstructure:"max_request_units_utilization_percentage"`
-		MonthlyAnalyticalStorageReadOperations  *int64   `mapstructure:"monthly_analytical_storage_read_operations"`
-		MonthlyAnalyticalStorageWriteOperations *int64   `mapstructure:"monthly_analytical_storage_write_operations"`
-		StorageGb                               *int64   `mapstructure:"storage_gb"`
-		MonthlyRestoredDataGb                   *int64   `mapstructure:"monthly_restored_data_gb"`
+		// receives monthly number of serverless request units
+		MonthlyServerlessRequestUnits *int64 `mapstructure:"monthly_serverless_request_units"`
+		// receives Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100
+		MaxRequestUnitsUtilizationPercentage *float64 `mapstructure:"max_request_units_utilization_percentage"`
+		// receives monthly number of read analytical storage operations\
+		MonthlyAnalyticalStorageReadOperations *int64 `mapstructure:"monthly_analytical_storage_read_operations"`
+		// receives monthly number of write analytical storage operations.
+		MonthlyAnalyticalStorageWriteOperations *int64 `mapstructure:"monthly_analytical_storage_write_operations"`
+		// receives total size of storage in GB
+		StorageGb *int64 `mapstructure:"storage_gb"`
+		//receives monthly total amount of point-in-time restore data in GB
+		MonthlyRestoredDataGb *int64 `mapstructure:"monthly_restored_data_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
 

@@ -10,7 +10,7 @@ import (
 func (ts *AzureTestSuite) TestDNSSRVRecord() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("Azure DNS", "West Europ")
+	ts.IngestService("Azure DNS", "Zone 1")
 	fmt.Println("Azure DNS data ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/dns_srv_record/usage.json")

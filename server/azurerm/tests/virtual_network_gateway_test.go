@@ -10,32 +10,24 @@ import (
 func (ts *AzureTestSuite) TestVirtualNetworkGateway() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	//ts.IngestService("Virtual Machines", "eastus")
-	//fmt.Println("Virtual Machine data ingested")
-	//
-	//ts.IngestService("VPN Gateway", "Zone 1")
-	//fmt.Println("VPN Gateway ingested")
-	//
-	ts.IngestService("VPN Gateway", "")
+	ts.IngestService("Virtual Machines", "eastus")
+	fmt.Println("Virtual Machine data ingested")
+
+	ts.IngestService("VPN Gateway", "Zone 1")
 	fmt.Println("VPN Gateway ingested")
+
+	ts.IngestService("VPN Gateway", "eastus")
+	fmt.Println("VPN Gateway ingested")
+
+	ts.IngestService("Virtual Network", "eastus")
+	fmt.Println("Virtual Network data ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/virtual_network_gateway/usage.yml")
 	require.NoError(ts.T(), err)
 
 	stat := ts.getDirCosts("../../testdata/azure/virtual_network_gateway", *usg)
 	costComponent := stat.GetCostComponents()
-	for k, v := range costComponent {
-		fmt.Printf("cost component : %v \n", k)
-		fmt.Printf("name : %v \n ", v.Name)
-		fmt.Printf("unit : %v \n ", v.Unit)
-		fmt.Printf("rate : %v \n ", v.Rate)
-		fmt.Printf("Details : %v \n ", v.Details)
-		fmt.Printf("Usage : %v \n ", v.Usage)
-		fmt.Printf("MonthlyQuantity : %v \n ", v.MonthlyQuantity)
-		fmt.Printf("HourlyQuantity : %v \n ", v.HourlyQuantity)
-		fmt.Printf("Error : %v \n ", v.Error)
-		fmt.Printf("\n")
-	}
+
 	expectedCostComponent := []cost.Component{
 		{
 			Name:            "VPN gateway (VpnGw2)",
@@ -58,6 +50,20 @@ func (ts *AzureTestSuite) TestVirtualNetworkGateway() {
 			Unit:            "tunnel",
 			Rate: cost.Cost{
 				Decimal:  decimal.NewFromFloat(0.01),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "IP address (dynamic)",
+			MonthlyQuantity: decimal.Zero,
+			HourlyQuantity:  decimal.NewFromFloat(1),
+			Unit:            "hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.004),
 				Currency: "USD",
 			},
 			Details: []string{},

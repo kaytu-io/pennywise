@@ -17,6 +17,7 @@ type dnsPTRRecordValues struct {
 	ResourceGroupName ResourceGroupNameStruct `mapstructure:"resource_group_name"`
 
 	Usage struct {
+		// receives monthly number of DNS queries
 		MonthlyQueries int64 `mapstructure:"monthly_queries"`
 	} `mapstructure:"pennywise_usage"`
 }

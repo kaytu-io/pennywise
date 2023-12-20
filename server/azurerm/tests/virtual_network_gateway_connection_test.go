@@ -10,8 +10,14 @@ func (ts *AzureTestSuite) TestVirtualNetworkGatewayConnection() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
 
+	ts.IngestService("VPN Gateway", "Zone 1")
+	fmt.Println("VPN Gateway data ingested")
+
 	ts.IngestService("VPN Gateway", "eastus")
 	fmt.Println("VPN Gateway data ingested")
+
+	ts.IngestService("Virtual Network", "eastus")
+	fmt.Println("Virtual Network data ingested")
 
 	stat := ts.getDirCosts("../../testdata/azure/virtual_network_gateway_connection", nil)
 	costComponent := stat.GetCostComponents()
@@ -248,6 +254,20 @@ func (ts *AzureTestSuite) TestVirtualNetworkGatewayConnection() {
 			Unit:            "hours",
 			Rate: cost.Cost{
 				Decimal:  decimal.NewFromFloat(1.25),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "IP address (dynamic)",
+			MonthlyQuantity: decimal.Zero,
+			HourlyQuantity:  decimal.NewFromFloat(1),
+			Unit:            "hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.004),
 				Currency: "USD",
 			},
 			Details: []string{},
