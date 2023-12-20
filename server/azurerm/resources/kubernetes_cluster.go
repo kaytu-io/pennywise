@@ -63,6 +63,7 @@ type kubernetesClusterValues struct {
 	} `mapstructure:"network_profile"`
 
 	Usage struct {
+		// receives node count for the default node pool
 		Nodes                  *int64   `mapstructure:"nodes"`
 		MonthlyHrs             *float64 `mapstructure:"monthly_hrs"`
 		MonthlyDataProcessedGB *int64   `mapstructure:"monthly_data_processed_gb"`

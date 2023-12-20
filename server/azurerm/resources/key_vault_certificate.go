@@ -27,7 +27,9 @@ type keyVaultCertificateValues struct {
 	KeyVaultId KeyVaultId `mapstructure:"key_vault_id"`
 
 	Usage struct {
+		// receives monthly number of certificate renewal requests
 		MonthlyCertificateRenewalRequests *int64 `mapstructure:"monthly_certificate_renewal_requests"`
+		// receives monthly number of non-renewal certificate operations
 		MonthlyCertificateOtherOperations *int64 `mapstructure:"monthly_certificate_other_operations"`
 	} `mapstructure:"pennywise_usage"`
 }

@@ -7,57 +7,28 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
+func (ts *AzureTestSuite) TestLinuxVirtualMachine() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-
 	ts.IngestService("Virtual Machines", "eastus")
 	fmt.Println("Virtual Machine data ingested")
 
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/linux_virtual_machine_scale_set/usage.yaml")
+	usg, err := ts.getUsage("../../testdata/azure/linux_virtual_machine/usage.yml")
 	require.NoError(ts.T(), err)
 
-	state := ts.getDirCosts("../../testdata/azure/linux_virtual_machine_scale_set", *usg)
-	costComponents := state.GetCostComponents()
-	expectedCostComponents := []cost.Component{
+	stat := ts.getDirCosts("../../testdata/azure/linux_virtual_machine", *usg)
+	costComponent := stat.GetCostComponents()
+	expectedCostComponent := []cost.Component{
 		{
-			Name:            "Compute Basic_A2",
+			Name:            "Compute Standard_F2",
 			MonthlyQuantity: decimal.NewFromFloat(730),
 			HourlyQuantity:  decimal.Zero,
 			Unit:            "Monthly Hours",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.079),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Compute Basic_A2",
-			MonthlyQuantity: decimal.NewFromFloat(730),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "Monthly Hours",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.079),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Compute Basic_A2",
-			MonthlyQuantity: decimal.NewFromFloat(730),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "Monthly Hours",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.079),
+				Decimal:  decimal.NewFromFloat(0.099),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -68,38 +39,9 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 		{
 			Name:            "Managed Storage",
 			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
+			HourlyQuantity:  decimal.NewFromFloat(0),
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(1.536),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Managed Storage",
-			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(1.536),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Managed Storage",
-			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(1.536),
+				Decimal:  decimal.NewFromFloat(5.2795),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -110,35 +52,7 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 		{
 			Name:            "Compute Basic_A2",
 			MonthlyQuantity: decimal.NewFromFloat(730),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "Monthly Hours",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.079),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Compute Basic_A2",
-			MonthlyQuantity: decimal.NewFromFloat(730),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "Monthly Hours",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.079),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Compute Basic_A2",
-			MonthlyQuantity: decimal.NewFromFloat(730),
-			HourlyQuantity:  decimal.Zero,
+			HourlyQuantity:  decimal.NewFromFloat(0),
 			Unit:            "Monthly Hours",
 			Rate: cost.Cost{
 				Decimal:  decimal.NewFromFloat(0.079),
@@ -152,8 +66,34 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 		{
 			Name:            "Managed Storage",
 			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
+			HourlyQuantity:  decimal.NewFromFloat(0),
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Standard_B1s",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.NewFromFloat(0),
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.0104),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.NewFromFloat(0),
 			Rate: cost.Cost{
 				Decimal:  decimal.NewFromFloat(1.536),
 				Currency: "USD",
@@ -166,8 +106,7 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 		{
 			Name:            "Managed Storage",
 			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
+			HourlyQuantity:  decimal.NewFromFloat(0),
 			Rate: cost.Cost{
 				Decimal:  decimal.NewFromFloat(1.536),
 				Currency: "USD",
@@ -178,12 +117,92 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 			Error: nil,
 		},
 		{
+			Name:            "Compute Standard_B1s",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.NewFromFloat(0),
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.0104),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
 			Name:            "Managed Storage",
 			MonthlyQuantity: decimal.NewFromFloat(1),
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "",
+			HourlyQuantity:  decimal.NewFromFloat(0),
 			Rate: cost.Cost{
 				Decimal:  decimal.NewFromFloat(1.536),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Standard_A2_v2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.NewFromFloat(0),
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.091),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.NewFromFloat(0),
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(2.4),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute Standard_A2_v2",
+			MonthlyQuantity: decimal.NewFromFloat(730),
+			HourlyQuantity:  decimal.NewFromFloat(0),
+			Unit:            "Monthly Hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.091),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.NewFromFloat(0),
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(76.8),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Managed Storage",
+			MonthlyQuantity: decimal.NewFromFloat(1),
+			HourlyQuantity:  decimal.NewFromFloat(0),
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(5.2795),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -192,9 +211,8 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachineScaleSet() {
 			Error: nil,
 		},
 	}
-
-	ts.Equal(len(expectedCostComponents), len(costComponents))
-	for _, comp := range expectedCostComponents {
-		ts.True(componentExists(comp, costComponents))
+	ts.Equal(len(expectedCostComponent), len(costComponent))
+	for _, comp := range expectedCostComponent {
+		ts.True(componentExists(comp, costComponent), fmt.Sprintf("Could not match component %s: %v", comp.Name, comp))
 	}
 }

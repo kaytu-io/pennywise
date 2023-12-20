@@ -45,10 +45,14 @@ type keyVaultKeyValues struct {
 	KeyVaultId KeyVaultId `mapstructure:"key_vault_id"`
 
 	Usage struct {
-		MonthlySecretOperations        *int64 `mapstructure:"monthly_secrets_operations"`
-		MonthlyKeyRotationRenewals     *int64 `mapstructure:"monthly_key_rotation_renewals"`
+		// receives monthly number of secrets transactions
+		MonthlySecretOperations *int64 `mapstructure:"monthly_secrets_operations"`
+		// receives monthly number of Managed Azure Storage account key rotation renewals
+		MonthlyKeyRotationRenewals *int64 `mapstructure:"monthly_key_rotation_renewals"`
+		// receives monthly number of Software or HSM transactions.
 		MonthlyProtectedKeysOperations *int64 `mapstructure:"monthly_protected_keys_operations"`
-		HsmProtectedKeys               *int64 `mapstructure:"hsm_protected_keys"`
+		// receives number of protected keys.
+		HsmProtectedKeys *int64 `mapstructure:"hsm_protected_keys"`
 	} `mapstructure:"pennywise_usage"`
 }
 
