@@ -174,8 +174,8 @@ func (inst *VirtualMachineScaleSet) Components() []query.Component {
 			DiskMbpsReadWrite:  0,
 
 			Usage: struct {
-				MonthlyDiskOperations float64 `mapstructure:"monthly_disk_operations"`
-			}{MonthlyDiskOperations: osDiskMonthlyOperations},
+				MonthlyDiskOperations *float64 `mapstructure:"monthly_disk_operations"`
+			}{MonthlyDiskOperations: &osDiskMonthlyOperations},
 		})
 		components = append(components, managedStorage.Components()...)
 	}
@@ -195,8 +195,8 @@ func (inst *VirtualMachineScaleSet) Components() []query.Component {
 				DiskMbpsReadWrite:  0,
 
 				Usage: struct {
-					MonthlyDiskOperations float64 `mapstructure:"monthly_disk_operations"`
-				}{MonthlyDiskOperations: dataDiskMonthlyOperations},
+					MonthlyDiskOperations *float64 `mapstructure:"monthly_disk_operations"`
+				}{MonthlyDiskOperations: &dataDiskMonthlyOperations},
 			})
 			components = append(components, managedStorage.Components()...)
 		}

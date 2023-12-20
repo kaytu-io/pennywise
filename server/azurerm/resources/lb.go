@@ -32,7 +32,7 @@ type loadBalancerValues struct {
 	SkuTier     string  `mapstructure:"sku_tier"`
 
 	Usage struct {
-		MonthlyDataProceed float64 `mapstructure:"monthly_data_proceed"`
+		MonthlyDataProceed float64 `mapstructure:"monthly_data_processed_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
 

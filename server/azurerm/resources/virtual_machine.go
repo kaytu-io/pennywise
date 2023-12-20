@@ -131,9 +131,9 @@ func (inst *VirtualMachine) Components() []query.Component {
 	}
 	components = append(components, ultraSSDReservationCostComponent(inst.provider.key, inst.location))
 	if len(inst.storageOsDisk) > 0 {
-		var osDiskOperations float64
+		var osDiskOperations *decimal.Decimal
 		if inst.monthlyOsDiskOperations != nil {
-			osDiskOperations = inst.monthlyOsDiskOperations.InexactFloat64()
+			osDiskOperations = inst.monthlyOsDiskOperations
 		}
 		managedStorage := inst.provider.newManagedStorage(managedDiskValues{
 			StorageAccountType: inst.storageOsDisk[0].ManagedDiskType,
@@ -144,8 +144,8 @@ func (inst *VirtualMachine) Components() []query.Component {
 			DiskMbpsReadWrite:  0,
 
 			Usage: struct {
-				MonthlyDiskOperations float64 `mapstructure:"monthly_disk_operations"`
-			}{MonthlyDiskOperations: osDiskOperations},
+				MonthlyDiskOperations *float64 `mapstructure:"monthly_disk_operations"`
+			}{MonthlyDiskOperations: util.DecimalToFloat(osDiskOperations)},
 		})
 		components = append(components, managedStorage.Components()...)
 	}

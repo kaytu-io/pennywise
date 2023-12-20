@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -43,7 +44,7 @@ func (p *Provider) newSnapshot(vals snapshotValues) *Image {
 	}
 	return &Image{
 		imageType: "Snapshot",
-		storageGB: decimal.NewFromFloat(storageGB),
+		storageGB: util.DecimalPtr(decimal.NewFromFloat(storageGB)),
 		location:  getLocationName(vals.Location),
 	}
 }
