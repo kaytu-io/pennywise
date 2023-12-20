@@ -51,15 +51,30 @@ Then run the cost estimator for your terraform project.
 go run . cost terraform --project path-to-project
 ```
 You can also specify the usage file path by usage tag.
-The usage file is responsible for getting usage details from user. As an example:
+The usage file is responsible for getting usage details from user.
+currently The usage file is supported in two types : (json , yaml)
+The json file is as follows :
+````json
 {
-  "azurerm_linux_virtual_machine": {
-    "monthly_hours": 730
+  "azurerm_virtual_machine.windows": {
+    "monthly_os_disk_operations": 1000000,
+    "monthly_data_disk_operations": 2000000
   },
-  "azurerm_windows_virtual_machine": {
-    "monthly_hours": 730
+  "azurerm_virtual_machine.linux_withMonthlyHours": {
+    "monthly_hrs": 100
   },
-  "azurerm_lb": {
-    "monthly_data_proceed": 100
+  "azurerm_virtual_machine.windows_withMonthlyHours": {
+    "monthly_hrs": 100
   }
 }
+````
+the yaml file is as follows :
+````yaml
+azurerm_virtual_machine.windows:
+    monthly_os_disk_operations: 1000000
+    monthly_data_disk_operations: 2000000
+azurerm_virtual_machine.linux_withMonthlyHours:
+  monthly_hrs: 100
+azurerm_virtual_machine.windows_withMonthlyHours:
+  monthly_hrs: 100
+````
