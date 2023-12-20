@@ -1,5 +1,7 @@
 package usage
 
+import "strings"
+
 const (
 	// Key is the key used to set the usage
 	// on the values passed to the resources
@@ -62,6 +64,7 @@ type Usage map[string]map[string]interface{}
 
 // GetUsage will return the usage from the resource rt (ex: aws_instance)
 func (u Usage) GetUsage(rt string, addr string) map[string]interface{} {
+	addr = strings.Split(addr, "[")[0]
 	us, ok := u[addr]
 	if ok {
 		return us

@@ -6,16 +6,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func (ts *AzureTestSuite) TestStorageAccount() {
+func (ts *AzureTestSuite) TestStorageQueue() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
 	ts.IngestService("Storage", "westus")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/storage_account/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yml")
 	require.NoError(ts.T(), err)
 
-	state := ts.getDirCosts("../../testdata/azure/storage_account", *usg)
+	state := ts.getDirCosts("../../testdata/azure/storage_queue", *usg)
 	costComponents := state.GetCostComponents()
 	expectedCostComponents := []cost.Component{}
 
@@ -24,5 +24,4 @@ func (ts *AzureTestSuite) TestStorageAccount() {
 		ts.True(componentExists(comp, costComponents), fmt.Sprintf("Could not match component %s: %v", comp.Name, comp))
 	}
 	fmt.Println(costComponents)
-	fmt.Println(state.CostString())
 }
