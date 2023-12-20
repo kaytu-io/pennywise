@@ -14,7 +14,7 @@ type Image struct {
 
 	location  string
 	imageType string
-	storageGB decimal.Decimal
+	storageGB *decimal.Decimal
 }
 
 type Disk struct {
@@ -37,7 +37,10 @@ type imageValues struct {
 	OsDisk               []Disk                      `mapstructure:"os_disk"`
 	DataDisk             []Disk                      `mapstructure:"data_disk"`
 	SourceVirtualMachine *sourceVirtualMachineValues `mapstructure:"source_virtual_machine_id"`
-	StorageGB            *float64                    `mapstructure:"storage_gb"`
+
+	Usage struct {
+		StorageGB *float64 `mapstructure:"storage_gb"`
+	} `mapstructure:"pennywise_usage"`
 }
 
 // decodeImageValues decodes and returns computeInstanceValues from a Terraform values map.
@@ -60,15 +63,15 @@ func decodeImageValues(tfVals map[string]interface{}) (imageValues, error) {
 
 // newImage initializes a new ManagedImage from the provider
 func (p *Provider) newImage(vals imageValues) *Image {
-	sSize := float64(0)
+	var sSize *float64
 	if imageStorageSize(vals) != nil {
-		sSize = *imageStorageSize(vals)
+		sSize = imageStorageSize(vals)
 	}
 
 	return &Image{
 		provider:  p,
-		location:  vals.Location,
-		storageGB: decimal.NewFromFloat(sSize),
+		location:  getLocationName(vals.Location),
+		storageGB: util.FloatToDecimal(sSize),
 	}
 }
 
@@ -139,10 +142,15 @@ func getDiskSizeGB(disk Disk, refs []StorageDisk, i int) float64 {
 }
 
 func (inst *Image) Components() []query.Component {
+	var qty decimal.Decimal
+	if inst.storageGB != nil {
+		qty = *inst.storageGB
+	}
+
 	return []query.Component{{
 		Name:            "Storage",
 		Unit:            "1 GB/Month",
-		MonthlyQuantity: inst.storageGB,
+		MonthlyQuantity: qty,
 		ProductFilter: &product.Filter{
 			Location: util.StringPtr(inst.location),
 			Service:  util.StringPtr("Storage"),

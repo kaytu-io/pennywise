@@ -47,7 +47,7 @@ func (p *Provider) newPublicIPPrefix(vals publicIPPrefixValues) *PublicIPPrefix 
 	inst := &PublicIPPrefix{
 		provider: p,
 
-		location: vals.Location,
+		location: getLocationName(vals.Location),
 	}
 	return inst
 }
