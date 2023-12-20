@@ -53,6 +53,7 @@ go run . cost terraform --project path-to-project
 You can also specify the usage file path by usage tag.
 The usage file is responsible for getting usage details from user.
 currently The usage file is supported in two types : (json , yaml)
+
 The json file is as follows :
 ````json
 {
