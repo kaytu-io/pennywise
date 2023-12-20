@@ -146,7 +146,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Storage", "eastus")
 //	fmt.Println("Storage data ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/linux_virtual_machine/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/linux_virtual_machine/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/linux_virtual_machine", *usg)
@@ -162,7 +162,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Storage", "eastus")
 //	fmt.Println("Storage data ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/windows_virtual_machine/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/windows_virtual_machine/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/windows_virtual_machine", *usg)
@@ -178,7 +178,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Storage", "eastus")
 //	fmt.Println("Storage data ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/windows_virtual_machine_scale_set/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/windows_virtual_machine_scale_set/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/windows_virtual_machine_scale_set", *usg)
@@ -191,7 +191,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Virtual Machines", "eastus")
 //	fmt.Println("Virtual Machines data ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/virtual_machine/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/virtual_machine/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/virtual_machine", *usg)
@@ -207,7 +207,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Storage", "eastus")
 //	fmt.Println("Storage data ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/virtual_machine_scale_set/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/virtual_machine_scale_set/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/virtual_machine_scale_set", *usg)
@@ -223,7 +223,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("VPN Gateway", "eastus")
 //	fmt.Println("VPN Gateway ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/virtual_network_gateway/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/virtual_network_gateway/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/virtual_network_gateway", *usg)
@@ -250,7 +250,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Virtual Network", "eastus")
 //	fmt.Println("Virtual Network ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/virtual_network_peering/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/virtual_network_peering/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/virtual_network_peering", *usg)
@@ -491,7 +491,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Virtual Network", "eastus")
 //	fmt.Println("Virtual Network ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/private_endpoint/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/private_endpoint/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../testdata/private_endpoint", *usg)
@@ -504,7 +504,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Application Gateway", "eastus")
 //	fmt.Println("Application Gateway data ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/application_gateway/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/application_gateway/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/application_gateway", *usg)
@@ -517,7 +517,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Content Delivery Network", "eastus")
 //	fmt.Println("Content Delivery Network data ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/cdn_endpoint/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/cdn_endpoint/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/cdn_endpoint", *usg)
@@ -530,7 +530,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Container Registry", "eastus")
 //	fmt.Println("Container Registry data ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/container_registry/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/container_registry/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/container_registry", *usg)
@@ -543,7 +543,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Azure Cosmos DB", "eastus")
 //	fmt.Println("Azure Cosmos DB data ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_cassandra_keyspace/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_cassandra_keyspace/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/cosmosdb_cassandra_keyspace", *usg)
@@ -556,7 +556,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Azure Cosmos DB", "eastus")
 //	fmt.Println("Azure Cosmos DB data ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_cassandra_table/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_cassandra_table/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/cosmosdb_cassandra_table", *usg)
@@ -570,7 +570,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Storage", "eastus")
 //	fmt.Println("Storage ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/storage_account/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/storage_account/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/storage_account", *usg)
@@ -583,7 +583,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Storage", "eastus")
 //	fmt.Println("Storage ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/storage_queue", *usg)
@@ -596,7 +596,7 @@ func componentExists(component cost.Component, comps []cost.Component) bool {
 //	ts.IngestService("Storage", "westus")
 //	fmt.Println("Storage ingested")
 //
-//	usg, err := ts.getUsage("../../testdata/azure/storage_share/usage.yml")
+//	usg, err := ts.getUsage("../../testdata/azure/storage_share/usage.yaml")
 //	require.NoError(ts.T(), err)
 //
 //	cost := ts.getDirCosts("../../testdata/azure/storage_share", *usg)

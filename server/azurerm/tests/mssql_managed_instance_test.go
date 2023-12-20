@@ -13,7 +13,7 @@ func (ts *AzureTestSuite) TestMssqlManagedInstance() {
 	ts.IngestService("SQL Managed Instance", "eastus")
 	fmt.Println("SQL Managed Instance ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/mssql_managed_instance/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/mssql_managed_instance/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/mssql_managed_instance", *usg)

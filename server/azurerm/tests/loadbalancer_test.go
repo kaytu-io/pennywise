@@ -13,7 +13,7 @@ func (ts *AzureTestSuite) TestLoadBalancer() {
 	ts.IngestService("Load Balancer", "eastus")
 	fmt.Println("Load Balancer ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/load_balancer/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/load_balancer/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/load_balancer", *usg)

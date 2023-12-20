@@ -20,7 +20,7 @@ func (ts *AzureTestSuite) TestCosmosdbCassandraTable() {
 	ts.IngestService("Azure Cosmos DB", "centralus")
 	fmt.Println("Azure Cosmos DB data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_cassandra_table/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_cassandra_table/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	stat := ts.getDirCosts("../../testdata/azure/cosmosdb_cassandra_table", *usg)

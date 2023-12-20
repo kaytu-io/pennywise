@@ -13,7 +13,7 @@ func (ts *AzureTestSuite) TestCosmosdbGremlinGraph() {
 	ts.IngestService("Azure Cosmos DB", "eastus")
 	fmt.Println("Azure Cosmos DB data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_gremlin_graph/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/cosmosdb_gremlin_graph/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/cosmosdb_gremlin_graph", *usg)
