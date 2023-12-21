@@ -28,9 +28,7 @@ type AzureRMCDNEndpoint struct {
 	optimizationType   *string
 
 	//usage:
-	// receives the monthly number of outbound data transfers in GB
-	monthlyOutboundGB *int64
-	// receives the monthly number of rules engine requests
+	monthlyOutboundGB          *int64
 	monthlyRulesEngineRequests *int64
 }
 
@@ -42,7 +40,9 @@ type AzureRMCDNEndpointValue struct {
 	OptimizationType   *string                  `mapstructure:"optimization_type"`
 
 	Usage struct {
-		MonthlyOutboundGB          *int64 `mapstructure:"monthly_outbound_gb"`
+		// receives the monthly number of outbound data transfers in GB
+		MonthlyOutboundGB *int64 `mapstructure:"monthly_outbound_gb"`
+		// receives the monthly number of rules engine requests
 		MonthlyRulesEngineRequests *int64 `mapstructure:"monthly_rules_engine_requests"`
 	} `mapstructure:"pennywise_usage"`
 }

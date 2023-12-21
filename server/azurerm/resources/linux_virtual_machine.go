@@ -20,6 +20,7 @@ type LinuxVirtualMachine struct {
 	osDisk   []OsDisk
 
 	// Usage
+	// receives monthly number of hours the instance ran for
 	monthlyHours *decimal.Decimal
 }
 
@@ -35,7 +36,6 @@ type linuxVirtualMachineValues struct {
 	} `mapstructure:"os_disk"`
 
 	Usage struct {
-		// receives monthly number of hours the instance ran for
 		MonthlyHours *float64 `mapstructure:"monthly_hours"`
 	} `mapstructure:"pennywise_usage"`
 }

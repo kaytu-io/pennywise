@@ -43,9 +43,13 @@ type storageQueueValues struct {
 	StorageAccountName StorageAccountName `mapstructure:"storage_account_name"`
 
 	Usage struct {
-		MonthlyStorageGb                    *int64 `mapstructure:"monthly_storage_gb"`
-		MonthlyClass1Operations             *int64 `mapstructure:"monthly_class_1_operations"`
-		MonthlyClass2Operations             *int64 `mapstructure:"monthly_class_2_operations"`
+		// receive monthly amount of storage used in GB.
+		MonthlyStorageGb *int64 `mapstructure:"monthly_storage_gb"`
+		// receive monthly number of Class 1 operations
+		MonthlyClass1Operations *int64 `mapstructure:"monthly_class_1_operations"`
+		// receive monthly number of Class 2 operations
+		MonthlyClass2Operations *int64 `mapstructure:"monthly_class_2_operations"`
+		// receive monthly amount of Geo-replication data transfer in GB
 		MonthlyGeoReplicationDataTransferGB *int64 `mapstructure:"monthly_geo_replication_data_transfer_gb"`
 	} `mapstructure:"pennywise_usage"`
 }

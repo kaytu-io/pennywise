@@ -11,6 +11,7 @@ type PrivateDNSAAAARecord struct {
 	location string
 
 	// Usage
+	// receive monthly number of DNS queries
 	monthlyQueries *int64
 }
 

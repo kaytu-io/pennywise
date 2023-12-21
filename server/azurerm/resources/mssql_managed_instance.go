@@ -13,8 +13,10 @@ type mssqlManagedInstanceValues struct {
 	StorageSizeInGb    int64  `mapstructure:"storage_size_in_gb"`
 
 	Usage struct {
+		// receive number of GBs used by long-term retention backup storage.
 		LongTermRetentionStorageGB *int64 `mapstructure:"long_term_retention_storage_gb"`
-		BackupStorageGB            *int64 `mapstructure:"backup_storage_gb"`
+		//receive number of GBs used by Point-In-Time Restore (PITR) backup storage.
+		BackupStorageGB *int64 `mapstructure:"backup_storage_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
 

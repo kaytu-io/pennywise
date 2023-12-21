@@ -22,7 +22,8 @@ type LinuxVirtualMachineScaleSet struct {
 	osDisk                 []OsDisk
 
 	// Usage
-	monthlyHours            *decimal.Decimal
+	monthlyHours *decimal.Decimal
+	// receive number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
 	osDiskMonthlyOperations *decimal.Decimal
 }
 

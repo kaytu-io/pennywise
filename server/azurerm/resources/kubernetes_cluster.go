@@ -29,9 +29,12 @@ type KubernetesCluster struct {
 	addonProfileHttpApplicationRoutingEnable *bool
 
 	// Usage
+	// receives monthly inbound and outbound data processed in GB
 	loadBalancerMonthlyDataProcessedGB *int64
-	defaultNodePoolNodes               *int64
-	monthlyHrs                         *float64
+	// receives node count for the default node pool
+	defaultNodePoolNodes *int64
+	// receives monthly hours for the default node pool
+	monthlyHrs *float64
 }
 
 type DefaultNodePoolStruct struct {
@@ -63,12 +66,9 @@ type kubernetesClusterValues struct {
 	} `mapstructure:"network_profile"`
 
 	Usage struct {
-		// receives node count for the default node pool
-		Nodes *int64 `mapstructure:"nodes"`
-		// receives monthly hours for the default node pool
-		MonthlyHrs *float64 `mapstructure:"monthly_hrs"`
-		// receives monthly inbound and outbound data processed in GB
-		MonthlyDataProcessedGB *int64 `mapstructure:"monthly_data_processed_gb"`
+		Nodes                  *int64   `mapstructure:"nodes"`
+		MonthlyHrs             *float64 `mapstructure:"monthly_hrs"`
+		MonthlyDataProcessedGB *int64   `mapstructure:"monthly_data_processed_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
 

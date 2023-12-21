@@ -18,7 +18,9 @@ type PrivateEndpoint struct {
 	location string
 
 	// Usage
-	monthlyInboundDataProcessedGb  *int64
+	// receive monthly inbound data processed in GB.
+	monthlyInboundDataProcessedGb *int64
+	// receive monthly outbound data processed in GB.
 	monthlyOutboundDataProcessedGb *int64
 }
 

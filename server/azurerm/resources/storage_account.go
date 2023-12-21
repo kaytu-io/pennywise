@@ -54,20 +54,34 @@ type storageAccountValues struct {
 	AccountReplicationType string  `mapstructure:"account_replication_type"`
 
 	Usage struct {
-		MonthlyStorageGB                        *float64 `mapstructure:"storage_gb"`
-		MonthlyIterativeReadOperations          *float64 `mapstructure:"monthly_iterative_read_operations"`
-		MonthlyReadOperations                   *float64 `mapstructure:"monthly_read_operations"`
-		MonthlyIterativeWriteOperations         *float64 `mapstructure:"monthly_iterative_write_operations"`
-		MonthlyWriteOperations                  *float64 `mapstructure:"monthly_write_operations"`
+		// receive total size of storage in GB.
+		MonthlyStorageGB *float64 `mapstructure:"storage_gb"`
+		// receive monthly number of Iterative read operations (GPv2).
+		MonthlyIterativeReadOperations *float64 `mapstructure:"monthly_iterative_read_operations"`
+		// receive monthly number of Read operations.
+		MonthlyReadOperations *float64 `mapstructure:"monthly_read_operations"`
+		// receive monthly number of Iterative write operations (GPv2).
+		MonthlyIterativeWriteOperations *float64 `mapstructure:"monthly_iterative_write_operations"`
+		// receive monthly number of Write operations.
+		MonthlyWriteOperations *float64 `mapstructure:"monthly_write_operations"`
+		// receive monthly number of List and Create Container operations
 		MonthlyListAndCreateContainerOperations *float64 `mapstructure:"monthly_list_and_create_container_operations"`
-		MonthlyOtherOperations                  *float64 `mapstructure:"monthly_other_operations"`
-		MonthlyDataRetrievalGB                  *float64 `mapstructure:"monthly_data_retrieval_gb"`
-		MonthlyDataWriteGB                      *float64 `mapstructure:"monthly_data_write_gb"`
-		BlobIndexTags                           *float64 `mapstructure:"blob_index_tags"`
-		DataAtRestStorageGB                     *float64 `mapstructure:"data_at_rest_storage_gb"`
-		SnapshotsStorageGB                      *float64 `mapstructure:"snapshots_storage_gb"`
-		MetadataAtRestStorageGB                 *float64 `mapstructure:"metadata_at_rest_storage_gb"`
-		EarlyDeletionGB                         *float64 `mapstructure:"early_deletion_gb"`
+		// receive monthly number of All other operations.
+		MonthlyOtherOperations *float64 `mapstructure:"monthly_other_operations"`
+		// receive monthly number of data retrieval in GB.
+		MonthlyDataRetrievalGB *float64 `mapstructure:"monthly_data_retrieval_gb"`
+		// receive monthly number of data write in GB.
+		MonthlyDataWriteGB *float64 `mapstructure:"monthly_data_write_gb"`
+		// receive total number of Blob indexes.
+		BlobIndexTags *float64 `mapstructure:"blob_index_tags"`
+		// receive total size of Data at Rest in GB (File storage).
+		DataAtRestStorageGB *float64 `mapstructure:"data_at_rest_storage_gb"`
+		// receive total size of Snapshots in GB (File storage).
+		SnapshotsStorageGB *float64 `mapstructure:"snapshots_storage_gb"`
+		// receive total size of Metadata in GB (File storage).
+		MetadataAtRestStorageGB *float64 `mapstructure:"metadata_at_rest_storage_gb"`
+		// receive total size of Early deletion data in GB.
+		EarlyDeletionGB *float64 `mapstructure:"early_deletion_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
 
