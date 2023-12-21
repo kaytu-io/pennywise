@@ -27,20 +27,20 @@ type StorageAccount struct {
 	nfsv3                  bool
 
 	// Usage
-	monthlyStorageGB                        *float64
-	monthlyIterativeReadOperations          *int64
-	monthlyReadOperations                   *int64
-	monthlyIterativeWriteOperations         *int64
-	monthlyWriteOperations                  *int64
-	monthlyListAndCreateContainerOperations *int64
-	monthlyOtherOperations                  *int64
-	monthlyDataRetrievalGB                  *float64
-	monthlyDataWriteGB                      *float64
-	blobIndexTags                           *int64
-	dataAtRestStorageGB                     *float64
-	snapshotsStorageGB                      *float64
-	metadataAtRestStorageGB                 *float64
-	earlyDeletionGB                         *float64
+	monthlyStorageGB                        *decimal.Decimal
+	monthlyIterativeReadOperations          *decimal.Decimal
+	monthlyReadOperations                   *decimal.Decimal
+	monthlyIterativeWriteOperations         *decimal.Decimal
+	monthlyWriteOperations                  *decimal.Decimal
+	monthlyListAndCreateContainerOperations *decimal.Decimal
+	monthlyOtherOperations                  *decimal.Decimal
+	monthlyDataRetrievalGB                  *decimal.Decimal
+	monthlyDataWriteGB                      *decimal.Decimal
+	blobIndexTags                           *decimal.Decimal
+	dataAtRestStorageGB                     *decimal.Decimal
+	snapshotsStorageGB                      *decimal.Decimal
+	metadataAtRestStorageGB                 *decimal.Decimal
+	earlyDeletionGB                         *decimal.Decimal
 }
 
 // storageAccountValues is holds the values that we need to be able
@@ -55,15 +55,15 @@ type storageAccountValues struct {
 
 	Usage struct {
 		MonthlyStorageGB                        *float64 `mapstructure:"storage_gb"`
-		MonthlyIterativeReadOperations          *int64   `mapstructure:"monthly_iterative_read_operations"`
-		MonthlyReadOperations                   *int64   `mapstructure:"monthly_read_operations"`
-		MonthlyIterativeWriteOperations         *int64   `mapstructure:"monthly_iterative_write_operations"`
-		MonthlyWriteOperations                  *int64   `mapstructure:"monthly_write_operations"`
-		MonthlyListAndCreateContainerOperations *int64   `mapstructure:"monthly_list_and_create_container_operations"`
-		MonthlyOtherOperations                  *int64   `mapstructure:"monthly_other_operations"`
+		MonthlyIterativeReadOperations          *float64 `mapstructure:"monthly_iterative_read_operations"`
+		MonthlyReadOperations                   *float64 `mapstructure:"monthly_read_operations"`
+		MonthlyIterativeWriteOperations         *float64 `mapstructure:"monthly_iterative_write_operations"`
+		MonthlyWriteOperations                  *float64 `mapstructure:"monthly_write_operations"`
+		MonthlyListAndCreateContainerOperations *float64 `mapstructure:"monthly_list_and_create_container_operations"`
+		MonthlyOtherOperations                  *float64 `mapstructure:"monthly_other_operations"`
 		MonthlyDataRetrievalGB                  *float64 `mapstructure:"monthly_data_retrieval_gb"`
 		MonthlyDataWriteGB                      *float64 `mapstructure:"monthly_data_write_gb"`
-		BlobIndexTags                           *int64   `mapstructure:"blob_index_tags"`
+		BlobIndexTags                           *float64 `mapstructure:"blob_index_tags"`
 		DataAtRestStorageGB                     *float64 `mapstructure:"data_at_rest_storage_gb"`
 		SnapshotsStorageGB                      *float64 `mapstructure:"snapshots_storage_gb"`
 		MetadataAtRestStorageGB                 *float64 `mapstructure:"metadata_at_rest_storage_gb"`
@@ -126,6 +126,21 @@ func (p *Provider) newStorageAccount(vals storageAccountValues) *StorageAccount 
 		accountReplicationType: accountReplicationType,
 		accountTier:            accountTier,
 		nfsv3:                  nfsv3,
+
+		monthlyStorageGB:                        util.FloatToDecimal(vals.Usage.MonthlyStorageGB),
+		monthlyIterativeReadOperations:          util.FloatToDecimal(vals.Usage.MonthlyIterativeReadOperations),
+		monthlyReadOperations:                   util.FloatToDecimal(vals.Usage.MonthlyReadOperations),
+		monthlyIterativeWriteOperations:         util.FloatToDecimal(vals.Usage.MonthlyIterativeWriteOperations),
+		monthlyWriteOperations:                  util.FloatToDecimal(vals.Usage.MonthlyWriteOperations),
+		monthlyListAndCreateContainerOperations: util.FloatToDecimal(vals.Usage.MonthlyListAndCreateContainerOperations),
+		monthlyOtherOperations:                  util.FloatToDecimal(vals.Usage.MonthlyOtherOperations),
+		monthlyDataRetrievalGB:                  util.FloatToDecimal(vals.Usage.MonthlyDataRetrievalGB),
+		monthlyDataWriteGB:                      util.FloatToDecimal(vals.Usage.MonthlyDataWriteGB),
+		blobIndexTags:                           util.FloatToDecimal(vals.Usage.BlobIndexTags),
+		dataAtRestStorageGB:                     util.FloatToDecimal(vals.Usage.DataAtRestStorageGB),
+		snapshotsStorageGB:                      util.FloatToDecimal(vals.Usage.SnapshotsStorageGB),
+		metadataAtRestStorageGB:                 util.FloatToDecimal(vals.Usage.MetadataAtRestStorageGB),
+		earlyDeletionGB:                         util.FloatToDecimal(vals.Usage.EarlyDeletionGB),
 	}
 }
 
@@ -274,7 +289,9 @@ func (inst *StorageAccount) storageCostComponents() []query.Component {
 		return components
 	}
 
-	quantity = decimal.NewFromFloat(*inst.monthlyStorageGB)
+	if inst.monthlyStorageGB != nil {
+		quantity = *inst.monthlyStorageGB
+	}
 
 	// Only Hot storage has pricing tiers, others have a single price for any
 	// amount.
@@ -344,7 +361,7 @@ func (inst *StorageAccount) iterativeWriteOperationsCostComponents() []query.Com
 	itemsPerCost := 100
 
 	if inst.monthlyIterativeWriteOperations != nil {
-		value := decimal.NewFromInt(*inst.monthlyIterativeWriteOperations)
+		value := *inst.monthlyIterativeWriteOperations
 		quantity = value.Div(decimal.NewFromInt(int64(itemsPerCost)))
 	}
 
@@ -408,7 +425,7 @@ func (inst *StorageAccount) writeOperationsCostComponents() []query.Component {
 	itemsPerCost := 10000
 
 	if inst.monthlyWriteOperations != nil {
-		value := decimal.NewFromInt(*inst.monthlyWriteOperations)
+		value := *inst.monthlyWriteOperations
 		quantity = value.Div(decimal.NewFromInt(int64(itemsPerCost)))
 	}
 
@@ -476,7 +493,7 @@ func (inst *StorageAccount) listAndCreateContainerOperationsCostComponents() []q
 	itemsPerCost := 10000
 
 	if inst.monthlyListAndCreateContainerOperations != nil {
-		value := decimal.NewFromInt(*inst.monthlyListAndCreateContainerOperations)
+		value := *inst.monthlyListAndCreateContainerOperations
 		quantity = value.Div(decimal.NewFromInt(int64(itemsPerCost)))
 	}
 
@@ -532,7 +549,7 @@ func (inst *StorageAccount) iterativeReadOperationsCostComponents() []query.Comp
 	itemsPerCost := 10000
 
 	if inst.monthlyIterativeReadOperations != nil {
-		value := decimal.NewFromInt(*inst.monthlyIterativeReadOperations)
+		value := *inst.monthlyIterativeReadOperations
 		quantity = value.Div(decimal.NewFromInt(int64(itemsPerCost)))
 	}
 
@@ -590,7 +607,7 @@ func (inst *StorageAccount) readOperationsCostComponents() []query.Component {
 	itemsPerCost := 10000
 
 	if inst.monthlyReadOperations != nil {
-		value := decimal.NewFromInt(*inst.monthlyReadOperations)
+		value := *inst.monthlyReadOperations
 		quantity = value.Div(decimal.NewFromInt(int64(itemsPerCost)))
 	}
 
@@ -663,7 +680,7 @@ func (inst *StorageAccount) otherOperationsCostComponents() []query.Component {
 	itemsPerCost := 10000
 
 	if inst.monthlyOtherOperations != nil {
-		value := decimal.NewFromInt(*inst.monthlyOtherOperations)
+		value := *inst.monthlyOtherOperations
 		quantity = value.Div(decimal.NewFromInt(int64(itemsPerCost)))
 	}
 
@@ -730,7 +747,7 @@ func (inst *StorageAccount) dataRetrievalCostComponents() []query.Component {
 	var quantity decimal.Decimal
 
 	if inst.monthlyDataRetrievalGB != nil {
-		quantity = decimal.NewFromFloat(*inst.monthlyDataRetrievalGB)
+		quantity = *inst.monthlyDataRetrievalGB
 	}
 
 	meterName := "Data Retrieval"
@@ -790,7 +807,7 @@ func (inst *StorageAccount) dataWriteCostComponents() []query.Component {
 	var quantity decimal.Decimal
 
 	if inst.monthlyDataWriteGB != nil {
-		quantity = decimal.NewFromFloat(*inst.monthlyDataWriteGB)
+		quantity = *inst.monthlyDataWriteGB
 	}
 
 	meterName := "Data Write"
@@ -855,7 +872,7 @@ func (inst *StorageAccount) blobIndexTagsCostComponents() []query.Component {
 	itemsPerCost := 10000
 
 	if inst.blobIndexTags != nil {
-		value := decimal.NewFromInt(*inst.blobIndexTags)
+		value := *inst.blobIndexTags
 		quantity = value.Div(decimal.NewFromInt(int64(itemsPerCost)))
 	}
 
@@ -902,7 +919,7 @@ func (inst *StorageAccount) dataAtRestCostComponents() []query.Component {
 	var quantity decimal.Decimal
 
 	if inst.dataAtRestStorageGB != nil {
-		quantity = decimal.NewFromFloat(*inst.dataAtRestStorageGB)
+		quantity = *inst.dataAtRestStorageGB
 	}
 
 	meterName := "Data Stored"
@@ -951,7 +968,7 @@ func (inst *StorageAccount) snapshotsCostComponents() []query.Component {
 	var quantity decimal.Decimal
 
 	if inst.snapshotsStorageGB != nil {
-		quantity = decimal.NewFromFloat(*inst.snapshotsStorageGB)
+		quantity = *inst.snapshotsStorageGB
 	}
 
 	meterName := "Data Stored"
@@ -1000,7 +1017,7 @@ func (inst *StorageAccount) metadataAtRestCostComponents() []query.Component {
 	var quantity decimal.Decimal
 
 	if inst.metadataAtRestStorageGB != nil {
-		quantity = decimal.NewFromFloat(*inst.metadataAtRestStorageGB)
+		quantity = *inst.metadataAtRestStorageGB
 	}
 
 	meterName := "Metadata"
@@ -1051,9 +1068,8 @@ func (inst *StorageAccount) earlyDeletionCostComponents() []query.Component {
 	}
 
 	var quantity decimal.Decimal
-
 	if inst.earlyDeletionGB != nil {
-		quantity = decimal.NewFromFloat(*inst.earlyDeletionGB)
+		quantity = *inst.earlyDeletionGB
 	}
 
 	meterName := "Early Delete"

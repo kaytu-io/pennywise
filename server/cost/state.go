@@ -33,9 +33,6 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 		for _, comp := range res.Components {
 			prods, err := backend.Products().Filter(ctx, comp.ProductFilter)
 			if err != nil {
-				//fmt.Println("====================")
-				//fmt.Println("Error product", comp.Name, err.Error())
-				//state.addComponent(res.Address, comp.Name, Component{Error: err})
 				continue
 			}
 			if len(prods) < 1 {
@@ -55,31 +52,18 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 			}
 			prices, err := backend.Prices().Filter(ctx, prods, comp.PriceFilter)
 			if err != nil {
-				//fmt.Println("error price", comp.Name, comp.PriceFilter)
-				//fmt.Println("=====PRODS")
-				//for _, prod := range prods {
-				//	fmt.Println(*prod)
-				//}
-				//
-				//state.addComponent(res.Address, comp.Name, Component{Error: err})
 				continue
 			}
 			if len(prices) < 1 {
-				//fmt.Println("no price", comp.Name, comp.PriceFilter)
-				//fmt.Println("=====PRODS")
-				//for _, prod := range prods {
-				//	fmt.Println(*prod)
-				//}
-				//state.addComponent(res.Address, comp.Name, Component{Error: ErrPriceNotFound})
 				continue
 			}
 
 			component := Component{
 				Name:            comp.Name,
-				MonthlyQuantity: comp.MonthlyQuantity.Round(3),
-				HourlyQuantity:  comp.HourlyQuantity.Round(3),
+				MonthlyQuantity: comp.MonthlyQuantity.Round(5),
+				HourlyQuantity:  comp.HourlyQuantity.Round(5),
 				Unit:            comp.Unit,
-				Rate:            Cost{Decimal: prices[0].Value.Round(3), Currency: prices[0].Currency},
+				Rate:            Cost{Decimal: prices[0].Value.Round(5), Currency: prices[0].Currency},
 				Details:         comp.Details,
 				Usage:           comp.Usage,
 			}

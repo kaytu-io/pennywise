@@ -23,7 +23,7 @@ type StorageShare struct {
 	quota                  int64
 
 	// Usage
-	monthlyStorageGB        *int64
+	storageGB               *int64
 	snapshotsStorageGB      *int64
 	monthlyReadOperations   *int64
 	monthlyWriteOperations  *int64
@@ -41,7 +41,7 @@ type storageShareValues struct {
 	AccessTier         string             `mapstructure:"access_tier"`
 
 	Usage struct {
-		MonthlyStorageGb        *int64 `mapstructure:"monthly_storage_gb"`
+		StorageGb               *int64 `mapstructure:"storage_gb"`
 		SnapshotsStorageGB      *int64 `mapstructure:"snapshots_storage_gb"`
 		MonthlyReadOperations   *int64 `mapstructure:"monthly_read_operations"`
 		MonthlyWriteOperations  *int64 `mapstructure:"monthly_write_operations"`
@@ -79,7 +79,6 @@ func (p *Provider) newStorageShare(vals storageShareValues) *StorageShare {
 	if accessTier == "" {
 		accessTier = "TransactionOptimized"
 	}
-	quota := vals.Quota
 
 	if vals.StorageAccountName.Values.AccountReplicationType != nil {
 		accountReplicationType = *vals.StorageAccountName.Values.AccountReplicationType
@@ -90,10 +89,10 @@ func (p *Provider) newStorageShare(vals storageShareValues) *StorageShare {
 		location:               vals.StorageAccountName.Values.Location,
 		accountReplicationType: accountReplicationType,
 		accessTierString:       accessTier,
-		quota:                  quota,
+		quota:                  vals.Quota,
 		accountKind:            vals.StorageAccountName.Values.AccountKind,
 
-		monthlyStorageGB:        vals.Usage.MonthlyStorageGb,
+		storageGB:               vals.Usage.StorageGb,
 		snapshotsStorageGB:      vals.Usage.SnapshotsStorageGB,
 		monthlyReadOperations:   vals.Usage.MonthlyReadOperations,
 		monthlyWriteOperations:  vals.Usage.MonthlyWriteOperations,
@@ -151,8 +150,8 @@ func (inst *StorageShare) dataStorageCostComponent() query.Component {
 		qty = decimal.NewFromInt(inst.quota)
 	}
 
-	if inst.monthlyStorageGB != nil {
-		qty = decimal.NewFromInt(*inst.monthlyStorageGB)
+	if inst.storageGB != nil {
+		qty = decimal.NewFromInt(*inst.storageGB)
 	}
 
 	skuName := fmt.Sprintf("%s %s", inst.accessTier(), strings.ToUpper(inst.accountReplicationType))
