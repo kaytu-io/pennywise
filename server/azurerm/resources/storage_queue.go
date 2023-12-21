@@ -100,6 +100,11 @@ func (p *Provider) newStorageQueue(vals storageQueueValues) *StorageQueue {
 		monthlyClass2Operations:             vals.Usage.MonthlyClass2Operations,
 		monthlyGeoReplicationDataTransferGB: vals.Usage.MonthlyGeoReplicationDataTransferGB,
 	}
+
+	if strings.ToUpper(inst.accountReplicationType) == "ZRS" && inst.location == "westus" {
+		inst.location = "westus2"
+	}
+
 	return inst
 }
 

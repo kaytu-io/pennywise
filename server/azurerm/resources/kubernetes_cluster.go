@@ -64,9 +64,11 @@ type kubernetesClusterValues struct {
 
 	Usage struct {
 		// receives node count for the default node pool
-		Nodes                  *int64   `mapstructure:"nodes"`
-		MonthlyHrs             *float64 `mapstructure:"monthly_hrs"`
-		MonthlyDataProcessedGB *int64   `mapstructure:"monthly_data_processed_gb"`
+		Nodes *int64 `mapstructure:"nodes"`
+		// receives monthly hours for the default node pool
+		MonthlyHrs *float64 `mapstructure:"monthly_hrs"`
+		// receives monthly inbound and outbound data processed in GB
+		MonthlyDataProcessedGB *int64 `mapstructure:"monthly_data_processed_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
 

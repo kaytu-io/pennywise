@@ -38,6 +38,7 @@ type managedDiskValues struct {
 	DiskIopsReadWrite  float64 `mapstructure:"disk_iops_read_write"`
 
 	Usage struct {
+		//receive number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 		MonthlyDiskOperations *float64 `mapstructure:"monthly_disk_operations"`
 	} `mapstructure:"pennywise_usage"`
 }
