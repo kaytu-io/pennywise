@@ -13,7 +13,7 @@ func (ts *AzureTestSuite) TestPostgresqlFlexibleServer() {
 	ts.IngestService("Azure Database for PostgreSQL", "eastus")
 	fmt.Println("Azure Database for PostgreSQL ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/postgresql_flexible_server/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/postgresql_flexible_server/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/postgresql_flexible_server", *usg)

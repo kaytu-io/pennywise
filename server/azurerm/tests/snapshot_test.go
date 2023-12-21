@@ -13,7 +13,7 @@ func (ts *AzureTestSuite) TestSnapshot() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/snapshot/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/snapshot/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/snapshot", *usg)

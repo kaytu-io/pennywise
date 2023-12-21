@@ -20,6 +20,7 @@ type LinuxVirtualMachine struct {
 	osDisk   []OsDisk
 
 	// Usage
+	// receives monthly number of hours the instance ran for
 	monthlyHours *decimal.Decimal
 }
 

@@ -50,8 +50,10 @@ type virtualMachineScaleSetValues struct {
 	StorageProfileDataDisk       []StorageDisk                                `mapstructure:"storage_profile_data_disk"`
 
 	Usage struct {
-		MonthlyHours              *float64 `mapstructure:"monthly_hours"`
-		OsDiskMonthlyOperations   *float64 `mapstructure:"os_disk_monthly_operations"`
+		MonthlyHours *float64 `mapstructure:"monthly_hours"`
+		// receive monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB
+		OsDiskMonthlyOperations *float64 `mapstructure:"os_disk_monthly_operations"`
+		// receive monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
 		DataDiskMonthlyOperations *float64 `mapstructure:"data_disk_monthly_operations"`
 		Instances                 *int64   `mapstructure:"instances"`
 	} `mapstructure:"pennywise_usage"`

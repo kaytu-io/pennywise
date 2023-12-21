@@ -41,13 +41,21 @@ type storageShareValues struct {
 	AccessTier         string             `mapstructure:"access_tier"`
 
 	Usage struct {
-		StorageGb               *int64 `mapstructure:"storage_gb"`
-		SnapshotsStorageGB      *int64 `mapstructure:"snapshots_storage_gb"`
-		MonthlyReadOperations   *int64 `mapstructure:"monthly_read_operations"`
-		MonthlyWriteOperations  *int64 `mapstructure:"monthly_write_operations"`
-		MonthlyListOperations   *int64 `mapstructure:"monthly_list_operations"`
-		MonthlyOtherOperations  *int64 `mapstructure:"monthly_other_operations"`
-		MonthlyDataRetrievalGB  *int64 `mapstructure:"monthly_data_retrieval_gb"`
+		// receive Total size of storage in GB. Overrides any provided `quota`
+		StorageGb *int64 `mapstructure:"storage_gb"`
+		// receive total size of Snapshots in GB
+		SnapshotsStorageGB *int64 `mapstructure:"snapshots_storage_gb"`
+		// receive monthly number of Read operations.
+		MonthlyReadOperations *int64 `mapstructure:"monthly_read_operations"`
+		// receive monthly number of Write operations.
+		MonthlyWriteOperations *int64 `mapstructure:"monthly_write_operations"`
+		// receive monthly number of List and Create Container operations.
+		MonthlyListOperations *int64 `mapstructure:"monthly_list_operations"`
+		// receive monthly number of All other operations.
+		MonthlyOtherOperations *int64 `mapstructure:"monthly_other_operations"`
+		// receive monthly number of data retrieval in GB.
+		MonthlyDataRetrievalGB *int64 `mapstructure:"monthly_data_retrieval_gb"`
+		// receive total size of Metadata in GB
 		MetadataAtRestStorageGB *int64 `mapstructure:"metadata_at_rest_storage_gb"`
 	} `mapstructure:"pennywise_usage"`
 }

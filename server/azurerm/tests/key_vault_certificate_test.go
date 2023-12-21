@@ -13,7 +13,7 @@ func (ts *AzureTestSuite) TestKeyVaultCertificate() {
 	ts.IngestService("Key Vault", "eastus")
 	fmt.Println("Key Vault ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/key_vault_certificate/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/key_vault_certificate/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/key_vault_certificate", *usg)

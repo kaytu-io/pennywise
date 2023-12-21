@@ -24,6 +24,7 @@ type ManagedDisk struct {
 	diskIopsReadWrite  float64
 
 	// Usage
+	//receive number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 	monthlyDiskOperations *decimal.Decimal
 }
 

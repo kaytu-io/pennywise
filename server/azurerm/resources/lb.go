@@ -20,6 +20,7 @@ type LoadBalancer struct {
 	skuTier     string
 
 	// Usage
+	// receives monthly inbound and outbound data processed in GB
 	monthlyDataProceed decimal.Decimal
 }
 

@@ -15,7 +15,7 @@ func (ts *AzureTestSuite) TestNatGateway() {
 	ts.IngestService("Virtual Network", "westeurope")
 	fmt.Println("Virtual Network ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/nat_gateway/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/nat_gateway/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/nat_gateway", *usg)

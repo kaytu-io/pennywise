@@ -13,7 +13,7 @@ func (ts *AzureTestSuite) TestMssqlDatabase() {
 	ts.IngestService("SQL Database", "eastus")
 	fmt.Println("SQL Database ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/mssql_database/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/mssql_database/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/mssql_database", *usg)

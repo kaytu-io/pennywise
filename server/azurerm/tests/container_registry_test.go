@@ -14,7 +14,7 @@ func (ts *AzureTestSuite) TestContainerRegistry() {
 	ts.IngestService("Container Registry", "westeurope")
 	fmt.Println("Container Registry data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/container_registry/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/container_registry/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	stat := ts.getDirCosts("../../testdata/azure/container_registry", *usg)

@@ -38,6 +38,7 @@ type windowsVirtualMachineValues struct {
 	} `mapstructure:"os_disk"`
 
 	Usage struct {
+		// receive monthly number of hours the instance ran for.
 		MonthlyHours *float64 `mapstructure:"monthly_hours"`
 	} `mapstructure:"pennywise_usage"`
 }

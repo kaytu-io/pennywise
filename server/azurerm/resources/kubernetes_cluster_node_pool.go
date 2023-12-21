@@ -22,7 +22,9 @@ type kubernetesClusterNodePool struct {
 	osDiskSizeGB *int
 	osType       *string
 	// Usage
-	nodes      *int64
+	// receives node count for the default node pool
+	nodes *int64
+	// receives monthly hours for the default node pool
 	monthlyHrs *float64
 }
 type KubernetesClusterIdStruct struct {

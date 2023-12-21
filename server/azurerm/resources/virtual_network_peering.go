@@ -41,6 +41,7 @@ type virtualNetworkPeeringValues struct {
 	DestinationLocation DestinationLocationStruct `mapstructure:"remote_virtual_network_id"`
 
 	Usage struct {
+		// receive monthly inbound/outbound data transferred by the VNET peering in GB.
 		MonthlyDataTransferGB float64 `mapstructure:"monthly_data_transfer_gb"`
 	} `mapstructure:"pennywise_usage"`
 }

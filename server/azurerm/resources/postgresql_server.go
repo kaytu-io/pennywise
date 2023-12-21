@@ -11,6 +11,7 @@ type postgresqlServerValues struct {
 	GeoRedundantBackupEnabled *bool  `mapstructure:"geo_redundant_backup_enabled"`
 
 	Usage struct {
+		// receive additional consumption of backup storage in GB.
 		AdditionalBackupStorageGb *int64 `mapstructure:"additional_backup_storage_gb"`
 	} `mapstructure:"pennywise_usage"`
 }

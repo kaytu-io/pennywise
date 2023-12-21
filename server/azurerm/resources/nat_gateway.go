@@ -17,6 +17,7 @@ type NatGateway struct {
 	location string
 
 	// Usage
+	// receive monthly data processed by the NAT Gateway in GB.
 	monthlyDataProcessedGb *int64
 }
 

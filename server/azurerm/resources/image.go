@@ -39,6 +39,7 @@ type imageValues struct {
 	SourceVirtualMachine *sourceVirtualMachineValues `mapstructure:"source_virtual_machine_id"`
 
 	Usage struct {
+		// receives total size of image storage in GB
 		StorageGB *float64 `mapstructure:"storage_gb"`
 	} `mapstructure:"pennywise_usage"`
 }

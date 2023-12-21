@@ -23,6 +23,7 @@ type MariadbServer struct {
 	geoRedundantBackupEnabled *bool
 
 	// Usage
+	// receive additional consumption of backup storage in GB.
 	additionalBackupStorageGb *int64
 }
 

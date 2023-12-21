@@ -45,7 +45,9 @@ type applicationGatewayValues struct {
 	AutoscaleConfiguration []ApplicationGatewayAutoscaleConfiguration `mapstructure:"autoscale_configuration"`
 
 	Usage struct {
-		CapacityUnits          *int64 `mapstructure:"capacity_units"`
+		// receive number capacity(for v2) units gateway.
+		CapacityUnits *int64 `mapstructure:"capacity_units"`
+		// receive monthly data processed by the Application Gateway in GB.
 		MonthlyDataProcessedGb *int64 `mapstructure:"monthly_data_processed_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
