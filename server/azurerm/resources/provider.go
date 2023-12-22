@@ -482,11 +482,41 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 		}
 		return p.NewAzureRMKubernetesCluster(vals).Components()
 	case "azurerm_kubernetes_cluster_node_pool":
-		vals, err := decoderKubernetesClusterNodePool(tfRes.Values)
+		vals, err := decodeKubernetesClusterNodePool(tfRes.Values)
 		if err != nil {
 			return nil
 		}
 		return p.newAzureRMKubernetesClusterNodePool(vals).Components()
+	case "azurerm_automation_account":
+		vals, err := decodeAutomationAccount(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newAutomationAccount(vals).Component()
+	case "azurerm_automation_dsc_configuration":
+		vals, err := decodeAutomationDNSConfiguration(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newAutomationDSCConfiguration(vals).Component()
+	case "azurerm_automation_dsc_nodeconfiguration":
+		vals, err := decodeAutomationDSCNodeConfiguration(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newAutomationDSCNodeConfiguration(vals).Component()
+	case "azurerm_automation_job_schedule":
+		vals, err := decodeAutomationJOBSchedule(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newAutomationJOBSchedule(vals).Component()
+	case "azurerm_integration_service_environment":
+		vals, err := decodeIntegrationServiceEnvironment(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newIntegrationServiceEnvironment(vals).Component()
 	default:
 		return nil
 	}

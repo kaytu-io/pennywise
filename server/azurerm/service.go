@@ -32,5 +32,7 @@ var (
 		"SQL Database":                  {},
 		"SQL Managed Instance":          {},
 		"Azure Kubernetes Service":      {},
+		"Automation":                    {},
+		"Logic Apps":                    {},
 	}
 )

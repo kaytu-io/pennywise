@@ -49,8 +49,8 @@ type kubernetesClusterNodePoolValues struct {
 	} `mapstructure:"pennywise_usage"`
 }
 
-// decoderKubernetesClusterNodePool decodes and returns kubernetesClusterValues from a Terraform values map.
-func decoderKubernetesClusterNodePool(tfVals map[string]interface{}) (kubernetesClusterNodePoolValues, error) {
+// decodeKubernetesClusterNodePool decodes and returns kubernetesClusterValues from a Terraform values map.
+func decodeKubernetesClusterNodePool(tfVals map[string]interface{}) (kubernetesClusterNodePoolValues, error) {
 	var v kubernetesClusterNodePoolValues
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,

@@ -129,6 +129,21 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_kubernetes_cluster": {
 		Refs: []Reference{{RefValue: "resource_group_name", RefAttribute: "name"}},
 	},
+	"azurerm_automation_account": {
+		Refs: []Reference{{RefValue: "resource_group_name", RefAttribute: "name"}},
+	},
+	"azurerm_automation_dsc_nodeconfiguration": {
+		Refs: []Reference{{RefValue: "resource_group_name", RefAttribute: "name"}, {RefValue: "automation_account_name", RefAttribute: "name"}},
+	},
+	"azurerm_automation_dns_configuration": {
+		Refs: []Reference{{RefValue: "resource_group_name", RefAttribute: "name"}, {RefValue: "automation_account_name", RefAttribute: "name"}},
+	},
+	"azurerm_automation_job_schedule": {
+		Refs: []Reference{{RefValue: "resource_group_name", RefAttribute: "name"}},
+	},
+	"azurerm_integration_service_environment": {
+		Refs: []Reference{{RefValue: "resource_group_name", RefAttribute: "name"}, {RefValue: "virtual_network_name", RefAttribute: "name"}},
+	},
 }
 
 type ResourceFunction func(Resource) (Resource, error)

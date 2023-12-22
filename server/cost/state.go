@@ -36,18 +36,18 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 				continue
 			}
 			if len(prods) < 1 {
-				//fmt.Println("====================")
-				//fmt.Println("No product", comp.Name)
-				//fmt.Println("location", *comp.ProductFilter.Location)
-				//for _, attr := range comp.ProductFilter.AttributeFilters {
-				//	if attr.Value != nil {
-				//		fmt.Println(attr.Key, fmt.Sprintf("'%s'", *attr.Value))
-				//	}
-				//	if attr.ValueRegex != nil {
-				//		fmt.Println(attr.Key, fmt.Sprintf("'%s'", *attr.ValueRegex))
-				//	}
-				//}
-				//state.addComponent(res.Address, comp.Name, Component{Error: ErrProductNotFound})
+				fmt.Println("====================")
+				fmt.Println("No product", comp.Name)
+				fmt.Println("location", *comp.ProductFilter.Location)
+				for _, attr := range comp.ProductFilter.AttributeFilters {
+					if attr.Value != nil {
+						fmt.Println(attr.Key, fmt.Sprintf("'%s'", *attr.Value))
+					}
+					if attr.ValueRegex != nil {
+						fmt.Println(attr.Key, fmt.Sprintf("'%s'", *attr.ValueRegex))
+					}
+				}
+				state.addComponent(res.Address, comp.Name, Component{Error: ErrProductNotFound})
 				continue
 			}
 			prices, err := backend.Prices().Filter(ctx, prods, comp.PriceFilter)
