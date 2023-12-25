@@ -19,6 +19,20 @@ type Component struct {
 	Error error
 }
 
+func (c Component) GetRounded() Component {
+	return Component{
+		Name:            c.Name,
+		MonthlyQuantity: c.MonthlyQuantity.Round(3),
+		HourlyQuantity:  c.HourlyQuantity.Round(3),
+		Unit:            c.Unit,
+		Rate:            Cost{Decimal: c.Rate.Decimal.Round(3), Currency: c.Rate.Currency},
+		Details:         c.Details,
+		Usage:           c.Usage,
+
+		Error: c.Error,
+	}
+}
+
 // Cost returns the cost of this component (Rate multiplied by Quantity).
 func (c Component) Cost() Cost {
 	if !c.MonthlyQuantity.IsZero() {
@@ -32,19 +46,19 @@ func (c Component) Cost() Cost {
 
 func (c Component) CostString() string {
 	var str string
-	str = fmt.Sprintf("%v", c.Cost())
+	str = fmt.Sprintf("%v", c.Cost().Decimal.Round(3))
 	if !c.MonthlyQuantity.IsZero() {
-		str = fmt.Sprintf("%s (%v monthly cost", str, c.Rate.Decimal)
+		str = fmt.Sprintf("%s (%v monthly cost", str, c.Rate.Decimal.Round(3))
 		if c.Unit != "" {
 			str = fmt.Sprintf("%s per %s", str, c.Unit)
 		}
-		str = fmt.Sprintf("%s, qty: %s)", str, c.MonthlyQuantity)
+		str = fmt.Sprintf("%s, qty: %s)", str, c.MonthlyQuantity.Round(3))
 	} else if !c.HourlyQuantity.IsZero() {
-		str = fmt.Sprintf("%s (%v hourly cost", str, c.Rate.Decimal)
+		str = fmt.Sprintf("%s (%v hourly cost", str, c.Rate.Decimal.Round(3))
 		if c.Unit != "" {
 			str = fmt.Sprintf("%s per %s", str, c.Unit)
 		}
-		str = fmt.Sprintf("%s, qty: %s)", str, c.HourlyQuantity.Mul(HoursPerMonth))
+		str = fmt.Sprintf("%s, qty: %s)", str, c.HourlyQuantity.Mul(HoursPerMonth).Round(3))
 	} else {
 		return fmt.Sprintf("No cost")
 	}
