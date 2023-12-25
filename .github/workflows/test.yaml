@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - feat-aws-tests
+      - feat-new-resources
 
 jobs:
   build-and-test:
