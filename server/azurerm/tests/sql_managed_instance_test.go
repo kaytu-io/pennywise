@@ -16,6 +16,8 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 	fmt.Println("Virtual Machines ingested")
 	ts.IngestService("Storage", "westeurope")
 	fmt.Println("Storage ingested")
+	ts.IngestService("SQL Database", "westeurope")
+	fmt.Println("SQL Database ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/sql_managed_instance/usage.yaml")
 	require.NoError(ts.T(), err)
