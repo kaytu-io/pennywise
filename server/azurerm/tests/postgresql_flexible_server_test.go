@@ -10,8 +10,12 @@ import (
 func (ts *AzureTestSuite) TestPostgresqlFlexibleServer() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("Azure Database for PostgreSQL", "westus")
+	ts.IngestService("Azure Database for PostgreSQL", "eastus")
 	fmt.Println("Azure Database for PostgreSQL ingested")
+	ts.IngestService("Virtual Machines", "eastus")
+	fmt.Println("Virtual Machines ingested")
+	ts.IngestService("Storage", "eastus")
+	fmt.Println("Storage ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/postgresql_flexible_server/usage.yaml")
 	require.NoError(ts.T(), err)

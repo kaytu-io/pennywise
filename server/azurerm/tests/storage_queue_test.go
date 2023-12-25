@@ -8,7 +8,7 @@ import (
 func (ts *AzureTestSuite) TestStorageQueue() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("Storage", "westus")
+	ts.IngestService("Storage", "")
 	fmt.Println("Storage ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yaml")
