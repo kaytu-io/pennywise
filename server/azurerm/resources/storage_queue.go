@@ -116,12 +116,12 @@ func (inst *StorageQueue) Components() []query.Component {
 	var components []query.Component
 
 	if !inst.isAccountKindSupported() {
-		fmt.Println("!inst.isAccountKindSupported()")
+		fmt.Println("Account kind is not supported for this resource")
 		return nil
 	}
 
 	if !inst.isReplicationTypeSupported() {
-		fmt.Println("!inst.isReplicationTypeSupported()")
+		fmt.Println("Replication type is not supported for this resource")
 		return nil
 	}
 

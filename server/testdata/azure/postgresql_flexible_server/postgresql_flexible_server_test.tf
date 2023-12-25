@@ -5,7 +5,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "example" {
   name     = "nat-gateway-example-rg"
-  location = "westus"
+  location = "eastus"
 }
 
 resource "azurerm_postgresql_flexible_server" "gp" {

@@ -11,6 +11,8 @@ func (ts *AzureTestSuite) TestLoadBalancerRule() {
 	fmt.Println("Suite Setup")
 	ts.IngestService("Load Balancer", "")
 	fmt.Println("Load Balancer ingested")
+	ts.IngestService("Virtual Network", "")
+	fmt.Println("Virtual Network ingested")
 
 	state := ts.getDirCosts("../../testdata/azure/lb_rule", nil)
 	costComponents := state.GetCostComponents()
