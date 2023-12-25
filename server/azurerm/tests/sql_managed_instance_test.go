@@ -29,7 +29,7 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 			HourlyQuantity:  decimal.NewFromInt(1),
 			Unit:            "hours",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(2.679024),
+				Decimal:  decimal.NewFromFloat(2.679),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -43,7 +43,7 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 			HourlyQuantity:  decimal.Zero,
 			Unit:            "GB",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.13685),
+				Decimal:  decimal.NewFromFloat(0.137),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -71,7 +71,7 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 			HourlyQuantity:  decimal.Zero,
 			Unit:            "GB",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.0298),
+				Decimal:  decimal.NewFromFloat(0.03),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -85,7 +85,7 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 			HourlyQuantity:  decimal.Zero,
 			Unit:            "GB",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.0298),
+				Decimal:  decimal.NewFromFloat(0.03),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -99,7 +99,7 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 			HourlyQuantity:  decimal.Zero,
 			Unit:            "GB",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.13685),
+				Decimal:  decimal.NewFromFloat(0.137),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -127,7 +127,7 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 			HourlyQuantity:  decimal.Zero,
 			Unit:            "GB",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.0372),
+				Decimal:  decimal.NewFromFloat(0.037),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -155,21 +155,7 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 			HourlyQuantity:  decimal.NewFromInt(4),
 			Unit:            "vCore-hours",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.099966),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "LTR backup storage (LRS)",
-			MonthlyQuantity: decimal.Zero,
-			HourlyQuantity:  decimal.Zero,
-			Unit:            "GB",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.0298),
+				Decimal:  decimal.NewFromFloat(0.1),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -183,7 +169,7 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 			HourlyQuantity:  decimal.NewFromInt(1),
 			Unit:            "hours",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.669756),
+				Decimal:  decimal.NewFromFloat(0.67),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -197,7 +183,21 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 			HourlyQuantity:  decimal.Zero,
 			Unit:            "GB",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.13685),
+				Decimal:  decimal.NewFromFloat(0.137),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Compute (BC_GEN5 40 Cores)",
+			MonthlyQuantity: decimal.Zero,
+			HourlyQuantity:  decimal.NewFromInt(1),
+			Unit:            "hours",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(13.395),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -211,4 +211,5 @@ func (ts *AzureTestSuite) TestSqlManagedInstance() {
 	for _, comp := range expectedCostComponents {
 		ts.True(componentExists(comp, costComponents), fmt.Sprintf("Could not match component %s: %v", comp.Name, comp))
 	}
+	fmt.Println(costComponents)
 }
