@@ -9,7 +9,7 @@ import (
 func (ts *AzureTestSuite) TestLoadBalancerRule() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("Load Balancer", "eastus")
+	ts.IngestService("Load Balancer", "")
 	fmt.Println("Load Balancer ingested")
 
 	state := ts.getDirCosts("../../testdata/azure/lb_rule", nil)

@@ -17,5 +17,5 @@ func (ts *AzureTestSuite) TestStorageAccount() {
 	state := ts.getDirCosts("../../testdata/azure/storage_account", *usg)
 	cost, err := state.Cost()
 	require.NoError(ts.T(), err)
-	ts.Equal(12483120.2124, cost.Decimal.InexactFloat64())
+	ts.Equal(12483120.212, cost.Decimal.InexactFloat64())
 }

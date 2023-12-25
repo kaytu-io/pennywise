@@ -90,7 +90,7 @@ func (s *State) Cost() (Cost, error) {
 		}
 	}
 
-	return total, nil
+	return Cost{Currency: total.Currency, Decimal: total.Decimal.Round(3)}, nil
 }
 
 func (s *State) GetCostComponents() []Component {

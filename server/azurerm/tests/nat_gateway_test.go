@@ -10,7 +10,7 @@ import (
 func (ts *AzureTestSuite) TestNatGateway() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("NAT Gateway", "westeurope")
+	ts.IngestService("NAT Gateway", "")
 	fmt.Println("NAT Gateway ingested")
 	ts.IngestService("Virtual Network", "westeurope")
 	fmt.Println("Virtual Network ingested")

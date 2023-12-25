@@ -11,7 +11,7 @@ func (ts *AzureTestSuite) TestPostgresqlServer() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
 	ts.IngestService("Azure Database for PostgreSQL", "eastus")
-	fmt.Println("Databases ingested")
+	fmt.Println("Azure Database for PostgreSQL ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/postgresql_server/usage.yaml")
 	require.NoError(ts.T(), err)

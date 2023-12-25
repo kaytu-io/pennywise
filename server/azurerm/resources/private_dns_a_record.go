@@ -24,6 +24,8 @@ type privateDNSARecordValues struct {
 
 func (p *Provider) newPrivateDnsARecord(vals privateDNSARecordValues) *PrivateDNSARecord {
 	inst := &PrivateDNSARecord{
+		provider: p,
+
 		location:       vals.ResourceGroupName.Values.Location,
 		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
