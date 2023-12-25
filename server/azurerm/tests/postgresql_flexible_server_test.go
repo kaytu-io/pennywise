@@ -12,10 +12,6 @@ func (ts *AzureTestSuite) TestPostgresqlFlexibleServer() {
 	fmt.Println("Suite Setup")
 	ts.IngestService("Azure Database for PostgreSQL", "eastus")
 	fmt.Println("Azure Database for PostgreSQL ingested")
-	ts.IngestService("Virtual Machines", "eastus")
-	fmt.Println("Virtual Machines ingested")
-	ts.IngestService("Storage", "eastus")
-	fmt.Println("Storage ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/postgresql_flexible_server/usage.yaml")
 	require.NoError(ts.T(), err)
@@ -38,26 +34,12 @@ func (ts *AzureTestSuite) TestPostgresqlFlexibleServer() {
 			Error: nil,
 		},
 		{
-			Name:            "Storage",
-			MonthlyQuantity: decimal.NewFromInt(32),
-			HourlyQuantity:  decimal.NewFromInt(0),
-			Unit:            "GB",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.138),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
 			Name:            "Compute (GP_Standard_D4s_v3)",
 			MonthlyQuantity: decimal.NewFromInt(0),
 			HourlyQuantity:  decimal.NewFromInt(1),
 			Unit:            "hours",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.39),
+				Decimal:  decimal.NewFromFloat(0.342),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -71,7 +53,7 @@ func (ts *AzureTestSuite) TestPostgresqlFlexibleServer() {
 			HourlyQuantity:  decimal.NewFromInt(1),
 			Unit:            "hours",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.524),
+				Decimal:  decimal.NewFromFloat(0.472),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -94,26 +76,12 @@ func (ts *AzureTestSuite) TestPostgresqlFlexibleServer() {
 			Error: nil,
 		},
 		{
-			Name:            "Storage",
-			MonthlyQuantity: decimal.NewFromInt(64),
-			HourlyQuantity:  decimal.NewFromInt(0),
-			Unit:            "GB",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.138),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
 			Name:            "Compute (GP_Standard_D16s_v3)",
 			MonthlyQuantity: decimal.NewFromInt(0),
 			HourlyQuantity:  decimal.NewFromInt(1),
 			Unit:            "hours",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(1.56),
+				Decimal:  decimal.NewFromFloat(1.368),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -128,20 +96,6 @@ func (ts *AzureTestSuite) TestPostgresqlFlexibleServer() {
 			Unit:            "GB",
 			Rate: cost.Cost{
 				Decimal:  decimal.NewFromFloat(0.095),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Storage",
-			MonthlyQuantity: decimal.NewFromInt(0),
-			HourlyQuantity:  decimal.NewFromInt(0),
-			Unit:            "GB",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.138),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -179,6 +133,62 @@ func (ts *AzureTestSuite) TestPostgresqlFlexibleServer() {
 		},
 		{
 			Name:            "Storage",
+			MonthlyQuantity: decimal.NewFromInt(128),
+			HourlyQuantity:  decimal.NewFromInt(0),
+			Unit:            "GB",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.115),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Storage",
+			MonthlyQuantity: decimal.NewFromInt(32),
+			HourlyQuantity:  decimal.NewFromInt(0),
+			Unit:            "GB",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.115),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Storage",
+			MonthlyQuantity: decimal.NewFromInt(64),
+			HourlyQuantity:  decimal.NewFromInt(0),
+			Unit:            "GB",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.115),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Storage",
+			MonthlyQuantity: decimal.NewFromInt(0),
+			HourlyQuantity:  decimal.NewFromInt(0),
+			Unit:            "GB",
+			Rate: cost.Cost{
+				Decimal:  decimal.NewFromFloat(0.115),
+				Currency: "USD",
+			},
+			Details: []string{},
+			Usage:   false,
+
+			Error: nil,
+		},
+		{
+			Name:            "Storage",
 			MonthlyQuantity: decimal.NewFromInt(0),
 			HourlyQuantity:  decimal.NewFromInt(0),
 			Unit:            "GB",
@@ -197,7 +207,7 @@ func (ts *AzureTestSuite) TestPostgresqlFlexibleServer() {
 			HourlyQuantity:  decimal.NewFromInt(1),
 			Unit:            "hours",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.022),
+				Decimal:  decimal.NewFromFloat(0.017),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -212,20 +222,6 @@ func (ts *AzureTestSuite) TestPostgresqlFlexibleServer() {
 			Unit:            "GB",
 			Rate: cost.Cost{
 				Decimal:  decimal.NewFromFloat(0.095),
-				Currency: "USD",
-			},
-			Details: []string{},
-			Usage:   false,
-
-			Error: nil,
-		},
-		{
-			Name:            "Storage",
-			MonthlyQuantity: decimal.NewFromInt(128),
-			HourlyQuantity:  decimal.NewFromInt(0),
-			Unit:            "GB",
-			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.138),
 				Currency: "USD",
 			},
 			Details: []string{},
