@@ -60,10 +60,10 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 
 			component := Component{
 				Name:            comp.Name,
-				MonthlyQuantity: comp.MonthlyQuantity.Round(5),
-				HourlyQuantity:  comp.HourlyQuantity.Round(5),
+				MonthlyQuantity: comp.MonthlyQuantity,
+				HourlyQuantity:  comp.HourlyQuantity,
 				Unit:            comp.Unit,
-				Rate:            Cost{Decimal: prices[0].Value.Round(5), Currency: prices[0].Currency},
+				Rate:            Cost{Decimal: prices[0].Value, Currency: prices[0].Currency},
 				Details:         comp.Details,
 				Usage:           comp.Usage,
 			}
@@ -97,7 +97,9 @@ func (s *State) GetCostComponents() []Component {
 	var components []Component
 	for _, res := range s.Resources {
 		for _, comp := range res.Components {
-			components = append(components, comp...)
+			for _, c := range comp {
+				components = append(components, c.GetRounded())
+			}
 		}
 	}
 	return components
@@ -108,7 +110,7 @@ func (s *State) CostString() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	costString := fmt.Sprintf("- Total Cost (per month): %v", cost)
+	costString := fmt.Sprintf("- Total Cost (per month): %v", cost.Decimal.Round(3))
 	for name, rs := range s.Resources {
 		rsCostString, err := rs.CostString()
 		if err != nil {

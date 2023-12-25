@@ -33,7 +33,7 @@ func (re Resource) CostString() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	costString := fmt.Sprintf("---- Total Resource Cost: %v", cost)
+	costString := fmt.Sprintf("---- Total Resource Cost: %v", cost.Decimal.Round(3))
 	for _, comps := range re.Components {
 		for _, c := range comps {
 			costString = fmt.Sprintf("%s\n-------- %s : %s", costString, c.Name, c.CostString())
