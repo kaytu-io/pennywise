@@ -41,7 +41,7 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachine() {
 			MonthlyQuantity: decimal.NewFromFloat(1),
 			HourlyQuantity:  decimal.NewFromFloat(0),
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(5.2795),
+				Decimal:  decimal.NewFromFloat(5.28),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -82,7 +82,7 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachine() {
 			HourlyQuantity:  decimal.NewFromFloat(0),
 			Unit:            "Monthly Hours",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.0104),
+				Decimal:  decimal.NewFromFloat(0.01),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -122,7 +122,7 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachine() {
 			HourlyQuantity:  decimal.NewFromFloat(0),
 			Unit:            "Monthly Hours",
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(0.0104),
+				Decimal:  decimal.NewFromFloat(0.01),
 				Currency: "USD",
 			},
 			Details: []string{},
@@ -202,7 +202,7 @@ func (ts *AzureTestSuite) TestLinuxVirtualMachine() {
 			MonthlyQuantity: decimal.NewFromFloat(1),
 			HourlyQuantity:  decimal.NewFromFloat(0),
 			Rate: cost.Cost{
-				Decimal:  decimal.NewFromFloat(5.2795),
+				Decimal:  decimal.NewFromFloat(5.28),
 				Currency: "USD",
 			},
 			Details: []string{},

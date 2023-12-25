@@ -10,7 +10,7 @@ import (
 func (ts *AzureTestSuite) TestLoadBalancer() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("Load Balancer", "eastus")
+	ts.IngestService("Load Balancer", "")
 	fmt.Println("Load Balancer ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/load_balancer/usage.yaml")

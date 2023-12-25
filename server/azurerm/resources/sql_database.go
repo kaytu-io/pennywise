@@ -31,13 +31,13 @@ type SQLDatabase struct {
 
 	// Usage
 	// receive override number of GBs used by extra data storage.
-	extraDataStorageGB *float64 `infracost_usage:"extra_data_storage_gb"`
+	extraDataStorageGB *float64
 	// receive monthly number of used vCore-hours for serverless compute.
-	monthlyVCoreHours *int64 `infracost_usage:"monthly_vcore_hours"`
+	monthlyVCoreHours *int64
 	// receive number of GBs used by long-term retention backup storage.
-	longTermRetentionStorageGB *int64 `infracost_usage:"long_term_retention_storage_gb"`
+	longTermRetentionStorageGB *int64
 	// receive number of GBs used by Point-In-Time Restore (PITR) backup storage
-	backupStorageGB *int64 `infracost_usage:"backup_storage_gb"`
+	backupStorageGB *int64
 }
 
 // sqlDatabaseValues is holds the values that we need to be able

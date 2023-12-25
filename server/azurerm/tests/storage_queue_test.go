@@ -11,7 +11,7 @@ func (ts *AzureTestSuite) TestStorageQueue() {
 	ts.IngestService("Storage", "westus")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/storage_queue/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/storage_queue", *usg)

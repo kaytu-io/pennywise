@@ -19,7 +19,7 @@ func (ts *AzureTestSuite) TestKubernetesCluster() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage ingested")
 
-	ts.IngestService("Load Balancer", "eastus")
+	ts.IngestService("Load Balancer", "")
 	fmt.Println("Load Balancer ingested")
 
 	ts.IngestService("Azure DNS", "eastus")
