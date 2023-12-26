@@ -172,6 +172,7 @@ func (inst *KeyVaultKey) Components() []query.Component {
 		}
 	}
 
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 	return components
 }
 

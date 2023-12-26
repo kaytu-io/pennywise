@@ -103,6 +103,7 @@ func (inst *SqlManagedInstance) Components() []query.Component {
 	}
 
 	components = append(components, inst.sqlMILongTermRetentionStorageGBCostComponent())
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

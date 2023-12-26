@@ -6,6 +6,7 @@ import (
 	"github.com/kaytu-io/pennywise/server/internal/backend"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
+	"go.uber.org/zap"
 )
 
 // State represents a collection of all the Resource costs (either prior or planned.) It is not tied to any specific
@@ -22,7 +23,7 @@ var (
 )
 
 // NewState returns a new State from a query.Resource slice by using the Backend to fetch the pricing data.
-func NewState(ctx context.Context, backend backend.Backend, resources []query.Resource) (*State, error) {
+func NewState(ctx context.Context, backend backend.Backend, resources []query.Resource, logger *zap.Logger) (*State, error) {
 	state := &State{Resources: make(map[string]Resource)}
 	if len(resources) == 0 {
 		return nil, resource.ErrNoResources

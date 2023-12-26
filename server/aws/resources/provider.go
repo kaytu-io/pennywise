@@ -2,10 +2,10 @@ package resources
 
 import (
 	"fmt"
+	"github.com/kaytu-io/pennywise/server/aws/region"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
-
-	"github.com/kaytu-io/pennywise/server/aws/region"
+	"go.uber.org/zap"
 )
 
 const ProviderName = "aws"
@@ -15,14 +15,15 @@ const ProviderName = "aws"
 type Provider struct {
 	key    string
 	region region.Code
+	logger *zap.Logger
 }
 
 // NewProvider returns a new Provider with the provided default region and a query key.
-func NewProvider(key string, regionCode region.Code) (*Provider, error) {
+func NewProvider(key string, regionCode region.Code, logger *zap.Logger) (*Provider, error) {
 	if !regionCode.Valid() {
 		return nil, fmt.Errorf("invalid AWS region: %q", regionCode)
 	}
-	return &Provider{key: key, region: regionCode}, nil
+	return &Provider{key: key, region: regionCode, logger: logger}, nil
 }
 
 // Name returns the Provider's common name.

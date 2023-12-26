@@ -129,6 +129,7 @@ func (inst *StorageQueue) Components() []query.Component {
 	components = append(components, inst.operationsCostComponents()...)
 	components = append(components, inst.geoReplicationDataTransferCostComponents()...)
 
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 	return components
 }
 

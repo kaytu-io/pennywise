@@ -162,15 +162,22 @@ func (p *Provider) newSQLDatabase(vals sqlDatabaseValues) *SQLDatabase {
 }
 
 func (inst *SQLDatabase) Components() []query.Component {
+	var costComponents []query.Component
 	if inst.isElasticPool {
-		return inst.elasticPoolCostComponents()
+		costComponents = inst.elasticPoolCostComponents()
+		GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
+		return costComponents
 	}
 
 	if inst.cores != nil {
-		return inst.vCoreCostComponents()
+		costComponents = inst.vCoreCostComponents()
+		GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
+		return costComponents
 	}
 
-	return inst.dtuCostComponents()
+	costComponents = inst.dtuCostComponents()
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
+	return costComponents
 }
 
 const (

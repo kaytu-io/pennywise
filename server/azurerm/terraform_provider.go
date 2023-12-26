@@ -12,6 +12,6 @@ const RegistryName = "registry.terraform.io/hashicorp/azurerm"
 var TerraformProviderInitializer = resource.ProviderInitializer{
 	MatchNames: []string{ProviderName, RegistryName},
 	Provider: func(values map[string]interface{}) (resource.Provider, error) {
-		return azurerm.NewProvider(ProviderName)
+		return azurerm.NewProvider(ProviderName, nil)
 	},
 }

@@ -82,6 +82,7 @@ func (inst *KeyVaultCertificate) Components() []query.Component {
 		certificateOperations = decimalPtr(decimal.NewFromInt(*inst.monthlyCertificateRenewalRequests))
 	}
 	components = append(components, vaultKeysCostComponent(inst.provider.key, inst.location, "Certificate operations", "10K transactions", skuName, "Operations", "0", certificateOperations, 10000))
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

@@ -170,6 +170,7 @@ func (inst *VirtualMachine) Components() []query.Component {
 			components = append(components, managedStorage.Components()...)
 		}
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

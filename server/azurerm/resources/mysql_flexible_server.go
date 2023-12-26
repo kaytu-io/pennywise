@@ -124,6 +124,7 @@ func (inst *MysqlFlexibleServer) Components() []query.Component {
 	var components []query.Component
 
 	components = append(components, inst.computeCostComponent(), inst.backupCostComponent(), inst.storageCostComponent(), inst.iopsCostComponent())
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

@@ -61,6 +61,7 @@ func (inst *RMDNSZone) component() []query.Component {
 
 	costComponents := make([]query.Component, 0)
 	costComponents = append(costComponents, hostedPublicZoneCostComponent(inst.provider.key, region))
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 
 	return costComponents
 }

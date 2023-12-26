@@ -2,6 +2,7 @@ package resources
 
 import (
 	"github.com/kaytu-io/pennywise/server/resource"
+	"go.uber.org/zap"
 	"testing"
 
 	"github.com/shopspring/decimal"
@@ -15,7 +16,10 @@ import (
 )
 
 func TestEKSCluster_Components(t *testing.T) {
-	p, err := NewProvider("aws", "us-east-1")
+	logger, err := zap.NewProduction()
+	require.NoError(t, err)
+
+	p, err := NewProvider("aws", "us-east-1", logger)
 	require.NoError(t, err)
 
 	t.Run("EKSCluster", func(t *testing.T) {

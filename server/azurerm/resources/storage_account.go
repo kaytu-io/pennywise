@@ -192,6 +192,7 @@ func (inst *StorageAccount) Components() []query.Component {
 
 	components = append(components, inst.earlyDeletionCostComponents()...)
 
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 	return components
 }
 

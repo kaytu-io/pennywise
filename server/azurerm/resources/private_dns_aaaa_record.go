@@ -53,7 +53,9 @@ func decoderPrivateDnsAAAARecord(tfVals map[string]interface{}) (privateDNSAAAAR
 
 func (inst *PrivateDNSAAAARecord) component() []query.Component {
 	region := getLocationName(inst.location)
-	return privateDNSAAAARecord(inst.provider.key, region, inst.monthlyQueries)
+	costComponents := privateDNSAAAARecord(inst.provider.key, region, inst.monthlyQueries)
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
+	return costComponents
 }
 
 func privateDNSAAAARecord(key, region string, monthlyQueries *int64) []query.Component {

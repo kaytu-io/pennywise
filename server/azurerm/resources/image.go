@@ -148,7 +148,7 @@ func (inst *Image) Components() []query.Component {
 		qty = *inst.storageGB
 	}
 
-	return []query.Component{{
+	costComponent := []query.Component{{
 		Name:            "Storage",
 		Unit:            "1 GB/Month",
 		MonthlyQuantity: qty,
@@ -167,4 +167,7 @@ func (inst *Image) Components() []query.Component {
 			},
 		},
 	}}
+	GetCostComponentNamesAndSetLogger(costComponent, inst.provider.logger)
+
+	return costComponent
 }
