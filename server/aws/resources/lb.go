@@ -1,12 +1,14 @@
 package resources
 
 import (
+	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
+	"go.uber.org/zap"
 
 	"github.com/kaytu-io/pennywise/server/aws/region"
 )
@@ -14,6 +16,7 @@ import (
 // LB represents a Load Balancer definition that can be cost-estimated.
 type LB struct {
 	provider *Provider
+	logger   *zap.Logger
 	region   region.Code
 
 	// lbType describes the type of the Load Balancer.
@@ -50,6 +53,7 @@ func decodeLBValues(tfVals map[string]interface{}) (lbValues, error) {
 func (p *Provider) newLB(vals lbValues) *LB {
 	return &LB{
 		provider: p,
+		logger:   p.logger,
 		region:   p.region,
 		lbType:   vals.LoadBalancerType,
 	}
@@ -57,7 +61,10 @@ func (p *Provider) newLB(vals lbValues) *LB {
 
 // Components returns the price component queries that make up this LB.
 func (lb *LB) Components() []query.Component {
-	return []query.Component{lb.loadBalancerComponent()}
+	costComponent := []query.Component{lb.loadBalancerComponent()}
+
+	resources.GetCostComponentNamesAndSetLogger(costComponent, lb.logger)
+	return costComponent
 }
 
 func (lb *LB) loadBalancerComponent() query.Component {

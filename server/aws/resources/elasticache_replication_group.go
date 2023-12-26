@@ -1,6 +1,8 @@
 package resources
 
 import (
+	"github.com/kaytu-io/pennywise/server/azurerm/resources"
+	"go.uber.org/zap"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
@@ -14,6 +16,7 @@ import (
 type ElastiCacheReplication struct {
 	providerKey string
 
+	logger       *zap.Logger
 	region       region.Code
 	instanceType string
 
@@ -84,6 +87,7 @@ func (p *Provider) newElastiCacheReplication(vals elastiCacheReplicationValues) 
 
 	inst := &ElastiCacheReplication{
 		providerKey:              p.key,
+		logger:                   p.logger,
 		region:                   p.region,
 		instanceType:             vals.NodeType,
 		cacheEngine:              cacheType,
@@ -114,6 +118,7 @@ func (inst *ElastiCacheReplication) Components() []query.Component {
 		components = append(components, inst.backupStorageComponent())
 	}
 
+	resources.GetCostComponentNamesAndSetLogger(components, inst.logger)
 	return components
 }
 

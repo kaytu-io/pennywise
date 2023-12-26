@@ -2,6 +2,8 @@ package resources
 
 import (
 	"fmt"
+	"github.com/kaytu-io/pennywise/server/azurerm/resources"
+	"go.uber.org/zap"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
@@ -17,6 +19,7 @@ import (
 // Instance represents an EC2 instance definition that can be cost-estimated.
 type Instance struct {
 	provider     *Provider
+	logger       *zap.Logger
 	region       region.Code
 	instanceType string
 
@@ -97,6 +100,7 @@ func decodeInstanceValues(tfVals map[string]interface{}) (instanceValues, error)
 func (p *Provider) newInstance(vals instanceValues) *Instance {
 	inst := &Instance{
 		provider: p,
+		logger:   p.logger,
 		region:   p.region,
 		tenancy:  "Shared",
 
@@ -169,6 +173,7 @@ func (inst *Instance) Components() []query.Component {
 		components = append(components, inst.ebsOptimizedCostComponent())
 	}
 
+	resources.GetCostComponentNamesAndSetLogger(components, inst.logger)
 	return components
 }
 

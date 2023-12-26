@@ -1,10 +1,12 @@
 package resources
 
 import (
+	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"go.uber.org/zap"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
@@ -15,8 +17,8 @@ import (
 
 // DBInstance represents an RDS database instance definition that can be cost-estimated.
 type DBInstance struct {
-	providerKey string
-
+	providerKey  string
+	logger       *zap.Logger
 	region       region.Code
 	instanceType string
 
@@ -107,6 +109,7 @@ func (p *Provider) newDBInstance(vals dbInstanceValues) *DBInstance {
 
 	inst := &DBInstance{
 		providerKey:      p.key,
+		logger:           p.logger,
 		region:           p.region,
 		instanceType:     vals.InstanceClass,
 		databaseEngine:   dbType.engine,
@@ -133,6 +136,7 @@ func (inst *DBInstance) Components() []query.Component {
 		components = append(components, inst.iopsComponent())
 	}
 
+	resources.GetCostComponentNamesAndSetLogger(components, inst.logger)
 	return components
 }
 

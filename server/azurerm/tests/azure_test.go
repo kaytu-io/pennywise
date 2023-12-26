@@ -108,7 +108,7 @@ func (ts *AzureTestSuite) getDirCosts(projectDir string, usg usage.Usage) *cost.
 	}
 
 	for _, res := range resources {
-		components := provider.ResourceComponents(resources, res, ts.logger)
+		components := provider.ResourceComponents(resources, res)
 		qResource := query.Resource{
 			Address:    res.Address,
 			Provider:   res.ProviderName,
