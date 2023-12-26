@@ -74,7 +74,10 @@ func (inst LoadBalancerRule) Components() []query.Component {
 	if inst.loadBalancer.Values.Sku == "Basic" {
 		return nil
 	}
-	return []query.Component{RegionalOverageRulesComponent(inst.provider.key, inst.loadBalancer.Values.Location, decimal.NewFromInt(1))}
+	costComponent := []query.Component{RegionalOverageRulesComponent(inst.provider.key, inst.loadBalancer.Values.Location, decimal.NewFromInt(1))}
+
+	GetCostComponentNamesAndSetLogger(costComponent, inst.provider.logger)
+	return costComponent
 }
 
 func RegionalIncludedRulesComponent(key, location string) query.Component {

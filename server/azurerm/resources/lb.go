@@ -105,6 +105,7 @@ func (inst *LoadBalancer) Components() []query.Component {
 
 		components = append(components, inst.globalDataProceedComponent(inst.provider.key, inst.location, inst.monthlyDataProceed))
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

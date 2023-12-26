@@ -56,6 +56,7 @@ func (inst *KeyVaultManagedHardwareSecurityModule) Components() []query.Componen
 	var components []query.Component
 
 	components = append(components, inst.hsmPoolComponent())
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

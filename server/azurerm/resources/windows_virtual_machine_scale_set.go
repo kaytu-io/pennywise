@@ -112,6 +112,7 @@ func (inst *WindowsVirtualMachineScaleSet) Components() []query.Component {
 			components = append(components, osDiskSubResource(inst.provider, inst.location, inst.osDisk, inst.osDiskMonthlyOperations)...)
 		}
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

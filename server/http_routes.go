@@ -47,7 +47,7 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 	}
 	for _, res := range req.Resources {
 		if res.ProviderName == "azurerm" {
-			provider, err := azurermres.NewProvider(azurermres.ProviderName)
+			provider, err := azurermres.NewProvider(azurermres.ProviderName, h.logger)
 			if err != nil {
 				return ctx.JSON(http.StatusInternalServerError, err.Error())
 			}
@@ -61,7 +61,7 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 				Components: components,
 			})
 		} else if res.ProviderName == "aws" {
-			provider, err := awsres.NewProvider(awsres.ProviderName, awsrg.Code(res.RegionCode))
+			provider, err := awsres.NewProvider(awsres.ProviderName, awsrg.Code(res.RegionCode), h.logger)
 			if err != nil {
 				return ctx.JSON(http.StatusInternalServerError, err.Error())
 			}
@@ -77,7 +77,7 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 		}
 	}
 
-	state, err := cost.NewState(ctx.Request().Context(), h.backend, qResources)
+	state, err := cost.NewState(ctx.Request().Context(), h.backend, qResources, h.logger)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -91,7 +91,7 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	if req.ProviderName == "azurerm" {
-		provider, err := azurermres.NewProvider(azurermres.ProviderName)
+		provider, err := azurermres.NewProvider(azurermres.ProviderName, h.logger)
 		if err != nil {
 			return ctx.JSON(http.StatusInternalServerError, err.Error())
 		}
@@ -105,7 +105,7 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 			Components: components,
 		}
 	} else if req.ProviderName == "aws" {
-		provider, err := awsres.NewProvider(awsres.ProviderName, awsrg.Code(req.RegionCode))
+		provider, err := awsres.NewProvider(awsres.ProviderName, awsrg.Code(req.RegionCode), h.logger)
 		if err != nil {
 			return ctx.JSON(http.StatusInternalServerError, err.Error())
 		}
@@ -119,7 +119,7 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 			Components: components,
 		}
 	}
-	state, err := cost.NewState(ctx.Request().Context(), h.backend, []query.Resource{qResource})
+	state, err := cost.NewState(ctx.Request().Context(), h.backend, []query.Resource{qResource}, h.logger)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}

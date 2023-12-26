@@ -2,6 +2,7 @@ package resources
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"testing"
 
 	"github.com/kaytu-io/pennywise/server/internal/price"
@@ -15,7 +16,10 @@ import (
 )
 
 func TestAutoscalingGroup_Components(t *testing.T) {
-	p, err := NewProvider("aws", "eu-west-1")
+	logger, err := zap.NewProduction()
+	require.NoError(t, err)
+
+	p, err := NewProvider("aws", "eu-west-1", logger)
 	require.NoError(t, err)
 
 	t.Run("LaunchTemplate", func(t *testing.T) {

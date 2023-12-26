@@ -1,11 +1,5 @@
 package aws
 
-import (
-	"github.com/kaytu-io/pennywise/server/aws/region"
-	aws "github.com/kaytu-io/pennywise/server/aws/resources"
-	"github.com/kaytu-io/pennywise/server/resource"
-)
-
 const (
 	// RegistryName is the fully qualified name under which this provider is stored in the registry.
 	RegistryName = "registry.terraform.io/hashicorp/aws"
@@ -15,17 +9,22 @@ const (
 )
 
 // TerraformProviderInitializer is a terraform.ProviderInitializer that initializes the default AWS provider.
-var TerraformProviderInitializer = resource.ProviderInitializer{
-	MatchNames: []string{ProviderName, RegistryName},
-	Provider: func(values map[string]interface{}) (resource.Provider, error) {
-		r, ok := values["region"]
-		// If no region is defined it means it was passed via ENV variables
-		// and it's not tracked on the Plan or HCL so we'll assume the
-		// region to be the DefaultRegion
-		if !ok {
-			r = DefaultRegion
-		}
-		regCode := region.Code(r.(string))
-		return aws.NewProvider(ProviderName, regCode)
-	},
-}
+//var TerraformProviderInitializer = resource.ProviderInitializer{
+//	MatchNames: []string{ProviderName, RegistryName},
+//	Provider: func(values map[string]interface{}) (resource.Provider, error) {
+//		logger, err := zap.NewProduction()
+//		if err != nil {
+//			return nil, fmt.Errorf("Error : %v ", err)
+//		}
+//
+//		r, ok := values["region"]
+//		// If no region is defined it means it was passed via ENV variables
+//		// and it's not tracked on the Plan or HCL so we'll assume the
+//		// region to be the DefaultRegion
+//		if !ok {
+//			r = DefaultRegion
+//		}
+//		regCode := region.Code(r.(string))
+//		return aws.NewProvider(ProviderName, regCode, logger)
+//	},
+//}

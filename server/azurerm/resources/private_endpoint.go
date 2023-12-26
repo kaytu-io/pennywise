@@ -106,6 +106,7 @@ func (inst *PrivateEndpoint) Components() []query.Component {
 	} else {
 		components = append(components, inst.privateEndpointDataCostComponent("Outbound data processed (first 1PB)", "Standard Data Processed - Egress", "0", decimal.Zero))
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

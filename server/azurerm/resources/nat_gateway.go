@@ -71,6 +71,7 @@ func (inst *NatGateway) Components() []query.Component {
 
 	components = append(components, inst.natGatewayCostComponent("NAT gateway"))
 	components = append(components, inst.dataProcessedCostComponent("Data processed", monthlyDataProcessedGb))
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

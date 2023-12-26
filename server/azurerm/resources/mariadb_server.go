@@ -121,7 +121,7 @@ func (inst *MariadbServer) Components() []query.Component {
 	}
 
 	components = append(components, inst.databaseBackupStorageComponent(skuName, backupStorageGB))
-
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 	return components
 }
 

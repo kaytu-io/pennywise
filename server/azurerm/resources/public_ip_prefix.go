@@ -56,6 +56,7 @@ func (inst *PublicIPPrefix) Components() []query.Component {
 	var components []query.Component
 
 	components = append(components, inst.publicIPPrefixCostComponent("IP prefix"))
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

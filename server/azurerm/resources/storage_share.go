@@ -131,6 +131,7 @@ func (inst *StorageShare) Components() []query.Component {
 	components = append(components, inst.otherOperationsCostComponents()...)
 	components = append(components, inst.dataRetrievalCostComponents()...)
 
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 	return components
 }
 

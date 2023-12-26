@@ -88,6 +88,7 @@ func (inst *VirtualNetworkPeering) Components() []query.Component {
 		firstQuery,
 		secondQuery,
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }
