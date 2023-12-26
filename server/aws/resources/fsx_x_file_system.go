@@ -2,9 +2,11 @@ package resources
 
 import (
 	"fmt"
+	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"go.uber.org/zap"
 
 	"github.com/shopspring/decimal"
 
@@ -13,9 +15,9 @@ import (
 
 // FSxFileSystem represents an EFS that can be cost-estimated.
 type FSxFileSystem struct {
-	provider *Provider
-	region   region.Code
-
+	provider                     *Provider
+	region                       region.Code
+	logger                       *zap.Logger
 	storageCapacity              decimal.Decimal
 	storageType                  string
 	deploymentType               string
@@ -42,6 +44,7 @@ func (v *FSxFileSystem) Components() []query.Component {
 		components = append(components, v.fsxFileSystemBackupGBCostComponent())
 	}
 
+	resources.GetCostComponentNamesAndSetLogger(components, v.logger)
 	return components
 }
 

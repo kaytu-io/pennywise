@@ -2,10 +2,12 @@ package resources
 
 import (
 	"fmt"
+	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"go.uber.org/zap"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
@@ -17,6 +19,7 @@ import (
 // EKSCluster represents an EKSCluster instance definition that can be cost-estimated.
 type EKSCluster struct {
 	providerKey string
+	logger      *zap.Logger
 	region      region.Code
 
 	// tenancy describes the tenancy of an instance.
@@ -52,6 +55,7 @@ func decodeEKSClusterValues(tfVals map[string]interface{}) (eKSClusterValues, er
 func (p *Provider) newEKSCluster(vals eKSClusterValues) *EKSCluster {
 	inst := &EKSCluster{
 		providerKey: p.key,
+		logger:      p.logger,
 		region:      p.region,
 		// tenancy:     "Shared",
 	}
@@ -63,6 +67,7 @@ func (p *Provider) newEKSCluster(vals eKSClusterValues) *EKSCluster {
 func (inst *EKSCluster) Components() []query.Component {
 	components := []query.Component{inst.eKSClusterInstanceComponent()}
 
+	resources.GetCostComponentNamesAndSetLogger(components, inst.logger)
 	return components
 }
 
