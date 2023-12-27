@@ -130,6 +130,8 @@ func (inst *ManagedDisk) Components() []query.Component {
 		}
 		inst.diskOperationsComponent(inst.provider.key, inst.location, inst.storageAccountType, opsQty)
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
+
 	return components
 }
 

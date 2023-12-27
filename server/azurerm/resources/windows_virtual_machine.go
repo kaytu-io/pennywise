@@ -86,6 +86,8 @@ func (inst *WindowsVirtualMachine) Components() []query.Component {
 	// TODO: check if we have ultra ssd or not
 	components := []query.Component{inst.windowsVirtualMachineComponent()}
 	components = append(components, osDiskSubResource(inst.provider, inst.location, inst.osDisk, nil)...)
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
+
 	return components
 }
 

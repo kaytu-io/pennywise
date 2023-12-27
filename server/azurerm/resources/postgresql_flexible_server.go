@@ -108,6 +108,7 @@ func (inst *PostgresqlFlexibleServer) Components() []query.Component {
 	var components []query.Component
 
 	components = append(components, inst.computeCostComponent(), inst.backupCostComponent(), inst.storageCostComponent())
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

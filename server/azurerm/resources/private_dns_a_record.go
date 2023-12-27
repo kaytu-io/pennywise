@@ -24,6 +24,8 @@ type privateDNSARecordValues struct {
 
 func (p *Provider) newPrivateDnsARecord(vals privateDNSARecordValues) *PrivateDNSARecord {
 	inst := &PrivateDNSARecord{
+		provider: p,
+
 		location:       vals.ResourceGroupName.Values.Location,
 		monthlyQueries: &vals.Usage.MonthlyQueries,
 	}
@@ -50,7 +52,9 @@ func decoderPrivateDnsARecord(tfVals map[string]interface{}) (privateDNSARecordV
 
 func (inst *PrivateDNSARecord) component() []query.Component {
 	region := getLocationName(inst.location)
-	return privateDNSARecord(inst.provider.key, region, inst.monthlyQueries)
+	costComponents := privateDNSARecord(inst.provider.key, region, inst.monthlyQueries)
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
+	return costComponents
 }
 
 func privateDNSARecord(key string, region string, monthlyQueries *int64) []query.Component {

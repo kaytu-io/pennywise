@@ -6,6 +6,7 @@ import (
 	"github.com/kaytu-io/pennywise/server/internal/backend"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
+	"go.uber.org/zap"
 )
 
 // State represents a collection of all the Resource costs (either prior or planned.) It is not tied to any specific
@@ -22,7 +23,7 @@ var (
 )
 
 // NewState returns a new State from a query.Resource slice by using the Backend to fetch the pricing data.
-func NewState(ctx context.Context, backend backend.Backend, resources []query.Resource) (*State, error) {
+func NewState(ctx context.Context, backend backend.Backend, resources []query.Resource, logger *zap.Logger) (*State, error) {
 	state := &State{Resources: make(map[string]Resource)}
 	if len(resources) == 0 {
 		return nil, resource.ErrNoResources
@@ -60,10 +61,10 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 
 			component := Component{
 				Name:            comp.Name,
-				MonthlyQuantity: comp.MonthlyQuantity.Round(5),
-				HourlyQuantity:  comp.HourlyQuantity.Round(5),
+				MonthlyQuantity: comp.MonthlyQuantity,
+				HourlyQuantity:  comp.HourlyQuantity,
 				Unit:            comp.Unit,
-				Rate:            Cost{Decimal: prices[0].Value.Round(5), Currency: prices[0].Currency},
+				Rate:            Cost{Decimal: prices[0].Value, Currency: prices[0].Currency},
 				Details:         comp.Details,
 				Usage:           comp.Usage,
 			}
@@ -90,14 +91,16 @@ func (s *State) Cost() (Cost, error) {
 		}
 	}
 
-	return total, nil
+	return Cost{Currency: total.Currency, Decimal: total.Decimal.Round(3)}, nil
 }
 
 func (s *State) GetCostComponents() []Component {
 	var components []Component
 	for _, res := range s.Resources {
 		for _, comp := range res.Components {
-			components = append(components, comp...)
+			for _, c := range comp {
+				components = append(components, c.GetRounded())
+			}
 		}
 	}
 	return components
@@ -108,7 +111,7 @@ func (s *State) CostString() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	costString := fmt.Sprintf("- Total Cost (per month): %v", cost)
+	costString := fmt.Sprintf("- Total Cost (per month): %v", cost.Decimal.Round(3))
 	for name, rs := range s.Resources {
 		rsCostString, err := rs.CostString()
 		if err != nil {

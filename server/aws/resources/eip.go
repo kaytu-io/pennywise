@@ -1,10 +1,12 @@
 package resources
 
 import (
+	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
+	"go.uber.org/zap"
 
 	"github.com/kaytu-io/pennywise/server/aws/region"
 	"github.com/kaytu-io/pennywise/server/internal/price"
@@ -14,6 +16,7 @@ import (
 // ElasticIP represents an ElasticIP instance definition that can be cost-estimated.
 type ElasticIP struct {
 	providerKey           string
+	logger                *zap.Logger
 	region                region.Code
 	customerOwnedIpv4Pool string
 	instance              string
@@ -49,6 +52,7 @@ func (p *Provider) newElasticIP(vals elasticIPValues) *ElasticIP {
 
 	inst := &ElasticIP{
 		providerKey:           p.key,
+		logger:                p.logger,
 		region:                p.region,
 		customerOwnedIpv4Pool: vals.CustomerOwnedIpv4Pool,
 		instance:              vals.Instance,
@@ -70,7 +74,7 @@ func (inst *ElasticIP) Components() []query.Component {
 	}
 
 	components := []query.Component{inst.elasticIPInstanceComponent()}
-
+	resources.GetCostComponentNamesAndSetLogger(components, inst.logger)
 	return components
 }
 

@@ -10,8 +10,8 @@ import (
 func (ts *AzureTestSuite) TestSqlDatabase() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("Azure Cosmos DB", "eastus")
-	fmt.Println("Azure Cosmos DB ingested")
+	ts.IngestService("SQL Database", "eastus")
+	fmt.Println("SQL Database ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/sql_database/usage.yaml")
 	require.NoError(ts.T(), err)

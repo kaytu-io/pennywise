@@ -48,7 +48,7 @@ go run . ingest --provider (azure|aws) --service service-name --region region
 Then run the cost estimator for your terraform project.
 
 ```shell
-go run . cost terraform --project path-to-project
+go run . cost terraform --project path-to-project --usage path-to-usage-file
 ```
 You can also specify the usage file path by usage tag.
 The usage file is responsible for getting usage details from user.

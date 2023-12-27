@@ -150,6 +150,7 @@ func (inst AzureRMCDNEndpoint) Component() []query.Component {
 			}
 		}
 	}
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 
 	return costComponents
 }

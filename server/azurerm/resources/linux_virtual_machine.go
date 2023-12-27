@@ -83,6 +83,7 @@ func (inst *LinuxVirtualMachine) Components() []query.Component {
 	// TODO: check if we have ultra ssd or not
 	components := []query.Component{inst.linuxVirtualMachineComponent()}
 	components = append(components, osDiskSubResource(inst.provider, inst.location, inst.osDisk, nil)...)
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

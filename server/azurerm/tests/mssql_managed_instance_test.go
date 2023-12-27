@@ -10,7 +10,7 @@ import (
 func (ts *AzureTestSuite) TestMssqlManagedInstance() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("SQL Managed Instance", "eastus")
+	ts.IngestService("SQL Managed Instance", "")
 	fmt.Println("SQL Managed Instance ingested")
 
 	usg, err := ts.getUsage("../../testdata/azure/mssql_managed_instance/usage.yaml")

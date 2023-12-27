@@ -211,5 +211,6 @@ func (inst KubernetesCluster) Components() []query.Component {
 		costComponents = append(costComponents, hostedPublicZoneCostComponent(inst.provider.key, region))
 	}
 
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 	return costComponents
 }

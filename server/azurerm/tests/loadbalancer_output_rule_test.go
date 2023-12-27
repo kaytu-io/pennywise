@@ -9,8 +9,10 @@ import (
 func (ts *AzureTestSuite) TestLoadBalancerOutboundRule() {
 	ts.SetupSuite()
 	fmt.Println("Suite Setup")
-	ts.IngestService("Load Balancer", "westus")
+	ts.IngestService("Load Balancer", "")
 	fmt.Println("Load Balancer ingested")
+	ts.IngestService("Virtual Network", "")
+	fmt.Println("Virtual Network ingested")
 
 	state := ts.getDirCosts("../../testdata/azure/lb_outbound_rule", nil)
 	costComponents := state.GetCostComponents()

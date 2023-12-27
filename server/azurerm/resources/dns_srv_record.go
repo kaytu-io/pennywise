@@ -51,5 +51,7 @@ func (p *Provider) newDNSSRVRecord(vals dnsSRVRecordValues) *DNSSRVRecord {
 
 func (inst *DNSSRVRecord) component() []query.Component {
 	region := getLocationName(inst.location)
-	return DNSQueriesCostComponent(inst.provider.key, region, inst.monthlyQueries)
+	costComponents := DNSQueriesCostComponent(inst.provider.key, region, inst.monthlyQueries)
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
+	return costComponents
 }
