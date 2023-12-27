@@ -12,6 +12,8 @@ import (
 )
 
 type IntegrationServiceEnvironment struct {
+	provider *Provider
+
 	location string
 	skuName  string
 }
@@ -23,6 +25,7 @@ type IntegrationServiceEnvironmentValue struct {
 
 func (p *Provider) newIntegrationServiceEnvironment(vals IntegrationServiceEnvironmentValue) *IntegrationServiceEnvironment {
 	inst := &IntegrationServiceEnvironment{
+		provider: p,
 		location: vals.ResourceGroupName.Values.Location,
 		skuName:  vals.SkuName,
 	}
@@ -64,8 +67,9 @@ func (inst *IntegrationServiceEnvironment) Component() []query.Component {
 
 	if sku == "premium" && scaleNumber > 0 {
 		costComponents = append(costComponents, IntegrationScaleServiceEnvironmentCostComponent("Scale units", region, productName, scaleNumber))
-
 	}
+
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 	return costComponents
 }
 

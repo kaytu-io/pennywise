@@ -60,6 +60,7 @@ func (inst *AutomationJobSchedule) Component() []query.Component {
 	costComponents := make([]query.Component, 0)
 	costComponents = append(costComponents, automationRunTimeCostComponent(location, "500", "Basic Runtime", "Basic", monthlyJobRunMins))
 
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 	return costComponents
 }
 

@@ -561,30 +561,35 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 		if err != nil {
 			return nil
 		}
+		logger.Info(fmt.Sprintf("%v.%v decoded ", tfRes.Type, tfRes.Name))
 		return p.newAutomationAccount(vals).Component()
 	case "azurerm_automation_dsc_configuration":
 		vals, err := decodeAutomationDNSConfiguration(tfRes.Values)
 		if err != nil {
 			return nil
 		}
+		logger.Info(fmt.Sprintf("%v.%v decoded ", tfRes.Type, tfRes.Name))
 		return p.newAutomationDSCConfiguration(vals).Component()
 	case "azurerm_automation_dsc_nodeconfiguration":
 		vals, err := decodeAutomationDSCNodeConfiguration(tfRes.Values)
 		if err != nil {
 			return nil
 		}
+		logger.Info(fmt.Sprintf("%v.%v decoded ", tfRes.Type, tfRes.Name))
 		return p.newAutomationDSCNodeConfiguration(vals).Component()
 	case "azurerm_automation_job_schedule":
 		vals, err := decodeAutomationJOBSchedule(tfRes.Values)
 		if err != nil {
 			return nil
 		}
+		logger.Info(fmt.Sprintf("%v.%v decoded ", tfRes.Type, tfRes.Name))
 		return p.newAutomationJOBSchedule(vals).Component()
 	case "azurerm_integration_service_environment":
 		vals, err := decodeIntegrationServiceEnvironment(tfRes.Values)
 		if err != nil {
 			return nil
 		}
+		logger.Info(fmt.Sprintf("%v.%v decoded ", tfRes.Type, tfRes.Name))
 		return p.newIntegrationServiceEnvironment(vals).Component()
 	default:
 		return nil

@@ -46,5 +46,8 @@ func decodeAutomationDSCNodeConfiguration(tfVals map[string]interface{}) (Automa
 }
 
 func (inst *AutomationDSCNodeConfiguration) Component() []query.Component {
-	return automationDSCNodesCostComponent(inst.location, inst.nonAzureConfigNodeCount)
+	costComponent := automationDSCNodesCostComponent(inst.location, inst.nonAzureConfigNodeCount)
+
+	GetCostComponentNamesAndSetLogger(costComponent, inst.provider.logger)
+	return costComponent
 }

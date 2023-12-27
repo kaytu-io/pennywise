@@ -50,7 +50,10 @@ func decodeAutomationDNSConfiguration(tfVals map[string]interface{}) (Automation
 }
 
 func (inst *AutomationDSCConfiguration) Component() []query.Component {
-	return automationDSCNodesCostComponent(inst.location, inst.nonAzureConfigNodeCount)
+	costComponent := automationDSCNodesCostComponent(inst.location, inst.nonAzureConfigNodeCount)
+
+	GetCostComponentNamesAndSetLogger(costComponent, inst.provider.logger)
+	return costComponent
 }
 
 func automationDSCNodesCostComponent(location string, nonAzureConfigNodeCount *int64) []query.Component {

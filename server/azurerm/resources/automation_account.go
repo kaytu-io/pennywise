@@ -80,6 +80,8 @@ func (inst *AutomationAccount) Component() []query.Component {
 	}
 
 	costComponents = append(costComponents, watchersCostComponent(inst.provider.key, inst.monthlyWatcherHrs, location, "744", "Watcher", "Basic"))
+
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 	return costComponents
 }
 
