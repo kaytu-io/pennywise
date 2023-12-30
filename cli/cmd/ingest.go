@@ -5,7 +5,6 @@ import (
 	"github.com/kaytu-io/pennywise/server/client"
 	"github.com/spf13/cobra"
 	"os"
-	"strings"
 )
 
 var (
@@ -22,17 +21,11 @@ var ingest = &cobra.Command{
 		region := flags.ReadStringFlag(cmd, "region")
 
 		serverClient := client.NewPennywiseServerClient(ServerClientAddress)
-		if strings.ToLower(provider) == "aws" {
-			err := serverClient.IngestAws(service, region)
-			if err != nil {
-				return err
-			}
-		} else if strings.ToLower(provider) == "azure" {
-			err := serverClient.IngestAzure(service, region)
-			if err != nil {
-				return err
-			}
+		err := serverClient.Ingest(provider, service, region)
+		if err != nil {
+			return err
 		}
+
 		return nil
 	},
 }

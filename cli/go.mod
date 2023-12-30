@@ -162,6 +162,8 @@ require (
 	go.mozilla.org/sops/v3 v3.7.3 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
+	go.uber.org/multierr v1.2.0 // indirect
+	go.uber.org/zap v1.10.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/sync v0.5.0 // indirect
 	golang.org/x/term v0.15.0 // indirect
@@ -246,3 +248,5 @@ replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
 
 replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20231103101711-77c5e7d4d795
+
+replace github.com/kaytu-io/pennywise/server => /home/arta/data/codes/Work/Kaytu/pennywise/server
