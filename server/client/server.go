@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/cost"
+	"github.com/kaytu-io/pennywise/server/internal/ingester"
 	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/labstack/echo/v4"
 	"io"
@@ -19,9 +20,8 @@ type EchoError struct {
 
 type OnboardServiceClient interface {
 	GetResourceCost(req resource.Resource) (*cost.Cost, error)
-	GetStateCost(req []resource.Resource) (*cost.Cost, error)
-	IngestAws(service, region string) error
-	IngestAzure(service, region string) error
+	GetStateCost(req resource.State) (*cost.Cost, error)
+	Ingest(provider, service, region string) error
 }
 
 type serverClient struct {
@@ -34,28 +34,45 @@ func NewPennywiseServerClient(baseURL string) *serverClient {
 	}
 }
 
-func (s *serverClient) IngestAws(service, region string) error {
-	url := fmt.Sprintf("%s/api/v1/ingest/aws?service=%s&region=%s", s.baseURL, service, region)
+func (s *serverClient) ListIngestionJobs(provider, service, region, status string) ([]ingester.IngestionJob, error) {
+	url := fmt.Sprintf("%s/api/v1/ingest/jobs?status=%s&provider=%s&service=%s&region=%s", s.baseURL, status, provider, service, region)
 	url = strings.ReplaceAll(url, " ", "%20")
-	if statusCode, err := doRequest(http.MethodPut, url, nil, nil); err != nil {
+
+	var jobs []ingester.IngestionJob
+	if statusCode, err := doRequest(http.MethodGet, url, nil, &jobs); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
-			return echo.NewHTTPError(statusCode, err.Error())
+			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
-		return err
+		return nil, err
 	}
-	return nil
+	return jobs, nil
 }
 
-func (s *serverClient) IngestAzure(service, region string) error {
-	url := fmt.Sprintf("%s/api/v1/ingest/azure?service=%s&region=%s", s.baseURL, service, region)
-	url = strings.ReplaceAll(url, " ", "%20")
-	if statusCode, err := doRequest(http.MethodPut, url, nil, nil); err != nil {
+func (s *serverClient) GetIngestionJob(id string) (*ingester.IngestionJob, error) {
+	url := fmt.Sprintf("%s/api/v1/ingest/jobs/%s", s.baseURL, id)
+
+	var job ingester.IngestionJob
+	if statusCode, err := doRequest(http.MethodGet, url, nil, &job); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
-			return echo.NewHTTPError(statusCode, err.Error())
+			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
-		return err
+		return nil, err
 	}
-	return nil
+	return &job, nil
+}
+
+func (s *serverClient) Ingest(provider, service, region string) (*ingester.IngestionJob, error) {
+	url := fmt.Sprintf("%s/api/v1/ingest?provider=%s&service=%s&region=%s", s.baseURL, provider, service, region)
+	url = strings.ReplaceAll(url, " ", "%20")
+
+	var job ingester.IngestionJob
+	if statusCode, err := doRequest(http.MethodPut, url, nil, &job); err != nil {
+		if 400 <= statusCode && statusCode < 500 {
+			return nil, echo.NewHTTPError(statusCode, err.Error())
+		}
+		return nil, err
+	}
+	return &job, nil
 }
 
 func (s *serverClient) GetResourceCost(req resource.Resource) (*cost.State, error) {

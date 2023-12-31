@@ -4,14 +4,16 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/kaytu-io/pennywise/server/internal/ingester"
 	"github.com/kaytu-io/pennywise/server/internal/mysql"
 	"go.uber.org/zap"
 	"golang.org/x/net/context"
 )
 
 type HttpHandler struct {
-	backend *mysql.Backend
-	logger  *zap.Logger
+	backend   *mysql.Backend
+	logger    *zap.Logger
+	scheduler ingester.Scheduler
 }
 
 func InitializeHttpHandler(
@@ -30,8 +32,12 @@ func InitializeHttpHandler(
 
 	backend := mysql.NewBackend(db)
 
+	scheduler := ingester.NewScheduler(backend, logger, db)
+	scheduler.InsureScheduler()
+
 	return &HttpHandler{
-		logger:  logger,
-		backend: backend,
+		logger:    logger,
+		backend:   backend,
+		scheduler: scheduler,
 	}, nil
 }

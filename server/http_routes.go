@@ -2,25 +2,23 @@ package main
 
 import (
 	"fmt"
-	"github.com/kaytu-io/pennywise/server/aws"
 	awsrg "github.com/kaytu-io/pennywise/server/aws/region"
 	awsres "github.com/kaytu-io/pennywise/server/aws/resources"
-	"github.com/kaytu-io/pennywise/server/azurerm"
 	azurermres "github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/cost"
-	ingester2 "github.com/kaytu-io/pennywise/server/internal/ingester"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/labstack/echo/v4"
-	"golang.org/x/net/context"
 	"net/http"
+	"strconv"
 )
 
 func (h *HttpHandler) Register(e *echo.Echo) {
 	v1 := e.Group("/api/v1")
 
-	v1.PUT("/ingest/azure", h.IngestAzureTables)
-	v1.PUT("/ingest/aws", h.IngestAwsTables)
+	v1.PUT("/ingest", h.IngestTables)
+	v1.GET("/ingest/jobs/:id", h.GetIngestionJob)
+	v1.GET("/ingest/jobs", h.ListIngestionJobs)
 
 	cost := v1.Group("/cost")
 	cost.GET("/resource", h.GetResourceCost)
@@ -129,46 +127,49 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, state)
 }
 
-// IngestAwsTables run the ingester to receive pricing and store in the database for aws services
-// Params: service (query param), region (query param)
-func (h *HttpHandler) IngestAwsTables(ctx echo.Context) error {
+// IngestTables adds an ingestion job to receive pricing and store in the database
+// Params: provider (query param), service (query param), region (query param)
+func (h *HttpHandler) IngestTables(ctx echo.Context) error {
+	provider := ctx.QueryParam("provider")
 	service := ctx.QueryParam("service")
 	region := ctx.QueryParam("region")
-	ingester, err := aws.NewIngester(service, region)
+	lastId, err := h.scheduler.MakeJob(provider, service, region)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		ctx.JSON(http.StatusBadRequest, fmt.Errorf(err.Error()))
 	}
-	go func() {
-		fmt.Println("===================")
-		fmt.Println("Started ingesting prices for ", service, region)
-		err = ingester2.IngestPricing(ctx.Request().Context(), h.backend, ingester)
-		if err != nil {
-			fmt.Println("Error while ingesting  prices", err.Error())
-		}
-		fmt.Println("Completed ingesting prices for ", service, region)
-	}()
-
-	return ctx.JSON(http.StatusOK, "Tables successfully ingested")
+	job, err := h.scheduler.GetJobById(int32(lastId))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, fmt.Errorf(err.Error()))
+	}
+	return ctx.JSON(http.StatusOK, job)
 }
 
-// IngestAzureTables run the ingester to receive pricing and store in the database for azure services
-// Params: service (query param), region (query param)
-func (h *HttpHandler) IngestAzureTables(ctx echo.Context) error {
+// ListIngestionJobs returns list of ingestion jobs with the provided filters
+// Params: provider (query param), service (query param), region (query param), status (query param)
+func (h *HttpHandler) ListIngestionJobs(ctx echo.Context) error {
+	provider := ctx.QueryParam("provider")
+	status := ctx.QueryParam("status")
 	service := ctx.QueryParam("service")
-	region := ctx.QueryParam("region")
-	ingester, err := azurerm.NewIngester(service, region)
+	location := ctx.QueryParam("region")
+	jobs, err := h.scheduler.GetJobs(status, provider, service, location)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		return err
 	}
-	go func() {
-		fmt.Println("===================")
-		fmt.Println("Started ingesting prices for ", service, region)
-		err = ingester2.IngestPricing(context.Background(), h.backend, ingester)
-		if err != nil {
-			fmt.Println("Error while ingesting  prices", err.Error())
-		}
-		fmt.Println("Completed ingesting prices for ", service, region)
-	}()
+	return ctx.JSON(http.StatusOK, jobs)
+}
 
-	return ctx.JSON(http.StatusOK, "Tables successfully ingested")
+// GetIngestionJob returns an ingestion job with the provided id
+// Params: id (route param)
+func (h *HttpHandler) GetIngestionJob(ctx echo.Context) error {
+	idStr := ctx.Param("id")
+	id64, err := strconv.ParseInt(idStr, 10, 32)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, "invalid id")
+	}
+	id := int32(id64)
+	job, err := h.scheduler.GetJobById(id)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(http.StatusOK, *job)
 }
