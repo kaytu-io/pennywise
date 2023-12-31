@@ -17,6 +17,7 @@ require (
 	github.com/spf13/afero v1.11.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
+	github.com/terraform-linters/tflint-plugin-sdk v0.17.0
 	go.uber.org/zap v1.10.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/net v0.19.0
@@ -211,7 +212,6 @@ require (
 	github.com/sourcegraph/jsonrpc2 v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/terraform-linters/tflint v0.47.0 // indirect
-	github.com/terraform-linters/tflint-plugin-sdk v0.17.0 // indirect
 	github.com/terraform-linters/tflint-ruleset-terraform v0.4.0 // indirect
 	github.com/tidwall/gjson v1.17.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
