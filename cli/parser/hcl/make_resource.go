@@ -129,6 +129,15 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_kubernetes_cluster": {
 		Refs: []Reference{{RefValue: "resource_group_name", RefAttribute: "name"}},
 	},
+	"azurerm_function_app": {
+		Refs: []Reference{{RefValue: "app_service_plan_id", RefAttribute: "id"}, {RefValue: "service_plan_id", RefAttribute: "id"}},
+	},
+	"azurerm_linux_function_app": {
+		Refs: []Reference{{RefValue: "app_service_plan_id", RefAttribute: "id"}, {RefValue: "service_plan_id", RefAttribute: "id"}},
+	},
+	"azurerm_windows_function_app": {
+		Refs: []Reference{{RefValue: "app_service_plan_id", RefAttribute: "id"}, {RefValue: "service_plan_id", RefAttribute: "id"}},
+	},
 }
 
 type ResourceFunction func(Resource) (Resource, error)
