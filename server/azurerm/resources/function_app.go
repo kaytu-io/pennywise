@@ -2,9 +2,10 @@ package resources
 
 import (
 	"fmt"
-	"github.com/kaytu-io/infracost/external/resources/azure"
-	"github.com/kaytu-io/infracost/external/schema"
+	"github.com/kaytu-io/pennywise/server/internal/price"
+	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -40,8 +41,9 @@ type AppService struct {
 // functionAppValues is holds the values that we need to be able
 // to calculate the price of the FunctionApp
 type functionAppValues struct {
-	Location         string     `mapstructure:"location"`
-	AppServicePlanId AppService `mapstructure:"app_service_plan_id"`
+	Location         string       `mapstructure:"location"`
+	AppServicePlanId []AppService `mapstructure:"app_service_plan_id"`
+	ServicePlanId    []AppService `mapstructure:"service_plan_id"`
 
 	Usage struct {
 		MonthlyExecutions   *int64 `mapstructure:"monthly_executions"`
@@ -50,6 +52,20 @@ type functionAppValues struct {
 		Instances           *int64 `mapstructure:"instances"`
 	} `mapstructure:"pennywise_usage"`
 }
+
+var (
+	functionAppSkuMapCPU = map[string]int64{
+		"ep1": 1,
+		"ep2": 2,
+		"ep3": 4,
+	}
+
+	functionAppSkuMapMem = map[string]float64{
+		"ep1": 3.5,
+		"ep2": 7.0,
+		"ep3": 14.0,
+	}
+)
 
 // decodeFunctionAppValues decodes and returns functionAppValues from a Terraform values map.
 func decodeFunctionAppValues(tfVals map[string]interface{}) (functionAppValues, error) {
@@ -70,11 +86,23 @@ func decodeFunctionAppValues(tfVals map[string]interface{}) (functionAppValues, 
 	return v, nil
 }
 
-// newAppServiceCertificateBinding initializes a new AppServiceCertificateBinding from the provider
+// newFunctionApp initializes a new FunctionApp from the provider
 func (p *Provider) newFunctionApp(vals functionAppValues) *FunctionApp {
 	var appService AppService
+	if len(vals.AppServicePlanId) == 0 && len(vals.ServicePlanId) == 0 {
+		return &FunctionApp{
+			provider: p,
+
+			location: vals.Location,
+			tier:     "standard",
+		}
+	}
+	if len(vals.AppServicePlanId) > 0 {
+		appService = vals.AppServicePlanId[0]
+	} else {
+		appService = vals.ServicePlanId[0]
+	}
 	tier := "standard"
-	// support for the legacy azurerm_app_service_plan resource. This is only applicable for the legacy azurerm_function_app resource.
 	if len(appService.Values.Sku) > 0 {
 		skuTier := strings.ToLower(appService.Values.Sku[0].Tier)
 		skuSize := strings.ToLower(appService.Values.Sku[0].Size)
@@ -85,43 +113,66 @@ func (p *Provider) newFunctionApp(vals functionAppValues) *FunctionApp {
 		}
 
 		return &FunctionApp{
-			Address: d.Address,
-			Region:  region,
-			SKUName: skuSize,
-			Tier:    tier,
-			OSType:  kind,
+			provider: p,
+
+			location: vals.Location,
+			skuName:  skuSize,
+			tier:     tier,
+			osType:   kind,
 		}
 	}
 
-	skuName := data.Get("sku_name").String()
-	if strings.HasPrefix(strings.ToLower(skuName), "ep") {
+	skuSize := appService.Values.Sku[0].Size
+	if strings.HasPrefix(strings.ToLower(skuSize), "ep") {
 		tier = "premium"
 	}
 
-	instt := FunctionApp{
-		location: region,
-		skuName:  strings.ToLower(skuName),
+	inst := FunctionApp{
+		provider: p,
+
+		location: vals.Location,
+		skuName:  strings.ToLower(skuSize),
 		tier:     tier,
-		osType:   strings.ToLower(vals.),
+		osType:   strings.ToLower(appService.Values.Kind),
 
 		monthlyExecutions:   vals.Usage.MonthlyExecutions,
 		executionDurationMs: vals.Usage.ExecutionDurationMs,
 		memoryMb:            vals.Usage.MemoryMb,
 		instances:           vals.Usage.Instances,
 	}
-	return inst
+	return &inst
 }
 
 func (inst *FunctionApp) Components() []query.Component {
 	var components []query.Component
 
+	if inst.tier == "premium" {
+		cpu := inst.appFunctionPremiumCPUCostComponent()
+		if cpu != nil {
+			components = append(components, *cpu)
+		}
+
+		mem := inst.appFunctionPremiumMemoryCostComponent()
+		if mem != nil {
+			components = append(components, *mem)
+		}
+
+		return components
+	}
+
+	components = append(
+		components,
+		inst.appFunctionConsumptionExecutionTimeCostComponent(),
+		inst.appFunctionConsumptionExecutionsCostComponent(),
+	)
+
 	return components
 }
 
-func (r *FunctionApp) appFunctionPremiumCPUCostComponent() *schema.CostComponent {
+func (inst *FunctionApp) appFunctionPremiumCPUCostComponent() *query.Component {
 	var skuCPU *int64
 
-	if val, ok := functionAppSkuMapCPU[r.SKUName]; ok {
+	if val, ok := functionAppSkuMapCPU[inst.skuName]; ok {
 		skuCPU = &val
 	}
 
@@ -130,34 +181,35 @@ func (r *FunctionApp) appFunctionPremiumCPUCostComponent() *schema.CostComponent
 	}
 
 	instances := decimal.NewFromInt(1)
-	if r.Instances != nil {
-		instances = decimal.NewFromInt(*r.Instances)
+	if inst.instances != nil {
+		instances = decimal.NewFromInt(*inst.instances)
 	}
 
-	return &schema.CostComponent{
-		Name:           fmt.Sprintf("vCPU (%s)", strings.ToUpper(r.SKUName)),
+	return &query.Component{
+		Name:           fmt.Sprintf("vCPU (%s)", strings.ToUpper(inst.skuName)),
 		Unit:           "vCPU",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(instances.Mul(decimal.NewFromInt(*skuCPU))),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("Functions"),
-			ProductFamily: strPtr("Compute"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", ValueRegex: regexPtr("vCPU Duration$")},
+		HourlyQuantity: instances.Mul(decimal.NewFromInt(*skuCPU)),
+		ProductFilter: &product.Filter{
+			Provider: util.StringPtr(inst.provider.key),
+			Location: util.StringPtr(inst.location),
+			Service:  util.StringPtr("Functions"),
+			Family:   util.StringPtr("Compute"),
+			AttributeFilters: []*product.AttributeFilter{
+				{Key: "meter_name", ValueRegex: util.StringPtr("vCPU Duration$")},
 			},
 		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("Consumption"),
+		PriceFilter: &price.Filter{
+			AttributeFilters: []*price.AttributeFilter{
+				{Key: "type", Value: util.StringPtr("Consumption")},
+			},
 		},
 	}
 }
 
-func (r *FunctionApp) appFunctionPremiumMemoryCostComponent() *schema.CostComponent {
+func (inst *FunctionApp) appFunctionPremiumMemoryCostComponent() *query.Component {
 	var skuMemory *float64
 
-	if val, ok := functionAppSkuMapMem[r.SKUName]; ok {
+	if val, ok := functionAppSkuMapMem[inst.skuName]; ok {
 		skuMemory = &val
 	}
 
@@ -166,99 +218,102 @@ func (r *FunctionApp) appFunctionPremiumMemoryCostComponent() *schema.CostCompon
 	}
 
 	instances := decimal.NewFromInt(1)
-	if r.Instances != nil {
-		instances = decimal.NewFromInt(*r.Instances)
+	if inst.instances != nil {
+		instances = decimal.NewFromInt(*inst.instances)
 	}
 
-	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Memory (%s)", strings.ToUpper(r.SKUName)),
+	return &query.Component{
+		Name:           fmt.Sprintf("Memory (%s)", strings.ToUpper(inst.skuName)),
 		Unit:           "GB",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(instances.Mul(decimal.NewFromFloat(*skuMemory))),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("Functions"),
-			ProductFamily: strPtr("Compute"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", ValueRegex: regexPtr("Memory Duration$")},
+		HourlyQuantity: instances.Mul(decimal.NewFromFloat(*skuMemory)),
+		ProductFilter: &product.Filter{
+			Provider: util.StringPtr(inst.provider.key),
+			Location: util.StringPtr(inst.location),
+			Service:  util.StringPtr("Functions"),
+			Family:   util.StringPtr("Compute"),
+			AttributeFilters: []*product.AttributeFilter{
+				{Key: "meter_name", ValueRegex: util.StringPtr("Memory Duration$")},
 			},
 		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("Consumption"),
+		PriceFilter: &price.Filter{
+			AttributeFilters: []*price.AttributeFilter{
+				{Key: "type", Value: util.StringPtr("Consumption")},
+			},
 		},
 	}
 }
 
-func (r *FunctionApp) appFunctionConsumptionExecutionTimeCostComponent() *schema.CostComponent {
-	gbSeconds := r.calculateFunctionAppGBSeconds()
-	return &schema.CostComponent{
+func (inst *FunctionApp) appFunctionConsumptionExecutionTimeCostComponent() query.Component {
+	var quantity decimal.Decimal
+	gbSeconds := inst.calculateFunctionAppGBSeconds()
+	if gbSeconds == nil {
+		quantity = *gbSeconds
+	}
+	return query.Component{
 		Name:            "Execution time",
 		Unit:            "GB-seconds",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: gbSeconds,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("Functions"),
-			ProductFamily: strPtr("Compute"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", ValueRegex: regexPtr("Execution Time$")},
-				{Key: "skuName", Value: strPtr("Standard")},
+		MonthlyQuantity: quantity,
+		ProductFilter: &product.Filter{
+			Provider: util.StringPtr(inst.provider.key),
+			Location: util.StringPtr(inst.location),
+			Service:  util.StringPtr("Functions"),
+			Family:   util.StringPtr("Compute"),
+			AttributeFilters: []*product.AttributeFilter{
+				{Key: "meter_name", ValueRegex: util.StringPtr("Execution Time$")},
+				{Key: "sku_name", Value: util.StringPtr("Standard")},
 			},
 		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption:   strPtr("Consumption"),
-			StartUsageAmount: strPtr("400000"),
+		PriceFilter: &price.Filter{
+			AttributeFilters: []*price.AttributeFilter{
+				{Key: "type", Value: util.StringPtr("Consumption")},
+				{Key: "tier_minimum_units", Value: util.StringPtr("400000")},
+			},
 		},
 	}
 }
 
-func (r *FunctionApp) appFunctionConsumptionExecutionsCostComponent() *schema.CostComponent {
-	// Azure's pricing API returns prices per 10 executions so if the user has provided
-	// the number of executions, we should divide it by 10
-	var executions *decimal.Decimal
-	if r.MonthlyExecutions != nil {
-		executions = decimalPtr(decimal.NewFromInt(*r.MonthlyExecutions).Div(decimal.NewFromInt(10)))
+func (inst *FunctionApp) appFunctionConsumptionExecutionsCostComponent() query.Component {
+	var executions decimal.Decimal
+	if inst.monthlyExecutions != nil {
+		executions = decimal.NewFromInt(*inst.monthlyExecutions).Div(decimal.NewFromInt(10))
 	}
 
-	return &schema.CostComponent{
+	return query.Component{
 		Name:            "Executions",
 		Unit:            "1M requests",
-		UnitMultiplier:  decimal.NewFromInt(100000),
-		MonthlyQuantity: executions,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("Functions"),
-			ProductFamily: strPtr("Compute"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", ValueRegex: regexPtr("Total Executions$")},
-				{Key: "skuName", Value: strPtr("Standard")},
+		MonthlyQuantity: executions.Mul(decimal.NewFromInt(100000)),
+		ProductFilter: &product.Filter{
+			Provider: util.StringPtr(inst.provider.key),
+			Location: util.StringPtr(inst.location),
+			Service:  util.StringPtr("Functions"),
+			Family:   util.StringPtr("Compute"),
+			AttributeFilters: []*product.AttributeFilter{
+				{Key: "meterName", ValueRegex: util.StringPtr("Total Executions$")},
+				{Key: "skuName", Value: util.StringPtr("Standard")},
 			},
 		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption:   strPtr("Consumption"),
-			StartUsageAmount: strPtr("100000"),
+		PriceFilter: &price.Filter{
+			AttributeFilters: []*price.AttributeFilter{
+				{Key: "type", Value: util.StringPtr("Consumption")},
+				{Key: "tier_minimum_units", Value: util.StringPtr("100000")},
+			},
 		},
 	}
 }
 
-func (r *FunctionApp) calculateFunctionAppGBSeconds() *decimal.Decimal {
-	if r.MemoryMb == nil || r.ExecutionDurationMs == nil || r.MonthlyExecutions == nil {
+func (inst *FunctionApp) calculateFunctionAppGBSeconds() *decimal.Decimal {
+	if inst.memoryMb == nil || inst.executionDurationMs == nil || inst.monthlyExecutions == nil {
 		return nil
 	}
 
-	memorySize := decimal.NewFromInt(*r.MemoryMb)
-	averageRequestDuration := decimal.NewFromInt(*r.ExecutionDurationMs)
-	monthlyRequests := decimal.NewFromInt(*r.MonthlyExecutions)
+	memorySize := decimal.NewFromInt(*inst.memoryMb)
+	averageRequestDuration := decimal.NewFromInt(*inst.executionDurationMs)
+	monthlyRequests := decimal.NewFromInt(*inst.monthlyExecutions)
 
-	// Use a min of 128MB, and round-up to nearest 128MB
 	if memorySize.LessThan(decimal.NewFromInt(128)) {
 		memorySize = decimal.NewFromInt(128)
 	}
 	roundedMemory := memorySize.Div(decimal.NewFromInt(128)).Ceil().Mul(decimal.NewFromInt(128))
-	// Apply the minimum request duration
 	if averageRequestDuration.LessThan(decimal.NewFromInt(100)) {
 		averageRequestDuration = decimal.NewFromInt(100)
 	}

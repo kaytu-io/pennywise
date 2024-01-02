@@ -529,6 +529,24 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newApiManagement(vals).Components()
+	case "azurerm_function_app":
+		vals, err := decodeFunctionAppValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newFunctionApp(vals).Components()
+	case "azurerm_linux_function_app":
+		vals, err := decodeFunctionAppValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newFunctionApp(vals).Components()
+	case "azurerm_windows_function_app":
+		vals, err := decodeFunctionAppValues(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		return p.newFunctionApp(vals).Components()
 	default:
 		return nil
 	}
