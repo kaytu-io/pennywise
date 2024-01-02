@@ -35,6 +35,8 @@ type AppService struct {
 			Tier string `mapstructure:"tier"`
 			Size string `mapstructure:"size"`
 		} `mapstructure:"sku"`
+		SkuName string `mapstructure:"sku_name"`
+		OsType  string `mapstructure:"os_type"`
 	} `mapstructure:"values"`
 }
 
@@ -95,6 +97,11 @@ func (p *Provider) newFunctionApp(vals functionAppValues) *FunctionApp {
 
 			location: vals.Location,
 			tier:     "standard",
+
+			monthlyExecutions:   vals.Usage.MonthlyExecutions,
+			executionDurationMs: vals.Usage.ExecutionDurationMs,
+			memoryMb:            vals.Usage.MemoryMb,
+			instances:           vals.Usage.Instances,
 		}
 	}
 	if len(vals.AppServicePlanId) > 0 {
@@ -119,10 +126,15 @@ func (p *Provider) newFunctionApp(vals functionAppValues) *FunctionApp {
 			skuName:  skuSize,
 			tier:     tier,
 			osType:   kind,
+
+			monthlyExecutions:   vals.Usage.MonthlyExecutions,
+			executionDurationMs: vals.Usage.ExecutionDurationMs,
+			memoryMb:            vals.Usage.MemoryMb,
+			instances:           vals.Usage.Instances,
 		}
 	}
 
-	skuSize := appService.Values.Sku[0].Size
+	skuSize := appService.Values.SkuName
 	if strings.HasPrefix(strings.ToLower(skuSize), "ep") {
 		tier = "premium"
 	}
@@ -133,7 +145,7 @@ func (p *Provider) newFunctionApp(vals functionAppValues) *FunctionApp {
 		location: vals.Location,
 		skuName:  strings.ToLower(skuSize),
 		tier:     tier,
-		osType:   strings.ToLower(appService.Values.Kind),
+		osType:   strings.ToLower(appService.Values.OsType),
 
 		monthlyExecutions:   vals.Usage.MonthlyExecutions,
 		executionDurationMs: vals.Usage.ExecutionDurationMs,
@@ -246,7 +258,7 @@ func (inst *FunctionApp) appFunctionPremiumMemoryCostComponent() *query.Componen
 func (inst *FunctionApp) appFunctionConsumptionExecutionTimeCostComponent() query.Component {
 	var quantity decimal.Decimal
 	gbSeconds := inst.calculateFunctionAppGBSeconds()
-	if gbSeconds == nil {
+	if gbSeconds != nil {
 		quantity = *gbSeconds
 	}
 	return query.Component{
@@ -281,15 +293,15 @@ func (inst *FunctionApp) appFunctionConsumptionExecutionsCostComponent() query.C
 	return query.Component{
 		Name:            "Executions",
 		Unit:            "1M requests",
-		MonthlyQuantity: executions.Mul(decimal.NewFromInt(100000)),
+		MonthlyQuantity: executions,
 		ProductFilter: &product.Filter{
 			Provider: util.StringPtr(inst.provider.key),
 			Location: util.StringPtr(inst.location),
 			Service:  util.StringPtr("Functions"),
 			Family:   util.StringPtr("Compute"),
 			AttributeFilters: []*product.AttributeFilter{
-				{Key: "meterName", ValueRegex: util.StringPtr("Total Executions$")},
-				{Key: "skuName", Value: util.StringPtr("Standard")},
+				{Key: "meter_name", ValueRegex: util.StringPtr("Total Executions$")},
+				{Key: "sku_name", Value: util.StringPtr("Standard")},
 			},
 		},
 		PriceFilter: &price.Filter{

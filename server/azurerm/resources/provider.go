@@ -532,6 +532,7 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 	case "azurerm_function_app":
 		vals, err := decodeFunctionAppValues(tfRes.Values)
 		if err != nil {
+			fmt.Println("HEEEREEE", err.Error())
 			return nil
 		}
 		return p.newFunctionApp(vals).Components()
@@ -544,6 +545,7 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 	case "azurerm_windows_function_app":
 		vals, err := decodeFunctionAppValues(tfRes.Values)
 		if err != nil {
+
 			return nil
 		}
 		return p.newFunctionApp(vals).Components()

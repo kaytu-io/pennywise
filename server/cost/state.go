@@ -36,17 +36,17 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 				continue
 			}
 			if len(prods) < 1 {
-				//fmt.Println("====================")
-				//fmt.Println("No product", comp.Name)
-				//fmt.Println("location", *comp.ProductFilter.Location)
-				//for _, attr := range comp.ProductFilter.AttributeFilters {
-				//	if attr.Value != nil {
-				//		fmt.Println(attr.Key, fmt.Sprintf("'%s'", *attr.Value))
-				//	}
-				//	if attr.ValueRegex != nil {
-				//		fmt.Println(attr.Key, fmt.Sprintf("'%s'", *attr.ValueRegex))
-				//	}
-				//}
+				fmt.Println("====================")
+				fmt.Println("No product", comp.Name)
+				fmt.Println("location", *comp.ProductFilter.Location)
+				for _, attr := range comp.ProductFilter.AttributeFilters {
+					if attr.Value != nil {
+						fmt.Println(attr.Key, fmt.Sprintf("'%s'", *attr.Value))
+					}
+					if attr.ValueRegex != nil {
+						fmt.Println(attr.Key, fmt.Sprintf("'%s'", *attr.ValueRegex))
+					}
+				}
 				//state.addComponent(res.Address, comp.Name, Component{Error: ErrProductNotFound})
 				continue
 			}
@@ -60,10 +60,10 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 
 			component := Component{
 				Name:            comp.Name,
-				MonthlyQuantity: comp.MonthlyQuantity.Round(5),
-				HourlyQuantity:  comp.HourlyQuantity.Round(5),
+				MonthlyQuantity: comp.MonthlyQuantity.Round(9),
+				HourlyQuantity:  comp.HourlyQuantity.Round(9),
 				Unit:            comp.Unit,
-				Rate:            Cost{Decimal: prices[0].Value.Round(5), Currency: prices[0].Currency},
+				Rate:            Cost{Decimal: prices[0].Value.Round(9), Currency: prices[0].Currency},
 				Details:         comp.Details,
 				Usage:           comp.Usage,
 			}
