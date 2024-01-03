@@ -75,11 +75,11 @@ func (inst *ApiManagement) Components() []query.Component {
 	var tier string
 	var capacity decimal.Decimal
 	if s := strings.Split(inst.skuName, "_"); len(s) == 2 {
-		tier = strings.ToLower(s[0])
+		tier = s[0]
 		capacity, _ = decimal.NewFromString(s[1])
 	}
 
-	if tier != "consumption" {
+	if tier != "Consumption" {
 		components = append(components, inst.apiManagementCostComponent(
 			fmt.Sprintf("API management (%s)", tier),
 			"units",
@@ -127,8 +127,8 @@ func (inst *ApiManagement) apiManagementCostComponent(name, unit, tier string, q
 			Service:  util.StringPtr("API Management"),
 			Family:   util.StringPtr("Developer Tools"),
 			AttributeFilters: []*product.AttributeFilter{
-				{Key: "sku_name", ValueRegex: util.StringPtr(fmt.Sprintf("/^%s$/i", tier))},
-				{Key: "meter_name", ValueRegex: util.StringPtr(fmt.Sprintf("/^%s unit$/i", tier))},
+				{Key: "sku_name", ValueRegex: util.StringPtr(fmt.Sprintf("%s$", tier))},
+				{Key: "meter_name", ValueRegex: util.StringPtr(fmt.Sprintf("%s Unit$", tier))},
 			},
 		},
 		PriceFilter: &price.Filter{
@@ -150,7 +150,7 @@ func (inst *ApiManagement) consumptionAPICostComponent(tier string, quantity dec
 			Service:  util.StringPtr("API Management"),
 			Family:   util.StringPtr("Developer Tools"),
 			AttributeFilters: []*product.AttributeFilter{
-				{Key: "sku_name", ValueRegex: util.StringPtr(fmt.Sprintf("/^%s$/i", tier))},
+				{Key: "sku_name", ValueRegex: util.StringPtr(fmt.Sprintf("%s$", tier))},
 			},
 		},
 		PriceFilter: &price.Filter{

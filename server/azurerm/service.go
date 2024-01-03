@@ -34,5 +34,6 @@ var (
 		"Azure Kubernetes Service":      {},
 		"Functions":                     {},
 		"Azure App Service":             {},
+		"API Management":                {},
 	}
 )
