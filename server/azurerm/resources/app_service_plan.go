@@ -129,13 +129,13 @@ func servicePlanCostComponent(region, name, productName, skuRefactor string, cap
 		Unit:           "hours",
 		HourlyQuantity: decimal.NewFromInt(capacity),
 		ProductFilter: &product.Filter{
-			Provider: util.StringPtr("azure"),
+			Provider: util.StringPtr("azurerm"),
 			Location: util.StringPtr(region),
 			Service:  util.StringPtr("Azure App Service"),
 			Family:   util.StringPtr("Compute"),
 			AttributeFilters: append([]*product.AttributeFilter{
 				{Key: "product_name", Value: util.StringPtr("Azure App Service " + productName)},
-				{Key: "sku_name", ValueRegex: util.StringPtr(fmt.Sprintf("/%s$/i", skuRefactor))},
+				{Key: "sku_name", Value: util.StringPtr(skuRefactor)},
 			}, additionalAttributeFilters...),
 		},
 		PriceFilter: &price.Filter{
@@ -156,8 +156,12 @@ func getVersionedAppServicePlanSKU(skuName, os string) (string, string, []*produ
 	if version == "v1" {
 		version = ""
 	}
-
-	formattedSku := strings.TrimSpace(skuName[:2] + " ?" + version)
+	var formattedSku string
+	if strings.Contains(strings.ToLower(version), "m") || strings.Contains(strings.ToLower(skuName[:2]), "0") {
+		formattedSku = strings.TrimSpace(skuName[:2] + version)
+	} else {
+		formattedSku = strings.TrimSpace(skuName[:2] + " " + version)
+	}
 
 	productVersion := version
 	if len(version) > 0 && version[0] == 'm' {
@@ -165,14 +169,14 @@ func getVersionedAppServicePlanSKU(skuName, os string) (string, string, []*produ
 	}
 	productName := strings.ReplaceAll(tier+" "+productVersion+" Plan", "  ", " ")
 
-	if productVersion == "v3" && os == "linux" {
-		return formattedSku, productName, []*product.AttributeFilter{
-			{
-				Key:        "armSkuName",
-				ValueRegex: util.StringPtr(fmt.Sprintf("/%s$/i", strings.ReplaceAll(formattedSku, " ", "_"))),
-			},
-		}
-	}
+	//if productVersion == "v3" && os == "linux" {
+	//	return formattedSku, productName, []*product.AttributeFilter{
+	//		{
+	//			Key:        "arm_sku_name",
+	//			ValueRegex: util.StringPtr(fmt.Sprintf("%s$", strings.ToLower(strings.ReplaceAll(formattedSku, " ", "_")))),
+	//		},
+	//	}
+	//}
 
 	return formattedSku, productName, nil
 }

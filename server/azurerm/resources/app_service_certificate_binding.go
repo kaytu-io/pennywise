@@ -29,7 +29,7 @@ type BindingCertificateId struct {
 // to calculate the price of the AppServiceCertificateBinding
 type appServiceCertificateBindingValues struct {
 	CertificateId BindingCertificateId `mapstructure:"certificate_id"`
-	SSLState      string               `mapstructure:"product_type"`
+	SSLState      string               `mapstructure:"ssl_state"`
 }
 
 // decodeAppServiceCertificateBindingValues decodes and returns appServiceCertificateBindingValues from a Terraform values map.
@@ -64,7 +64,6 @@ func (p *Provider) newAppServiceCertificateBinding(vals appServiceCertificateBin
 
 func (inst *AppServiceCertificateBinding) Components() []query.Component {
 	var components []query.Component
-
 	sslState := strings.ToUpper(inst.sslState)
 
 	if !strings.HasPrefix(sslState, "IP") {
@@ -72,7 +71,6 @@ func (inst *AppServiceCertificateBinding) Components() []query.Component {
 	}
 
 	components = append(components, inst.AppServiceIpSslCertificateComponent())
-
 	return components
 }
 

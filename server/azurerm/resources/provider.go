@@ -517,12 +517,12 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 			return nil
 		}
 		return p.newAppServicePlan(vals).Components()
-	case "azurerm_service_planapi_man":
-		vals, err := decodeAppServicePlanValues(tfRes.Values)
+	case "azurerm_service_plan":
+		vals, err := decodeServicePlanValues(tfRes.Values)
 		if err != nil {
 			return nil
 		}
-		return p.newAppServicePlan(vals).Components()
+		return p.newServicePlan(vals).Components()
 	case "azurerm_api_management":
 		vals, err := decodeApiManagementValues(tfRes.Values)
 		if err != nil {

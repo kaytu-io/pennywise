@@ -8,7 +8,7 @@ import (
 // to calculate the price of the AppServiceCustomHostnameBinding
 type appServiceCustomHostnameBindingValues struct {
 	ResourceGroupName *ResourceGroupName `mapstructure:"resource_group_name"`
-	SSLState          string             `mapstructure:"product_type"`
+	SSLState          string             `mapstructure:"ssl_state"`
 }
 
 // decodeAppServiceCustomHostnameBindingValues decodes and returns appServiceCustomHostnameBindingValues from a Terraform values map.

@@ -52,6 +52,9 @@ func (p *Provider) newAppServiceCertificateOrder(vals appServiceCertificateOrder
 	if vals.ProductType != nil {
 		productType = *vals.ProductType
 	}
+	if strings.ToLower(productType) == "wildcard" {
+		productType = "Wildcard"
+	}
 
 	inst := &AppServiceCertificateOrder{
 		provider: p,
