@@ -138,6 +138,15 @@ var makeResourceProcesses = map[string]MakeResourceProcess{
 	"azurerm_windows_function_app": {
 		Refs: []Reference{{RefValue: "app_service_plan_id", RefAttribute: "id"}, {RefValue: "service_plan_id", RefAttribute: "id"}},
 	},
+	"azurerm_app_service_environment": {
+		Refs: []Reference{{RefValue: "resource_group_name", RefAttribute: "name"}},
+	},
+	"azurerm_app_service_custom_hostname_binding": {
+		Refs: []Reference{{RefValue: "resource_group_name", RefAttribute: "name"}},
+	},
+	"azurerm_app_service_certificate_binding": {
+		Refs: []Reference{{RefValue: "certificate_id", RefAttribute: "id"}},
+	},
 }
 
 type ResourceFunction func(Resource) (Resource, error)
