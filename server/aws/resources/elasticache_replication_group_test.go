@@ -11,7 +11,6 @@ import (
 
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 )
 
@@ -24,7 +23,7 @@ func TestElastiCacheReplication_Components(t *testing.T) {
 
 	//1 group 1 node
 	t.Run("RedisEngineDefault", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_elasticache_replication_group.test",
 			Type:         "aws_elasticache_replication_group",
 			Name:         "test",
@@ -35,9 +34,9 @@ func TestElastiCacheReplication_Components(t *testing.T) {
 				"availability_zones": []string{"eu-west-1a", "eu-west-1b"},
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Cache instance",
 				HourlyQuantity: decimal.NewFromInt(1),
@@ -66,7 +65,7 @@ func TestElastiCacheReplication_Components(t *testing.T) {
 	})
 
 	t.Run("RedisEngineGlobalReplicationGroupID", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_elasticache_replication_group.test",
 			Type:         "aws_elasticache_replication_group",
 			Name:         "test",
@@ -77,16 +76,16 @@ func TestElastiCacheReplication_Components(t *testing.T) {
 				"global_replication_group_id": "global-replication-group-1",
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{}
+		expected := []resource.Component{}
 
 		actual := p.ResourceComponents(rss, tfres)
 		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("RedisSnapShotRetentionLimit", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_elasticache_replication_group.test",
 			Type:         "aws_elasticache_replication_group",
 			Name:         "test",
@@ -98,9 +97,9 @@ func TestElastiCacheReplication_Components(t *testing.T) {
 				"snapshot_retention_limit": 5,
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Cache instance",
 				HourlyQuantity: decimal.NewFromInt(1),
@@ -146,7 +145,7 @@ func TestElastiCacheReplication_Components(t *testing.T) {
 	})
 
 	t.Run("RedisEngineNumCacheNodes", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_elasticache_replication_group.test",
 			Type:         "aws_elasticache_replication_group",
 			Name:         "test",
@@ -157,9 +156,9 @@ func TestElastiCacheReplication_Components(t *testing.T) {
 				"num_cache_clusters": 2,
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Cache instance",
 				HourlyQuantity: decimal.NewFromInt(2),
@@ -188,7 +187,7 @@ func TestElastiCacheReplication_Components(t *testing.T) {
 	})
 
 	t.Run("RedisEngineClusterMode", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_elasticache_replication_group.test",
 			Type:         "aws_elasticache_replication_group",
 			Name:         "test",
@@ -204,9 +203,9 @@ func TestElastiCacheReplication_Components(t *testing.T) {
 				},
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Cache instance",
 				HourlyQuantity: decimal.NewFromInt(8),

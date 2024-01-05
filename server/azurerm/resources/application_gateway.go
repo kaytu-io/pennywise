@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/tier_request"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -85,8 +85,8 @@ func (p *Provider) newApplicationGateway(vals applicationGatewayValues) *Applica
 	return inst
 }
 
-func (inst *ApplicationGateway) Components() []query.Component {
-	var components []query.Component
+func (inst *ApplicationGateway) Components() []resource.Component {
+	var components []resource.Component
 
 	var sku, tier string
 	tierLimits := []int{10240, 30720}
@@ -165,8 +165,8 @@ func (inst *ApplicationGateway) Components() []query.Component {
 	return components
 }
 
-func (inst *ApplicationGateway) gatewayCostComponent(name, tier, sku string, capacityUnits int64) query.Component {
-	return query.Component{
+func (inst *ApplicationGateway) gatewayCostComponent(name, tier, sku string, capacityUnits int64) resource.Component {
+	return resource.Component{
 		Name:           name,
 		Unit:           "hours",
 		HourlyQuantity: decimal.NewFromInt(capacityUnits),
@@ -188,8 +188,8 @@ func (inst *ApplicationGateway) gatewayCostComponent(name, tier, sku string, cap
 	}
 }
 
-func (inst *ApplicationGateway) dataProcessingCostComponent(name, sku, startUsage string, qty decimal.Decimal) query.Component {
-	return query.Component{
+func (inst *ApplicationGateway) dataProcessingCostComponent(name, sku, startUsage string, qty decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            "GB",
 		MonthlyQuantity: qty,
@@ -211,8 +211,8 @@ func (inst *ApplicationGateway) dataProcessingCostComponent(name, sku, startUsag
 	}
 }
 
-func (inst *ApplicationGateway) capacityUnitsCostComponent(name, tier string, capacityUnits int64) query.Component {
-	return query.Component{
+func (inst *ApplicationGateway) capacityUnitsCostComponent(name, tier string, capacityUnits int64) resource.Component {
+	return resource.Component{
 		Name:           fmt.Sprintf("V2 capacity units (%s)", name),
 		Unit:           "CU",
 		HourlyQuantity: decimal.NewFromInt(capacityUnits),
@@ -235,8 +235,8 @@ func (inst *ApplicationGateway) capacityUnitsCostComponent(name, tier string, ca
 	}
 }
 
-func (inst *ApplicationGateway) fixedForV2CostComponent(name, tier string) query.Component {
-	return query.Component{
+func (inst *ApplicationGateway) fixedForV2CostComponent(name, tier string) resource.Component {
+	return resource.Component{
 		Name:           name,
 		Unit:           "hours",
 		HourlyQuantity: decimal.NewFromInt(1),

@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
@@ -63,28 +63,28 @@ func (p *Provider) newElasticIP(vals elasticIPValues) *ElasticIP {
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *ElasticIP) Components() []query.Component {
+func (inst *ElasticIP) Components() []resource.Component {
 	// An Elastic IP address doesn’t incur charges as long as all the following conditions are true:
 	// * The Elastic IP address is associated with an EC2 instance.
 	// * The instance associated with the Elastic IP address is running.
 	// * The instance has only one Elastic IP address attached to it.
 	// * The Elastic IP address is associated with an attached network interface
 	if len(inst.customerOwnedIpv4Pool) > 0 || len(inst.instance) > 0 || len(inst.networkInterface) > 0 {
-		return []query.Component{}
+		return []resource.Component{}
 	}
 
-	components := []query.Component{inst.elasticIPInstanceComponent()}
+	components := []resource.Component{inst.elasticIPInstanceComponent()}
 	resources.GetCostComponentNamesAndSetLogger(components, inst.logger)
 	return components
 }
 
-func (inst *ElasticIP) elasticIPInstanceComponent() query.Component {
+func (inst *ElasticIP) elasticIPInstanceComponent() resource.Component {
 
 	attrFilters := []*product.AttributeFilter{
 		{Key: "Group", Value: util.StringPtr("ElasticIP:IdleAddress")},
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:           "Elastic IP",
 		Details:        []string{"ElasticIP:IdleAddress"},
 		HourlyQuantity: decimal.NewFromInt(1),

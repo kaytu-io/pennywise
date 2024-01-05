@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -112,8 +112,8 @@ func (p *Provider) newStorageShare(vals storageShareValues) *StorageShare {
 	return inst
 }
 
-func (inst *StorageShare) Components() []query.Component {
-	var components []query.Component
+func (inst *StorageShare) Components() []resource.Component {
+	var components []resource.Component
 
 	if inst.accountKind != nil {
 		accountKind := *inst.accountKind
@@ -152,7 +152,7 @@ func (inst *StorageShare) accessTier() string {
 	}[strings.ToLower(inst.accessTierString)]
 }
 
-func (inst *StorageShare) dataStorageCostComponent() query.Component {
+func (inst *StorageShare) dataStorageCostComponent() resource.Component {
 	var qty decimal.Decimal
 
 	if inst.accessTier() == "Premium" {
@@ -169,7 +169,7 @@ func (inst *StorageShare) dataStorageCostComponent() query.Component {
 		meterName = "Provisioned"
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            "Data at rest",
 		Unit:            "GB",
 		MonthlyQuantity: qty,
@@ -193,7 +193,7 @@ func (inst *StorageShare) dataStorageCostComponent() query.Component {
 	}
 }
 
-func (inst *StorageShare) snapshotCostComponents() query.Component {
+func (inst *StorageShare) snapshotCostComponents() resource.Component {
 	var qty decimal.Decimal
 	if inst.snapshotsStorageGB != nil {
 		qty = decimal.NewFromInt(*inst.snapshotsStorageGB)
@@ -205,7 +205,7 @@ func (inst *StorageShare) snapshotCostComponents() query.Component {
 		meterName = "Snapshots"
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            "Snapshots",
 		Unit:            "GB",
 		MonthlyQuantity: qty,
@@ -229,9 +229,9 @@ func (inst *StorageShare) snapshotCostComponents() query.Component {
 	}
 }
 
-func (inst *StorageShare) metadataCostComponents() []query.Component {
+func (inst *StorageShare) metadataCostComponents() []resource.Component {
 	if contains([]string{"Premium", "Standard"}, inst.accessTier()) {
-		return []query.Component{}
+		return []resource.Component{}
 	}
 
 	var qty decimal.Decimal
@@ -241,7 +241,7 @@ func (inst *StorageShare) metadataCostComponents() []query.Component {
 
 	skuName := fmt.Sprintf("%s %s", inst.accessTier(), strings.ToUpper(inst.accountReplicationType))
 
-	return []query.Component{{
+	return []resource.Component{{
 		Name:            "Metadata at rest",
 		Unit:            "GB",
 		MonthlyQuantity: qty,
@@ -265,9 +265,9 @@ func (inst *StorageShare) metadataCostComponents() []query.Component {
 	}}
 }
 
-func (inst *StorageShare) readOperationsCostComponents() []query.Component {
+func (inst *StorageShare) readOperationsCostComponents() []resource.Component {
 	if inst.accessTier() == "Premium" {
-		return []query.Component{}
+		return []resource.Component{}
 	}
 
 	var qty decimal.Decimal
@@ -277,7 +277,7 @@ func (inst *StorageShare) readOperationsCostComponents() []query.Component {
 
 	skuName := fmt.Sprintf("%s %s", inst.accessTier(), strings.ToUpper(inst.accountReplicationType))
 
-	return []query.Component{{
+	return []resource.Component{{
 		Name:            "Read operations",
 		Unit:            "10k operations",
 		MonthlyQuantity: qty,
@@ -301,9 +301,9 @@ func (inst *StorageShare) readOperationsCostComponents() []query.Component {
 	}}
 }
 
-func (inst *StorageShare) writeOperationsCostComponents() []query.Component {
+func (inst *StorageShare) writeOperationsCostComponents() []resource.Component {
 	if inst.accessTier() == "Premium" {
-		return []query.Component{}
+		return []resource.Component{}
 	}
 
 	var qty decimal.Decimal
@@ -313,7 +313,7 @@ func (inst *StorageShare) writeOperationsCostComponents() []query.Component {
 
 	skuName := fmt.Sprintf("%s %s", inst.accessTier(), strings.ToUpper(inst.accountReplicationType))
 
-	return []query.Component{{
+	return []resource.Component{{
 		Name:            "Write operations",
 		Unit:            "10k operations",
 		MonthlyQuantity: qty,
@@ -337,9 +337,9 @@ func (inst *StorageShare) writeOperationsCostComponents() []query.Component {
 	}}
 }
 
-func (inst *StorageShare) listOperationsCostComponents() []query.Component {
+func (inst *StorageShare) listOperationsCostComponents() []resource.Component {
 	if inst.accessTier() == "Premium" {
-		return []query.Component{}
+		return []resource.Component{}
 	}
 
 	var qty decimal.Decimal
@@ -349,7 +349,7 @@ func (inst *StorageShare) listOperationsCostComponents() []query.Component {
 
 	skuName := fmt.Sprintf("%s %s", inst.accessTier(), strings.ToUpper(inst.accountReplicationType))
 
-	return []query.Component{{
+	return []resource.Component{{
 		Name:            "List operations",
 		Unit:            "10k operations",
 		MonthlyQuantity: qty,
@@ -373,9 +373,9 @@ func (inst *StorageShare) listOperationsCostComponents() []query.Component {
 	}}
 }
 
-func (inst *StorageShare) otherOperationsCostComponents() []query.Component {
+func (inst *StorageShare) otherOperationsCostComponents() []resource.Component {
 	if inst.accessTier() == "Premium" {
-		return []query.Component{}
+		return []resource.Component{}
 	}
 
 	var qty decimal.Decimal
@@ -389,7 +389,7 @@ func (inst *StorageShare) otherOperationsCostComponents() []query.Component {
 		meterName = "Protocol Operations"
 	}
 
-	return []query.Component{
+	return []resource.Component{
 		{
 			Name:            "Other operations",
 			Unit:            "10k operations",
@@ -414,9 +414,9 @@ func (inst *StorageShare) otherOperationsCostComponents() []query.Component {
 		}}
 }
 
-func (inst *StorageShare) dataRetrievalCostComponents() []query.Component {
+func (inst *StorageShare) dataRetrievalCostComponents() []resource.Component {
 	if contains([]string{"Premium", "Standard", "Hot"}, inst.accessTier()) || strings.ToUpper(inst.accountReplicationType) == "GZRS" {
-		return []query.Component{}
+		return []resource.Component{}
 	}
 
 	var qty decimal.Decimal
@@ -426,7 +426,7 @@ func (inst *StorageShare) dataRetrievalCostComponents() []query.Component {
 
 	skuName := fmt.Sprintf("%s %s", inst.accessTier(), strings.ToUpper(inst.accountReplicationType))
 
-	return []query.Component{
+	return []resource.Component{
 		{
 			Name:            "Data retrieval",
 			Unit:            "GB",

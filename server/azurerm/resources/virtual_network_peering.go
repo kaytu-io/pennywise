@@ -3,8 +3,8 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -81,10 +81,10 @@ func (p *Provider) newVirtualNetworkPeering(vals virtualNetworkPeeringValues) *V
 	return inst
 }
 
-func (inst *VirtualNetworkPeering) Components() []query.Component {
+func (inst *VirtualNetworkPeering) Components() []resource.Component {
 	firstQuery := inst.egressDataProcessedCostComponent(inst.provider.key)
 	secondQuery := inst.ingressDataProcessedCostComponent(inst.provider.key)
-	components := []query.Component{
+	components := []resource.Component{
 		firstQuery,
 		secondQuery,
 	}
@@ -93,9 +93,9 @@ func (inst *VirtualNetworkPeering) Components() []query.Component {
 	return components
 }
 
-func (inst *VirtualNetworkPeering) egressDataProcessedCostComponent(key string) query.Component {
+func (inst *VirtualNetworkPeering) egressDataProcessedCostComponent(key string) resource.Component {
 	if inst.sourceLocation == inst.destinationLocation {
-		return query.Component{
+		return resource.Component{
 			Name:            "Outbound data transfer",
 			Unit:            "GB",
 			MonthlyQuantity: inst.monthlyDataTransferGB,
@@ -116,7 +116,7 @@ func (inst *VirtualNetworkPeering) egressDataProcessedCostComponent(key string) 
 		}
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            "Outbound data transfer",
 		Unit:            "GB",
 		MonthlyQuantity: inst.monthlyDataTransferGB,
@@ -138,9 +138,9 @@ func (inst *VirtualNetworkPeering) egressDataProcessedCostComponent(key string) 
 	}
 }
 
-func (inst *VirtualNetworkPeering) ingressDataProcessedCostComponent(key string) query.Component {
+func (inst *VirtualNetworkPeering) ingressDataProcessedCostComponent(key string) resource.Component {
 	if inst.sourceLocation == inst.destinationLocation {
-		return query.Component{
+		return resource.Component{
 			Name:            "Inbound data transfer",
 			Unit:            "GB",
 			MonthlyQuantity: inst.monthlyDataTransferGB,
@@ -161,7 +161,7 @@ func (inst *VirtualNetworkPeering) ingressDataProcessedCostComponent(key string)
 		}
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            "Inbound data transfer",
 		Unit:            "GB",
 		MonthlyQuantity: inst.monthlyDataTransferGB,

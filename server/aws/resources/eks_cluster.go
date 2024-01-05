@@ -5,8 +5,8 @@ import (
 	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"go.uber.org/zap"
 	"strings"
 
@@ -64,14 +64,14 @@ func (p *Provider) newEKSCluster(vals eKSClusterValues) *EKSCluster {
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *EKSCluster) Components() []query.Component {
-	components := []query.Component{inst.eKSClusterInstanceComponent()}
+func (inst *EKSCluster) Components() []resource.Component {
+	components := []resource.Component{inst.eKSClusterInstanceComponent()}
 
 	resources.GetCostComponentNamesAndSetLogger(components, inst.logger)
 	return components
 }
 
-func (inst *EKSCluster) eKSClusterInstanceComponent() query.Component {
+func (inst *EKSCluster) eKSClusterInstanceComponent() resource.Component {
 
 	// EU-AmazonEKS-Hours:perCluster
 	// Get us-east-1
@@ -86,7 +86,7 @@ func (inst *EKSCluster) eKSClusterInstanceComponent() query.Component {
 		region = fmt.Sprintf("%s%s%s", strings.ToUpper(splitedRegion[0]), strings.ToUpper(splitedRegion[1][0:1]), splitedRegion[2])
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:           "EKS Cluster",
 		Details:        []string{"EKSCluster:Compute"},
 		HourlyQuantity: decimal.NewFromInt(1),

@@ -3,8 +3,8 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -46,7 +46,7 @@ func decoderRMDNSZone(tfVals map[string]interface{}) (RMDNSZoneValue, error) {
 	return v, nil
 }
 
-func (inst *RMDNSZone) component() []query.Component {
+func (inst *RMDNSZone) component() []resource.Component {
 	region := getLocationName(inst.location)
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
@@ -59,15 +59,15 @@ func (inst *RMDNSZone) component() []query.Component {
 		region = "Zone 1"
 	}
 
-	costComponents := make([]query.Component, 0)
+	costComponents := make([]resource.Component, 0)
 	costComponents = append(costComponents, hostedPublicZoneCostComponent(inst.provider.key, region))
 	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 
 	return costComponents
 }
 
-func hostedPublicZoneCostComponent(key string, region string) query.Component {
-	return query.Component{
+func hostedPublicZoneCostComponent(key string, region string) resource.Component {
+	return resource.Component{
 		Name:            "Hosted zone",
 		Unit:            "months",
 		MonthlyQuantity: decimal.NewFromInt(1),

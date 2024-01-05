@@ -4,8 +4,8 @@ import (
 	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"go.uber.org/zap"
 	"strings"
 
@@ -129,8 +129,8 @@ func (p *Provider) newDBInstance(vals dbInstanceValues) *DBInstance {
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *DBInstance) Components() []query.Component {
-	components := []query.Component{inst.databaseInstanceComponent(), inst.storageComponent()}
+func (inst *DBInstance) Components() []resource.Component {
+	components := []resource.Component{inst.databaseInstanceComponent(), inst.storageComponent()}
 
 	if strings.HasPrefix(inst.storageType, "io") {
 		components = append(components, inst.iopsComponent())
@@ -140,7 +140,7 @@ func (inst *DBInstance) Components() []query.Component {
 	return components
 }
 
-func (inst *DBInstance) databaseInstanceComponent() query.Component {
+func (inst *DBInstance) databaseInstanceComponent() resource.Component {
 	instClass := inst.instanceType
 	attrFilters := []*product.AttributeFilter{
 		{Key: "InstanceType", Value: util.StringPtr(inst.instanceType)},
@@ -158,7 +158,7 @@ func (inst *DBInstance) databaseInstanceComponent() query.Component {
 		attrFilters = append(attrFilters, f)
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:           "Database instance",
 		Details:        []string{inst.deploymentOption, instClass},
 		HourlyQuantity: decimal.NewFromInt(1),
@@ -178,7 +178,7 @@ func (inst *DBInstance) databaseInstanceComponent() query.Component {
 	}
 }
 
-func (inst *DBInstance) storageComponent() query.Component {
+func (inst *DBInstance) storageComponent() resource.Component {
 	var volumeType string
 	switch inst.storageType {
 	case "standard":
@@ -189,7 +189,7 @@ func (inst *DBInstance) storageComponent() query.Component {
 		volumeType = "General Purpose"
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            "Database storage",
 		Details:         []string{volumeType},
 		MonthlyQuantity: inst.allocatedStorage,
@@ -207,8 +207,8 @@ func (inst *DBInstance) storageComponent() query.Component {
 	}
 }
 
-func (inst *DBInstance) iopsComponent() query.Component {
-	return query.Component{
+func (inst *DBInstance) iopsComponent() resource.Component {
+	return resource.Component{
 		Name:            "Database IOPS",
 		MonthlyQuantity: inst.storageIOPS,
 		Unit:            "IOPS",

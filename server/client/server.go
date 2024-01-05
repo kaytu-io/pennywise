@@ -19,7 +19,7 @@ type EchoError struct {
 }
 
 type OnboardServiceClient interface {
-	GetResourceCost(req resource.Resource) (*cost.Cost, error)
+	GetResourceCost(req resource.ResourceDef) (*cost.Cost, error)
 	GetStateCost(req resource.State) (*cost.Cost, error)
 	Ingest(provider, service, region string) error
 }
@@ -75,7 +75,7 @@ func (s *serverClient) Ingest(provider, service, region string) (*ingester.Inges
 	return &job, nil
 }
 
-func (s *serverClient) GetResourceCost(req resource.Resource) (*cost.State, error) {
+func (s *serverClient) GetResourceCost(req resource.ResourceDef) (*cost.State, error) {
 	url := fmt.Sprintf("%s/api/v1/cost/resource", s.baseURL)
 
 	payload, err := json.Marshal(req)

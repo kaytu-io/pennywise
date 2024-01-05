@@ -3,9 +3,9 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/tier_request"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -60,19 +60,19 @@ func (p *Provider) newDNSARecord(vals dnsARecordValues) *DNSARecord {
 	return inst
 }
 
-func (inst *DNSARecord) component() []query.Component {
+func (inst *DNSARecord) component() []resource.Component {
 	region := getLocationName(inst.location)
 	costComponents := DNSQueriesCostComponent(inst.provider.key, region, inst.monthlyQueries)
 	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 	return costComponents
 }
 
-func DNSQueriesCostComponent(key, region string, monthlyQueries *int64) []query.Component {
+func DNSQueriesCostComponent(key, region string, monthlyQueries *int64) []resource.Component {
 	region = getLocationName(region)
 
 	var monthlyQueriesDec decimal.Decimal
 	var requestQuantities []decimal.Decimal
-	var costComponents []query.Component
+	var costComponents []resource.Component
 	requests := []int{1000000000}
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
 		region = "US Gov Zone 1"
@@ -105,8 +105,8 @@ func DNSQueriesCostComponent(key, region string, monthlyQueries *int64) []query.
 	return costComponents
 }
 
-func dnsQueriesFirstCostComponent(key, region, name, startUsage string, monthlyQueries *decimal.Decimal) query.Component {
-	return query.Component{
+func dnsQueriesFirstCostComponent(key, region, name, startUsage string, monthlyQueries *decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            "1M queries",
 		MonthlyQuantity: *monthlyQueries,

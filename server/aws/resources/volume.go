@@ -3,8 +3,8 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
@@ -81,8 +81,8 @@ func (p *Provider) newVolume(vals volumeValues) *Volume {
 }
 
 // Components returns the price component queries that make up the Volume.
-func (v *Volume) Components() []query.Component {
-	comps := []query.Component{v.storageComponent()}
+func (v *Volume) Components() []resource.Component {
+	comps := []resource.Component{v.storageComponent()}
 
 	if v.volumeType == "io1" || v.volumeType == "io2" {
 		comps = append(comps, v.iopsComponent())
@@ -92,8 +92,8 @@ func (v *Volume) Components() []query.Component {
 	return comps
 }
 
-func (v *Volume) storageComponent() query.Component {
-	return query.Component{
+func (v *Volume) storageComponent() resource.Component {
+	return resource.Component{
 		Name:            "Storage",
 		MonthlyQuantity: v.size,
 		Unit:            "GB",
@@ -110,8 +110,8 @@ func (v *Volume) storageComponent() query.Component {
 	}
 }
 
-func (v *Volume) iopsComponent() query.Component {
-	return query.Component{
+func (v *Volume) iopsComponent() resource.Component {
+	return resource.Component{
 		Name:            "Provisioned IOPS",
 		MonthlyQuantity: v.iops,
 		Unit:            "IOPS",

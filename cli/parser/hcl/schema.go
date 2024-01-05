@@ -13,18 +13,18 @@ type Resource struct {
 	Values  map[string]interface{} `mapstructure:"values"`
 }
 
-func (r Resource) ToResource(provider string, defaultRegion *string) resource.Resource {
+func (r Resource) ToResource(provider resource.ProviderName, defaultRegion *string) resource.ResourceDef {
 	region := ""
 	if defaultRegion != nil {
 		region = *defaultRegion
 	}
 	for key, value := range r.Values {
-		if provider == "azurerm" && key == "location" {
+		if provider == resource.AzureProvider && key == "location" {
 			region = azurerm.GetRegionCode(value.(string))
 			break
 		}
 	}
-	return resource.Resource{
+	return resource.ResourceDef{
 		Address:      r.Address,
 		Type:         r.Type,
 		Name:         r.Name,
@@ -35,11 +35,11 @@ func (r Resource) ToResource(provider string, defaultRegion *string) resource.Re
 }
 
 type ProviderConfig struct {
-	Name string `json:"name"`
+	Name resource.ProviderName `json:"name"`
 }
 
 type Config struct {
-	ProviderConfig map[string]ProviderConfig `json:"provider_config"`
+	ProviderConfig map[resource.ProviderName]ProviderConfig `json:"provider_config"`
 }
 
 type Project struct {

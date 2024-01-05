@@ -11,7 +11,6 @@ import (
 
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 )
 
@@ -23,7 +22,7 @@ func TestDBInstance_Components(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("DefaultValues", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_db_instance.test",
 			Type:         "aws_db_instance",
 			Name:         "test",
@@ -34,9 +33,9 @@ func TestDBInstance_Components(t *testing.T) {
 				"engine":            "postgres",
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Database instance",
 				HourlyQuantity: decimal.NewFromInt(1),
@@ -82,7 +81,7 @@ func TestDBInstance_Components(t *testing.T) {
 	})
 
 	t.Run("IoStorageType", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_db_instance.test",
 			Type:         "aws_db_instance",
 			Name:         "test",
@@ -95,9 +94,9 @@ func TestDBInstance_Components(t *testing.T) {
 				"engine":            "postgres",
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Database instance",
 				HourlyQuantity: decimal.NewFromInt(1),
@@ -157,7 +156,7 @@ func TestDBInstance_Components(t *testing.T) {
 	})
 
 	t.Run("WithLicenseModelMultiAZ", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_db_instance.test",
 			Type:         "aws_db_instance",
 			Name:         "test",
@@ -170,9 +169,9 @@ func TestDBInstance_Components(t *testing.T) {
 				"multi_az":          true,
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Database instance",
 				HourlyQuantity: decimal.NewFromInt(1),

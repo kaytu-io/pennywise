@@ -4,8 +4,8 @@ import (
 	"github.com/kaytu-io/infracost/external/usage"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"golang.org/x/text/cases"
@@ -93,8 +93,8 @@ func (p *Provider) newKeyVaultKey(vals keyVaultKeyValues) *KeyVaultKey {
 	return inst
 }
 
-func (inst *KeyVaultKey) Components() []query.Component {
-	var components []query.Component
+func (inst *KeyVaultKey) Components() []resource.Component {
+	var components []resource.Component
 
 	var keySize string
 	if inst.keySize != nil {
@@ -176,14 +176,14 @@ func (inst *KeyVaultKey) Components() []query.Component {
 	return components
 }
 
-func vaultKeysCostComponent(key, region, name, unit, skuName, meterName, startUsage string, quantity *decimal.Decimal, multi int) query.Component {
+func vaultKeysCostComponent(key, region, name, unit, skuName, meterName, startUsage string, quantity *decimal.Decimal, multi int) resource.Component {
 	if quantity != nil {
 		quantity = decimalPtr(quantity.Div(decimal.NewFromInt(int64(multi))))
 	} else {
 		quantity = decimalPtr(decimal.Zero)
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            name,
 		Unit:            unit,
 		MonthlyQuantity: *quantity,

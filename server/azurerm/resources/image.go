@@ -3,8 +3,8 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -142,13 +142,13 @@ func getDiskSizeGB(disk Disk, refs []StorageDisk, i int) float64 {
 	return 0
 }
 
-func (inst *Image) Components() []query.Component {
+func (inst *Image) Components() []resource.Component {
 	var qty decimal.Decimal
 	if inst.storageGB != nil {
 		qty = *inst.storageGB
 	}
 
-	costComponent := []query.Component{{
+	costComponent := []resource.Component{{
 		Name:            "Storage",
 		Unit:            "1 GB/Month",
 		MonthlyQuantity: qty,

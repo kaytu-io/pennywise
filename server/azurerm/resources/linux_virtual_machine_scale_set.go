@@ -1,7 +1,7 @@
 package resources
 
 import (
-	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -94,8 +94,8 @@ func (p *Provider) newLinuxVirtualMachineScaleSet(vals linuxVirtualMachineScaleS
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *LinuxVirtualMachineScaleSet) Components() []query.Component {
-	var components []query.Component
+func (inst *LinuxVirtualMachineScaleSet) Components() []resource.Component {
+	var components []resource.Component
 
 	for i := int64(0); i < inst.instances; i++ {
 		components = append(components, linuxVirtualMachineComponent(inst.provider.key, inst.location, inst.sku, inst.monthlyHours))

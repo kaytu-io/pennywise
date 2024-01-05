@@ -1,11 +1,14 @@
 package cost
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/kaytu-io/pennywise/server/resource"
+)
 
 // Resource represents costs of a single cloud resource. Each Resource includes a Component map, keyed
 // by the label.
 type Resource struct {
-	Provider   string
+	Provider   resource.ProviderName
 	Type       string
 	Components map[string][]Component
 	Skipped    bool
@@ -46,7 +49,7 @@ func (re Resource) CostString() (string, error) {
 // map, keyed by the label.
 type ResourceDiff struct {
 	Address        string
-	Provider       string
+	Provider       resource.ProviderName
 	Type           string
 	ComponentDiffs map[string]*ComponentDiff
 }

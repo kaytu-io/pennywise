@@ -2,7 +2,7 @@ package resources
 
 import (
 	_ "fmt"
-	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"strings"
 )
@@ -42,8 +42,8 @@ func decoderPrivateDnsZone(tfVals map[string]interface{}) (privateDNSZoneValue, 
 	return v, nil
 }
 
-func (inst *PrivateDNSZone) component() []query.Component {
-	costComponents := make([]query.Component, 0)
+func (inst *PrivateDNSZone) component() []resource.Component {
+	costComponents := make([]resource.Component, 0)
 	region := getLocationName(inst.location)
 	costComponents = append(costComponents, PrivateDNSZoneCostComponent(inst.provider.key, region))
 	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
@@ -51,7 +51,7 @@ func (inst *PrivateDNSZone) component() []query.Component {
 	return costComponents
 }
 
-func PrivateDNSZoneCostComponent(key string, region string) query.Component {
+func PrivateDNSZoneCostComponent(key string, region string) resource.Component {
 	region = getLocationName(region)
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {

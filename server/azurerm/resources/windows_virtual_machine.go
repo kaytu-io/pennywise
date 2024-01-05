@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -82,9 +82,9 @@ func (p *Provider) newWindowsVirtualMachine(vals windowsVirtualMachineValues) *W
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *WindowsVirtualMachine) Components() []query.Component {
+func (inst *WindowsVirtualMachine) Components() []resource.Component {
 	// TODO: check if we have ultra ssd or not
-	components := []query.Component{inst.windowsVirtualMachineComponent()}
+	components := []resource.Component{inst.windowsVirtualMachineComponent()}
 	components = append(components, osDiskSubResource(inst.provider, inst.location, inst.osDisk, nil)...)
 	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
@@ -92,7 +92,7 @@ func (inst *WindowsVirtualMachine) Components() []query.Component {
 }
 
 // windowsVirtualMachineComponent returns the query needed to be able to calculate the price
-func (inst *WindowsVirtualMachine) windowsVirtualMachineComponent() query.Component {
+func (inst *WindowsVirtualMachine) windowsVirtualMachineComponent() resource.Component {
 	purchaseOption := "Consumption"
 	if strings.ToLower(inst.licenseType) == "windows_client" || strings.ToLower(inst.licenseType) == "windows_server" {
 		purchaseOption = "DevTestConsumption"
@@ -102,11 +102,11 @@ func (inst *WindowsVirtualMachine) windowsVirtualMachineComponent() query.Compon
 
 // windowsVirtualMachineComponent is the abstraction of the same LinuxVirtualMachine.linuxVirtualMachineComponent
 // so it can be reused
-func windowsVirtualMachineComponent(key, location, size, purchaseOption string, qty *decimal.Decimal) query.Component {
+func windowsVirtualMachineComponent(key, location, size, purchaseOption string, qty *decimal.Decimal) resource.Component {
 	if qty == nil {
 		qty = util.DecimalPtr(decimal.NewFromInt(730))
 	}
-	return query.Component{
+	return resource.Component{
 		Name:            fmt.Sprintf("Compute %s", size),
 		Unit:            "Monthly Hours",
 		MonthlyQuantity: *qty,

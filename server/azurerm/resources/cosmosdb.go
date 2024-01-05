@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/shopspring/decimal"
 	"strings"
 )
@@ -63,8 +63,8 @@ type Cosmosdb struct {
 	monthlyRestoredDataGb                   *int64
 }
 
-func (inst *Cosmosdb) Components() []query.Component {
-	var components []query.Component
+func (inst *Cosmosdb) Components() []resource.Component {
+	var components []resource.Component
 
 	if inst == nil {
 		return nil
@@ -82,8 +82,8 @@ func (inst *Cosmosdb) Components() []query.Component {
 	return components
 }
 
-func (inst *Cosmosdb) cosmosDBCostComponents() []query.Component {
-	var components []query.Component
+func (inst *Cosmosdb) cosmosDBCostComponents() []resource.Component {
+	var components []resource.Component
 
 	// The geo_location attribute is a required attribute however it can be an empty list because of
 	// expressions evaluating as nil, e.g. using a data block. If the geoLocations variable is empty
@@ -130,8 +130,8 @@ func (inst *Cosmosdb) cosmosDBCostComponents() []query.Component {
 	return components
 }
 
-func (inst *Cosmosdb) provisionedCosmosCostComponents(model string, throughputs *decimal.Decimal, skuName string) []query.Component {
-	var components []query.Component
+func (inst *Cosmosdb) provisionedCosmosCostComponents(model string, throughputs *decimal.Decimal, skuName string) []resource.Component {
+	var components []resource.Component
 
 	var meterName string
 	if strings.ToLower(skuName) == "rus" {
@@ -177,7 +177,7 @@ func (inst *Cosmosdb) provisionedCosmosCostComponents(model string, throughputs 
 		}
 
 		if l := locationNameMapping(g.Location); l != "" {
-			components = append(components, query.Component{
+			components = append(components, resource.Component{
 				Name:           fmt.Sprintf("%s, %s)", name, l),
 				Unit:           "RU/s x 100",
 				HourlyQuantity: quantity,
@@ -203,7 +203,7 @@ func (inst *Cosmosdb) provisionedCosmosCostComponents(model string, throughputs 
 	return components
 }
 
-func (inst *Cosmosdb) serverlessCosmosCostComponent(location string, availabilityZone bool) query.Component {
+func (inst *Cosmosdb) serverlessCosmosCostComponent(location string, availabilityZone bool) resource.Component {
 	var requestUnits decimal.Decimal
 	if inst.monthlyServerlessRequestUnits != nil {
 		requestUnits = decimal.NewFromInt(*inst.monthlyServerlessRequestUnits)
@@ -214,7 +214,7 @@ func (inst *Cosmosdb) serverlessCosmosCostComponent(location string, availabilit
 		requestUnits = requestUnits.Mul(decimal.NewFromFloat(1.25))
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            "Provisioned throughput (serverless)",
 		Unit:            "1M RU",
 		MonthlyQuantity: requestUnits,
@@ -237,8 +237,8 @@ func (inst *Cosmosdb) serverlessCosmosCostComponent(location string, availabilit
 	}
 }
 
-func (inst *Cosmosdb) storageCosmosCostComponents(skuName string) []query.Component {
-	var components []query.Component
+func (inst *Cosmosdb) storageCosmosCostComponents(skuName string) []resource.Component {
+	var components []resource.Component
 	var storageGB decimal.Decimal
 	if inst.storageGb != nil {
 		storageGB = decimal.NewFromInt(*inst.storageGb)
@@ -292,8 +292,8 @@ func (inst *Cosmosdb) storageCosmosCostComponents(skuName string) []query.Compon
 	return components
 }
 
-func (inst *Cosmosdb) backupStorageCosmosCostComponents() []query.Component {
-	var components []query.Component
+func (inst *Cosmosdb) backupStorageCosmosCostComponents() []resource.Component {
+	var components []resource.Component
 	var backupStorageGB decimal.Decimal
 	if inst.storageGb != nil {
 		backupStorageGB = decimal.NewFromInt(*inst.storageGb)
@@ -373,8 +373,8 @@ func (inst *Cosmosdb) backupStorageCosmosCostComponents() []query.Component {
 	return components
 }
 
-func (inst *Cosmosdb) storageCosmosCostComponent(name, location, skuName, productName string, quantities decimal.Decimal) query.Component {
-	return query.Component{
+func (inst *Cosmosdb) storageCosmosCostComponent(name, location, skuName, productName string, quantities decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            "GB",
 		MonthlyQuantity: quantities,
@@ -397,8 +397,8 @@ func (inst *Cosmosdb) storageCosmosCostComponent(name, location, skuName, produc
 	}
 }
 
-func (inst *Cosmosdb) backupCosmosCostComponent(name, location, skuName, productName, meterName string, quantities decimal.Decimal) query.Component {
-	return query.Component{
+func (inst *Cosmosdb) backupCosmosCostComponent(name, location, skuName, productName, meterName string, quantities decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            "GB",
 		MonthlyQuantity: quantities,
@@ -421,8 +421,8 @@ func (inst *Cosmosdb) backupCosmosCostComponent(name, location, skuName, product
 	}
 }
 
-func (inst *Cosmosdb) operationsCosmosCostComponent(name, location, meterName string, quantities decimal.Decimal) query.Component {
-	return query.Component{
+func (inst *Cosmosdb) operationsCosmosCostComponent(name, location, meterName string, quantities decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            "10K operations",
 		MonthlyQuantity: quantities,

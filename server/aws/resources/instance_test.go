@@ -11,7 +11,6 @@ import (
 
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 )
 
@@ -23,7 +22,7 @@ func TestInstance_Components(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("DefaultValues", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_instance.test",
 			Type:         "aws_instance",
 			Name:         "test",
@@ -32,9 +31,9 @@ func TestInstance_Components(t *testing.T) {
 				"instance_type": "m5.xlarge",
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		_ = []query.Component{
+		_ = []resource.Component{
 			{
 				Name:           "Compute",
 				HourlyQuantity: decimal.NewFromInt(1),
@@ -81,7 +80,7 @@ func TestInstance_Components(t *testing.T) {
 	})
 
 	t.Run("WithAllValues", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_instance.test",
 			Type:         "aws_instance",
 			Name:         "test",
@@ -105,9 +104,9 @@ func TestInstance_Components(t *testing.T) {
 				},
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		_ = []query.Component{
+		_ = []resource.Component{
 			{
 				Name:           "Compute",
 				HourlyQuantity: decimal.NewFromInt(1),

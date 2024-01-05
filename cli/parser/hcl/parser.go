@@ -5,10 +5,11 @@ import (
 	"github.com/kaytu-io/infracost/external/config"
 	"github.com/kaytu-io/infracost/external/providers/terraform"
 	usagePackage "github.com/kaytu-io/pennywise/cli/usage"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"golang.org/x/net/context"
 )
 
-func ParseHclResources(path string, usage usagePackage.Usage) (string, []Resource, error) {
+func ParseHclResources(path string, usage usagePackage.Usage) (resource.ProviderName, []Resource, error) {
 	var resources []Resource
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
@@ -27,7 +28,7 @@ func ParseHclResources(path string, usage usagePackage.Usage) (string, []Resourc
 	if providerErr != nil {
 		return "", nil, providerErr
 	}
-	provider := ""
+	var provider resource.ProviderName
 	jsons := h.LoadPlanJSONs()
 	for _, j := range jsons {
 		//fmt.Println("JSON", j.JSON)

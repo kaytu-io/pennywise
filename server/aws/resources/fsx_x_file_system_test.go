@@ -10,7 +10,6 @@ import (
 
 	"github.com/kaytu-io/pennywise/cli/usage"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/testutil"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 )
@@ -23,7 +22,7 @@ func TestFSXXFileSystem_Components(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("LustreFileSystem", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_fsx_lustre_file_system.test",
 			Type:         "aws_fsx_lustre_file_system",
 			Name:         "test",
@@ -35,9 +34,9 @@ func TestFSXXFileSystem_Components(t *testing.T) {
 				"automatic_backup_retention_days": float64(10),
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:            "Lustre Storage SSD",
 				MonthlyQuantity: decimal.NewFromFloat(1200),
@@ -66,7 +65,7 @@ func TestFSXXFileSystem_Components(t *testing.T) {
 	})
 
 	t.Run("OntapFileSystem", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_fsx_ontap_file_system.test",
 			Type:         "aws_fsx_ontap_file_system",
 			Name:         "test",
@@ -78,9 +77,9 @@ func TestFSXXFileSystem_Components(t *testing.T) {
 				"automatic_backup_retention_days": float64(10),
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:            "ONTAP Storage SSD",
 				MonthlyQuantity: decimal.NewFromFloat(1024),
@@ -143,7 +142,7 @@ func TestFSXXFileSystem_Components(t *testing.T) {
 	})
 
 	t.Run("OpenzfsFileSystem", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_fsx_openzfs_file_system.test",
 			Type:         "aws_fsx_openzfs_file_system",
 			Name:         "test",
@@ -155,9 +154,9 @@ func TestFSXXFileSystem_Components(t *testing.T) {
 				"automatic_backup_retention_days": float64(10),
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:            "OpenZFS Storage SSD",
 				MonthlyQuantity: decimal.NewFromFloat(1024),
@@ -220,7 +219,7 @@ func TestFSXXFileSystem_Components(t *testing.T) {
 	})
 
 	t.Run("WindowsFileSystem", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_fsx_windows_file_system.test",
 			Type:         "aws_fsx_windows_file_system",
 			Name:         "test",
@@ -232,9 +231,9 @@ func TestFSXXFileSystem_Components(t *testing.T) {
 				"automatic_backup_retention_days": float64(10),
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:            "Windows Storage SSD",
 				MonthlyQuantity: decimal.NewFromFloat(300),

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"go.uber.org/zap"
 
 	"github.com/shopspring/decimal"
@@ -33,8 +33,8 @@ type FSxFileSystem struct {
 }
 
 // Components returns the price component queries that make up the FSxFileSystem.
-func (v *FSxFileSystem) Components() []query.Component {
-	components := []query.Component{v.fsxFileSystemStorageCapacityCostComponent()}
+func (v *FSxFileSystem) Components() []resource.Component {
+	components := []resource.Component{v.fsxFileSystemStorageCapacityCostComponent()}
 
 	if v.fsxType != "Lustre" {
 		components = append(components, v.fsxFileSystemThroughputCapacityCostComponent())
@@ -48,8 +48,8 @@ func (v *FSxFileSystem) Components() []query.Component {
 	return components
 }
 
-func (v *FSxFileSystem) fsxFileSystemThroughputCapacityCostComponent() query.Component {
-	return query.Component{
+func (v *FSxFileSystem) fsxFileSystemThroughputCapacityCostComponent() resource.Component {
+	return resource.Component{
 		Name:            "Throughput capacity",
 		MonthlyQuantity: v.throughputCapacity,
 		Unit:            "MiBps-Mo",
@@ -68,7 +68,7 @@ func (v *FSxFileSystem) fsxFileSystemThroughputCapacityCostComponent() query.Com
 	}
 }
 
-func (v *FSxFileSystem) fsxFileSystemStorageCapacityCostComponent() query.Component {
+func (v *FSxFileSystem) fsxFileSystemStorageCapacityCostComponent() resource.Component {
 
 	attrFilters := []*product.AttributeFilter{
 		{Key: "Deployment_option", Value: util.StringPtr(v.deploymentOption)},
@@ -81,7 +81,7 @@ func (v *FSxFileSystem) fsxFileSystemStorageCapacityCostComponent() query.Compon
 		attrFilters = append(attrFilters, f)
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            fmt.Sprintf("%s Storage %s", v.fsxType, v.storageType),
 		MonthlyQuantity: v.storageCapacity,
 		Unit:            "GB-Mo",
@@ -97,7 +97,7 @@ func (v *FSxFileSystem) fsxFileSystemStorageCapacityCostComponent() query.Compon
 	}
 }
 
-func (v *FSxFileSystem) fsxFileSystemBackupGBCostComponent() query.Component {
+func (v *FSxFileSystem) fsxFileSystemBackupGBCostComponent() resource.Component {
 	deploymentOption := v.deploymentOption
 	if v.fsxType == "ONTAP" {
 		deploymentOption = "N/A"
@@ -117,7 +117,7 @@ func (v *FSxFileSystem) fsxFileSystemBackupGBCostComponent() query.Component {
 		}
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            fmt.Sprintf("%s Backup storage", v.fsxType),
 		MonthlyQuantity: v.storageCapacity,
 		Unit:            "GB-Mo",

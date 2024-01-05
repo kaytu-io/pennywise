@@ -11,7 +11,6 @@ import (
 
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 )
 
@@ -23,7 +22,7 @@ func TestEKSNodeGroup_Components(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("EKSNodeGroupDefault", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "module.test.aws_eks_node_group.test",
 			Type:         "aws_eks_node_group",
 			Name:         "test",
@@ -39,8 +38,8 @@ func TestEKSNodeGroup_Components(t *testing.T) {
 			},
 		}
 
-		rss := map[string]resource.Resource{
-			"aws_launch_template.test": resource.Resource{
+		rss := map[string]resource.ResourceDef{
+			"aws_launch_template.test": resource.ResourceDef{
 				Address:      "aws_launch_template.test",
 				Type:         "aws_launch_template",
 				Name:         "test",
@@ -60,7 +59,7 @@ func TestEKSNodeGroup_Components(t *testing.T) {
 			},
 		}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Compute",
 				HourlyQuantity: decimal.NewFromInt(3),
@@ -107,7 +106,7 @@ func TestEKSNodeGroup_Components(t *testing.T) {
 	})
 
 	t.Run("EKSNodeGroupLaunchTemplate", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "module.test.aws_eks_node_group.lt",
 			Type:         "aws_eks_node_group",
 			Name:         "lt",
@@ -122,8 +121,8 @@ func TestEKSNodeGroup_Components(t *testing.T) {
 			},
 		}
 
-		rss := map[string]resource.Resource{
-			"aws_launch_template.test": resource.Resource{
+		rss := map[string]resource.ResourceDef{
+			"aws_launch_template.test": resource.ResourceDef{
 				Address:      "aws_launch_template.test",
 				Type:         "aws_launch_template",
 				Name:         "test",
@@ -143,7 +142,7 @@ func TestEKSNodeGroup_Components(t *testing.T) {
 			},
 		}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Compute",
 				HourlyQuantity: decimal.NewFromInt(2),

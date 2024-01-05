@@ -3,8 +3,7 @@ name: Run Tests
 on:
   push:
     branches:
-      - main
-      - feat-new-resources
+      - '*'
 
 jobs:
   build-and-test:

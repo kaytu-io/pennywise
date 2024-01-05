@@ -47,7 +47,7 @@ func decodeEKSNodeGroupValues(tfVals map[string]interface{}) (eksNodeGroupValues
 }
 
 // newInstance creates a new Instance from instanceValues.
-func (p *Provider) newEKSNodeGroup(rss map[string]resource.Resource, vals eksNodeGroupValues) *Instance {
+func (p *Provider) newEKSNodeGroup(rss map[string]resource.ResourceDef, vals eksNodeGroupValues) *Instance {
 
 	inst := &Instance{
 		provider: p,

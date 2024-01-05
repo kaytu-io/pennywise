@@ -6,6 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kaytu-io/pennywise/server/internal/ingester"
 	"github.com/kaytu-io/pennywise/server/internal/mysql"
+	"github.com/kaytu-io/pennywise/server/internal/util"
 	"go.uber.org/zap"
 	"golang.org/x/net/context"
 )
@@ -33,7 +34,9 @@ func InitializeHttpHandler(
 	backend := mysql.NewBackend(db)
 
 	scheduler := ingester.NewScheduler(backend, logger, db)
-	scheduler.InsureScheduler()
+	util.EnsureRunGoroutin(func() {
+		scheduler.RunIngestionJobScheduler()
+	})
 
 	return &HttpHandler{
 		logger:    logger,

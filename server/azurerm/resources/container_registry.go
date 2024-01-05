@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -68,7 +68,7 @@ func decimalPtr(de decimal.Decimal) *decimal.Decimal {
 	return &de
 }
 
-func (inst *ContainerRegistry) component() []query.Component {
+func (inst *ContainerRegistry) component() []resource.Component {
 	var locationsCount int
 	var storageGB, includedStorage, monthlyBuildVCPU *decimal.Decimal
 	var overStorage decimal.Decimal
@@ -91,7 +91,7 @@ func (inst *ContainerRegistry) component() []query.Component {
 	}
 	locationsCount = inst.geoReplicationLocations
 
-	costComponents := make([]query.Component, 0)
+	costComponents := make([]resource.Component, 0)
 	// TODO: check the GeoReplicationLocation input that is true or not because i think it value should be 2 as Infracost cost component response
 	if locationsCount > 0 {
 		suffix := fmt.Sprintf("%d locations", locationsCount)
@@ -125,8 +125,8 @@ func (inst *ContainerRegistry) component() []query.Component {
 	return costComponents
 }
 
-func containerRegistryCostComponent(name, sku, location string) query.Component {
-	return query.Component{
+func containerRegistryCostComponent(name, sku, location string) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            "Day",
 		MonthlyQuantity: decimal.NewFromInt(30),
@@ -148,8 +148,8 @@ func containerRegistryCostComponent(name, sku, location string) query.Component 
 	}
 }
 
-func containerRegistryGeolocationCostComponent(name, sku, location string, geoReplicationLocations int) query.Component {
-	return query.Component{
+func containerRegistryGeolocationCostComponent(name, sku, location string, geoReplicationLocations int) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            "Day",
 		MonthlyQuantity: decimal.NewFromInt(30 * int64(geoReplicationLocations)),
@@ -171,8 +171,8 @@ func containerRegistryGeolocationCostComponent(name, sku, location string, geoRe
 	}
 }
 
-func containerRegistryStorageCostComponent(name, sku, location string, storage decimal.Decimal) query.Component {
-	return query.Component{
+func containerRegistryStorageCostComponent(name, sku, location string, storage decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            "GB",
 		MonthlyQuantity: storage,
@@ -194,8 +194,8 @@ func containerRegistryStorageCostComponent(name, sku, location string, storage d
 	}
 }
 
-func containerRegistryCPUCostComponent(name, sku, location string, monthlyBuildVCPU decimal.Decimal) query.Component {
-	return query.Component{
+func containerRegistryCPUCostComponent(name, sku, location string, monthlyBuildVCPU decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            "second",
 		MonthlyQuantity: monthlyBuildVCPU,

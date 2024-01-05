@@ -5,8 +5,8 @@ import (
 	"github.com/kaytu-io/infracost/external/schema"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -161,8 +161,8 @@ func (p *Provider) newSQLDatabase(vals sqlDatabaseValues) *SQLDatabase {
 	return inst
 }
 
-func (inst *SQLDatabase) Components() []query.Component {
-	var costComponents []query.Component
+func (inst *SQLDatabase) Components() []resource.Component {
+	var costComponents []resource.Component
 	if inst.isElasticPool {
 		costComponents = inst.elasticPoolCostComponents()
 		GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
@@ -248,7 +248,7 @@ var (
 	}
 )
 
-func (inst *SQLDatabase) dtuCostComponents() []query.Component {
+func (inst *SQLDatabase) dtuCostComponents() []resource.Component {
 	skuName := strings.ToLower(inst.sku)
 	if skuName == "basic" {
 		skuName = "b"
@@ -257,7 +257,7 @@ func (inst *SQLDatabase) dtuCostComponents() []query.Component {
 
 	daysInMonth := schema.HourToMonthUnitMultiplier.DivRound(decimal.NewFromInt(24), 24)
 
-	components := []query.Component{
+	components := []resource.Component{
 		{
 			Name:            fmt.Sprintf("Compute (%s)", strings.ToTitle(inst.sku)),
 			Unit:            "hours",
@@ -308,7 +308,7 @@ func (inst *SQLDatabase) dtuCostComponents() []query.Component {
 	return components
 }
 
-func (inst *SQLDatabase) vCoreCostComponents() []query.Component {
+func (inst *SQLDatabase) vCoreCostComponents() []resource.Component {
 	components := inst.computeHoursCostComponents()
 
 	if strings.ToLower(inst.tier) == sqlHyperscaleTier {
@@ -329,14 +329,14 @@ func (inst *SQLDatabase) vCoreCostComponents() []query.Component {
 	return components
 }
 
-func (inst *SQLDatabase) elasticPoolCostComponents() []query.Component {
-	return []query.Component{
+func (inst *SQLDatabase) elasticPoolCostComponents() []resource.Component {
+	return []resource.Component{
 		inst.longTermRetentionCostComponent(),
 		inst.pitrBackupCostComponent(),
 	}
 }
 
-func (inst *SQLDatabase) computeHoursCostComponents() []query.Component {
+func (inst *SQLDatabase) computeHoursCostComponents() []resource.Component {
 	if strings.ToLower(inst.tier) == sqlServerlessTier {
 		return inst.serverlessComputeHoursCostComponents()
 	}
@@ -344,7 +344,7 @@ func (inst *SQLDatabase) computeHoursCostComponents() []query.Component {
 	return inst.provisionedComputeCostComponents()
 }
 
-func (inst *SQLDatabase) serverlessComputeHoursCostComponents() []query.Component {
+func (inst *SQLDatabase) serverlessComputeHoursCostComponents() []resource.Component {
 	productNameRegex := fmt.Sprintf(".*%s - %s.*", inst.tier, inst.family)
 
 	var vCoreHours decimal.Decimal
@@ -352,7 +352,7 @@ func (inst *SQLDatabase) serverlessComputeHoursCostComponents() []query.Componen
 		vCoreHours = decimal.NewFromInt(*inst.monthlyVCoreHours)
 	}
 
-	costComponents := []query.Component{
+	costComponents := []resource.Component{
 		{
 			Name:            fmt.Sprintf("Compute (serverless, %s)", inst.sku),
 			Unit:            "vCore-hours",
@@ -377,7 +377,7 @@ func (inst *SQLDatabase) serverlessComputeHoursCostComponents() []query.Componen
 	}
 
 	if inst.zoneRedundant {
-		costComponents = append(costComponents, query.Component{
+		costComponents = append(costComponents, resource.Component{
 			Name:            fmt.Sprintf("Zone redundancy (serverless, %s)", inst.sku),
 			Unit:            "vCore-hours",
 			MonthlyQuantity: vCoreHours,
@@ -403,7 +403,7 @@ func (inst *SQLDatabase) serverlessComputeHoursCostComponents() []query.Componen
 	return costComponents
 }
 
-func (inst *SQLDatabase) provisionedComputeCostComponents() []query.Component {
+func (inst *SQLDatabase) provisionedComputeCostComponents() []resource.Component {
 	var cores int64
 	if inst.cores != nil {
 		cores = *inst.cores
@@ -412,7 +412,7 @@ func (inst *SQLDatabase) provisionedComputeCostComponents() []query.Component {
 	productNameRegex := fmt.Sprintf(".*%s - %s.*", inst.tier, inst.family)
 	name := fmt.Sprintf("Compute (provisioned, %s)", inst.sku)
 
-	components := []query.Component{
+	components := []resource.Component{
 		{
 			Name:           name,
 			Unit:           "hours",
@@ -436,7 +436,7 @@ func (inst *SQLDatabase) provisionedComputeCostComponents() []query.Component {
 	}
 
 	if inst.zoneRedundant {
-		components = append(components, query.Component{
+		components = append(components, resource.Component{
 			Name:           fmt.Sprintf("Zone redundancy (provisioned, %s)", inst.sku),
 			Unit:           "hours",
 			HourlyQuantity: decimal.NewFromInt(1),
@@ -461,7 +461,7 @@ func (inst *SQLDatabase) provisionedComputeCostComponents() []query.Component {
 	return components
 }
 
-func (inst *SQLDatabase) readReplicaCostComponent() query.Component {
+func (inst *SQLDatabase) readReplicaCostComponent() resource.Component {
 	productNameRegex := fmt.Sprintf(".*%s - %s.*", inst.tier, inst.family)
 	skuName := mssqlSkuName(*inst.cores, inst.zoneRedundant)
 
@@ -470,7 +470,7 @@ func (inst *SQLDatabase) readReplicaCostComponent() query.Component {
 		replicaCount = decimal.NewFromInt(*inst.readReplicaCount)
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:           "Read replicas",
 		Unit:           "hours",
 		HourlyQuantity: replicaCount,
@@ -492,7 +492,7 @@ func (inst *SQLDatabase) readReplicaCostComponent() query.Component {
 	}
 }
 
-func (inst *SQLDatabase) longTermRetentionCostComponent() query.Component {
+func (inst *SQLDatabase) longTermRetentionCostComponent() resource.Component {
 	var retention decimal.Decimal
 	if inst.longTermRetentionStorageGB != nil {
 		retention = decimal.NewFromInt(*inst.longTermRetentionStorageGB)
@@ -503,7 +503,7 @@ func (inst *SQLDatabase) longTermRetentionCostComponent() query.Component {
 		redundancyType = "RA-GRS"
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            fmt.Sprintf("Long-term retention (%s)", redundancyType),
 		Unit:            "GB",
 		MonthlyQuantity: retention,
@@ -526,7 +526,7 @@ func (inst *SQLDatabase) longTermRetentionCostComponent() query.Component {
 	}
 }
 
-func (inst *SQLDatabase) pitrBackupCostComponent() query.Component {
+func (inst *SQLDatabase) pitrBackupCostComponent() resource.Component {
 	var pitrGB decimal.Decimal
 	if inst.backupStorageGB != nil {
 		pitrGB = decimal.NewFromInt(*inst.backupStorageGB)
@@ -537,7 +537,7 @@ func (inst *SQLDatabase) pitrBackupCostComponent() query.Component {
 		redundancyType = "RA-GRS"
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            fmt.Sprintf("PITR backup storage (%s)", redundancyType),
 		Unit:            "GB",
 		MonthlyQuantity: pitrGB,
@@ -560,7 +560,7 @@ func (inst *SQLDatabase) pitrBackupCostComponent() query.Component {
 	}
 }
 
-func (inst *SQLDatabase) extraDataStorageCostComponent(extraStorageGB float64) *query.Component {
+func (inst *SQLDatabase) extraDataStorageCostComponent(extraStorageGB float64) *resource.Component {
 	tier := inst.tier
 	if tier == "" {
 		var ok bool
@@ -593,8 +593,8 @@ func (inst *SQLDatabase) mssqlProductFilter(filters []*product.AttributeFilter) 
 	}
 }
 
-func mssqlExtraDataStorageCostComponent(region string, tier string, extraStorageGB float64) query.Component {
-	return query.Component{
+func mssqlExtraDataStorageCostComponent(region string, tier string, extraStorageGB float64) resource.Component {
+	return resource.Component{
 		Name:            "Extra data storage",
 		Unit:            "GB",
 		MonthlyQuantity: decimal.NewFromFloat(extraStorageGB),
@@ -616,7 +616,7 @@ func mssqlExtraDataStorageCostComponent(region string, tier string, extraStorage
 	}
 }
 
-func (inst *SQLDatabase) mssqlLicenseCostComponent() query.Component {
+func (inst *SQLDatabase) mssqlLicenseCostComponent() resource.Component {
 	licenseRegion := "Global"
 	if strings.Contains(inst.location, "usgov") {
 		licenseRegion = "US Gov"
@@ -635,7 +635,7 @@ func (inst *SQLDatabase) mssqlLicenseCostComponent() query.Component {
 		coresVal = *inst.cores
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:           "SQL license",
 		Unit:           "vCore-hours",
 		HourlyQuantity: decimal.NewFromInt(coresVal),
@@ -656,7 +656,7 @@ func (inst *SQLDatabase) mssqlLicenseCostComponent() query.Component {
 	}
 }
 
-func (inst *SQLDatabase) mssqlStorageCostComponent() query.Component {
+func (inst *SQLDatabase) mssqlStorageCostComponent() resource.Component {
 	storageGB := decimal.NewFromInt(5)
 	if inst.maxSizeGB != nil {
 		storageGB = decimal.NewFromFloat(*inst.maxSizeGB)
@@ -674,7 +674,7 @@ func (inst *SQLDatabase) mssqlStorageCostComponent() query.Component {
 
 	productNameRegex := fmt.Sprintf(".*%s - Storage.*", storageTier)
 
-	return query.Component{
+	return resource.Component{
 		Name:            "Storage",
 		Unit:            "GB",
 		MonthlyQuantity: storageGB,

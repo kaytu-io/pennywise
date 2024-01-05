@@ -2,6 +2,7 @@ package resources
 
 import (
 	"github.com/kaytu-io/pennywise/server/azurerm/resources"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"go.uber.org/zap"
 	"strings"
 
@@ -9,7 +10,6 @@ import (
 	"github.com/shopspring/decimal"
 
 	"github.com/kaytu-io/pennywise/server/aws/region"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 )
 
 // ElastiCacheReplication represents an ElastiCacheReplication instance definition that can be cost-estimated.
@@ -106,13 +106,13 @@ func (p *Provider) newElastiCacheReplication(vals elastiCacheReplicationValues) 
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *ElastiCacheReplication) Components() []query.Component {
+func (inst *ElastiCacheReplication) Components() []resource.Component {
 	// If global_replication_group_id is set, node_type & num_node_groups can't be defined. So no cost found
 	if len(inst.globalReplicationGroupID) > 0 {
-		return []query.Component{}
+		return []resource.Component{}
 	}
 
-	components := []query.Component{inst.elastiCacheReplicationInstanceComponent()}
+	components := []resource.Component{inst.elastiCacheReplicationInstanceComponent()}
 
 	if inst.snapshotRetentionLimit.GreaterThan(decimal.NewFromInt(0)) && strings.HasPrefix(inst.cacheEngine, "Redis") {
 		components = append(components, inst.backupStorageComponent())
@@ -122,7 +122,7 @@ func (inst *ElastiCacheReplication) Components() []query.Component {
 	return components
 }
 
-func (inst *ElastiCacheReplication) elastiCacheReplicationInstanceComponent() query.Component {
+func (inst *ElastiCacheReplication) elastiCacheReplicationInstanceComponent() resource.Component {
 
 	// Currently, cost is the same as ElastiCache
 	// Use ElastiCache function to generate the right query
@@ -139,7 +139,7 @@ func (inst *ElastiCacheReplication) elastiCacheReplicationInstanceComponent() qu
 
 }
 
-func (inst *ElastiCacheReplication) backupStorageComponent() query.Component {
+func (inst *ElastiCacheReplication) backupStorageComponent() resource.Component {
 
 	// Currently, cost is the same as ElastiCache
 	// Use ElastiCache function to generate the right query

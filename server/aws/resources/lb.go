@@ -4,8 +4,8 @@ import (
 	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
@@ -60,14 +60,14 @@ func (p *Provider) newLB(vals lbValues) *LB {
 }
 
 // Components returns the price component queries that make up this LB.
-func (lb *LB) Components() []query.Component {
-	costComponent := []query.Component{lb.loadBalancerComponent()}
+func (lb *LB) Components() []resource.Component {
+	costComponent := []resource.Component{lb.loadBalancerComponent()}
 
 	resources.GetCostComponentNamesAndSetLogger(costComponent, lb.logger)
 	return costComponent
 }
 
-func (lb *LB) loadBalancerComponent() query.Component {
+func (lb *LB) loadBalancerComponent() resource.Component {
 	var family, name string
 	switch lb.lbType {
 	case "network":
@@ -84,7 +84,7 @@ func (lb *LB) loadBalancerComponent() query.Component {
 		family = "Load Balancer-Application"
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:           name,
 		HourlyQuantity: decimal.NewFromInt(1),
 		ProductFilter: &product.Filter{

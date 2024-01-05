@@ -2,8 +2,8 @@ package resources
 
 import (
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -70,18 +70,18 @@ func (p *Provider) newLoadBalancerRule(vals loadBalancerRuleValues) *LoadBalance
 	return lbRule
 }
 
-func (inst LoadBalancerRule) Components() []query.Component {
+func (inst LoadBalancerRule) Components() []resource.Component {
 	if inst.loadBalancer.Values.Sku == "Basic" {
 		return nil
 	}
-	costComponent := []query.Component{RegionalOverageRulesComponent(inst.provider.key, inst.loadBalancer.Values.Location, decimal.NewFromInt(1))}
+	costComponent := []resource.Component{RegionalOverageRulesComponent(inst.provider.key, inst.loadBalancer.Values.Location, decimal.NewFromInt(1))}
 
 	GetCostComponentNamesAndSetLogger(costComponent, inst.provider.logger)
 	return costComponent
 }
 
-func RegionalIncludedRulesComponent(key, location string) query.Component {
-	return query.Component{
+func RegionalIncludedRulesComponent(key, location string) resource.Component {
+	return resource.Component{
 		Name:            "Regional Included Rules",
 		MonthlyQuantity: decimal.NewFromInt(1),
 		ProductFilter: &product.Filter{
@@ -96,8 +96,8 @@ func RegionalIncludedRulesComponent(key, location string) query.Component {
 	}
 }
 
-func GlobalIncludedRulesComponent(key, location string) query.Component {
-	return query.Component{
+func GlobalIncludedRulesComponent(key, location string) resource.Component {
+	return resource.Component{
 		Name:            "Global Included Rules",
 		MonthlyQuantity: decimal.NewFromInt(1),
 		ProductFilter: &product.Filter{
@@ -112,8 +112,8 @@ func GlobalIncludedRulesComponent(key, location string) query.Component {
 	}
 }
 
-func RegionalOverageRulesComponent(key, location string, overageRules decimal.Decimal) query.Component {
-	return query.Component{
+func RegionalOverageRulesComponent(key, location string, overageRules decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:           "Regional Overage Rules",
 		HourlyQuantity: overageRules,
 		ProductFilter: &product.Filter{
@@ -128,8 +128,8 @@ func RegionalOverageRulesComponent(key, location string, overageRules decimal.De
 	}
 }
 
-func GlobalOverageRulesComponent(key, location string, overageRules decimal.Decimal) query.Component {
-	return query.Component{
+func GlobalOverageRulesComponent(key, location string, overageRules decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:           "Global Overage Rules",
 		HourlyQuantity: overageRules,
 		ProductFilter: &product.Filter{

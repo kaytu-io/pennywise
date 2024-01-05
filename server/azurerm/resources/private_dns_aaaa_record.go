@@ -1,7 +1,7 @@
 package resources
 
 import (
-	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -51,13 +51,13 @@ func decoderPrivateDnsAAAARecord(tfVals map[string]interface{}) (privateDNSAAAAR
 	return v, nil
 }
 
-func (inst *PrivateDNSAAAARecord) component() []query.Component {
+func (inst *PrivateDNSAAAARecord) component() []resource.Component {
 	region := getLocationName(inst.location)
 	costComponents := privateDNSAAAARecord(inst.provider.key, region, inst.monthlyQueries)
 	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 	return costComponents
 }
 
-func privateDNSAAAARecord(key, region string, monthlyQueries *int64) []query.Component {
+func privateDNSAAAARecord(key, region string, monthlyQueries *int64) []resource.Component {
 	return DNSQueriesCostComponent(key, region, monthlyQueries)
 }
