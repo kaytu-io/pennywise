@@ -138,17 +138,7 @@ func (s Scheduler) GetJobById(id int32) (*IngestionJob, error) {
 	return &job, nil
 }
 
-func (s Scheduler) InsureScheduler() {
-	go func() {
-		err := s.runIngestionJobScheduler()
-		if err != nil {
-			s.logger.Error(err.Error())
-			s.InsureScheduler()
-		}
-	}()
-}
-
-func (s Scheduler) runIngestionJobScheduler() error {
+func (s Scheduler) RunIngestionJobScheduler() {
 	s.logger.Info("IngestionJob scheduler started")
 
 	t := time.NewTicker(5 * time.Second)

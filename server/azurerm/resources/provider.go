@@ -555,68 +555,6 @@ func (p *Provider) ResourceComponents(rss map[string]resource.ResourceDef, tfRes
 		}
 		logger.Info(fmt.Sprintf("%v.%v decoded ", tfRes.Type, tfRes.Name))
 		return p.newAzureRMKubernetesClusterNodePool(vals).Components()
-	case "azurerm_app_service_certificate_order":
-		vals, err := decodeAppServiceCertificateOrderValues(tfRes.Values)
-		if err != nil {
-			return nil
-		}
-		return p.newAppServiceCertificateOrder(vals).Components()
-	case "azurerm_app_service_certificate_binding":
-		vals, err := decodeAppServiceCertificateBindingValues(tfRes.Values)
-		if err != nil {
-			return nil
-		}
-		return p.newAppServiceCertificateBinding(vals).Components()
-	case "azurerm_app_service_custom_hostname_binding":
-		vals, err := decodeAppServiceCustomHostnameBindingValues(tfRes.Values)
-		if err != nil {
-			return nil
-		}
-		return p.newAppServiceCustomHostnameBinding(vals).Components()
-	case "azurerm_app_service_environment":
-		vals, err := decodeAppServiceEnvironmentValues(tfRes.Values)
-		if err != nil {
-			return nil
-		}
-		return p.newAppServiceEnvironment(vals).Components()
-	case "azurerm_app_service_plan":
-		vals, err := decodeAppServicePlanValues(tfRes.Values)
-		if err != nil {
-			return nil
-		}
-		return p.newAppServicePlan(vals).Components()
-	case "azurerm_service_plan":
-		vals, err := decodeServicePlanValues(tfRes.Values)
-		if err != nil {
-			return nil
-		}
-		return p.newServicePlan(vals).Components()
-	case "azurerm_api_management":
-		vals, err := decodeApiManagementValues(tfRes.Values)
-		if err != nil {
-			return nil
-		}
-		return p.newApiManagement(vals).Components()
-	case "azurerm_function_app":
-		vals, err := decodeFunctionAppValues(tfRes.Values)
-		if err != nil {
-			fmt.Println("HEEEREEE", err.Error())
-			return nil
-		}
-		return p.newFunctionApp(vals).Components()
-	case "azurerm_linux_function_app":
-		vals, err := decodeFunctionAppValues(tfRes.Values)
-		if err != nil {
-			return nil
-		}
-		return p.newFunctionApp(vals).Components()
-	case "azurerm_windows_function_app":
-		vals, err := decodeFunctionAppValues(tfRes.Values)
-		if err != nil {
-
-			return nil
-		}
-		return p.newFunctionApp(vals).Components()
 	default:
 		return nil
 	}
