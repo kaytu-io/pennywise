@@ -1,0 +1,77 @@
+#name: Test and Build
+#
+#on:
+#  push:
+#    branches:
+#      - main
+#
+#jobs:
+#  build-and-test:
+#    runs-on: ubuntu-latest
+#
+#    services:
+#      mysql:
+#        image: mysql:latest
+#        env:
+#          MYSQL_ROOT_PASSWORD: root_password
+#          MYSQL_DATABASE: test_db
+#          MYSQL_USER: test_user
+#          MYSQL_PASSWORD: test_password
+#        ports:
+#          - 3306:3306
+#        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+#
+#    env:
+#      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+#      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+#      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#        with:
+#          token: ${{ secrets.GH_TOKEN }}
+#
+#      - name: Set up Go
+#        uses: actions/setup-go@v2
+#        with:
+#          go-version: 1.21.3
+#
+#      - name: Set up MySQL Connection Variables
+#        run: |
+#          echo "MYSQL_HOST=localhost" >> $GITHUB_ENV
+#          echo "MYSQL_PORT=3306" >> $GITHUB_ENV
+#          echo "MYSQL_DB=test_db" >> $GITHUB_ENV
+#          echo "MYSQL_USERNAME=test_user" >> $GITHUB_ENV
+#          echo "MYSQL_PASSWORD=test_password" >> $GITHUB_ENV
+#
+#      - run: git config --global url.https://${{ secrets.GH_TOKEN }}@github.com/kaytu-io.insteadOf https://github.com/kaytu-io
+#
+#      - name: Run Golang Tests
+#        run: |
+#          cd server/azurerm/tests
+#          go test -v . -timeout 30m
+#
+#      - name: Build Docker Image
+#        run: |
+#          docker build -t pennywise/pennywise-server:latest .
+#          docker tag pennywise/pennywise-server:latest pennywise/pennywise-server:version
+#
+#      - name: Push Docker Image to Docker Hub
+#        run: |
+#          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+#          docker push pennywise/pennywise-server:version
+#
+#      - name: Create Release
+#        run: |
+#          git tag -a v1.0.0 -m "Release version 1.0.0"
+#          git push origin v1.0.0
+#
+#      - name: Upload CLI and Server Binaries to Release
+#        uses: softprops/action-gh-release@v1
+#        with:
+#          files: |
+#            server/server
+#            cli/cli
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
