@@ -34,7 +34,7 @@ func EstimateTerraformPlanJson(plan io.Reader, u usage.Usage) error {
 	if err != nil {
 		return err
 	}
-	var resources []resource.Resource
+	var resources []resource.ResourceDef
 	for _, rs := range plannedQueries {
 		res := rs.ToResource("")
 		resources = append(resources, res)
