@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/kaytu-io/pennywise/server/resource"
 	"go.uber.org/zap"
@@ -71,7 +70,7 @@ func decodeEFSFileSystemValues(tfVals map[string]interface{}) (efsFileSystemValu
 }
 
 // newEFSFileSystem creates a new EFSFileSystem from efsFileSystemValues.
-func (p *Provider) newEFSFileSystem(rss map[string]resource.Resource, vals efsFileSystemValues) *EFSFileSystem {
+func (p *Provider) newEFSFileSystem(rss map[string]resource.ResourceDef, vals efsFileSystemValues) *EFSFileSystem {
 	v := &EFSFileSystem{
 		provider:       p,
 		logger:         p.logger,
@@ -122,13 +121,13 @@ func (v *EFSFileSystem) calculateProvisionedThroughput(storageGB decimal.Decimal
 }
 
 // Components returns the price component queries that make up the EFSFileSystem.
-func (v *EFSFileSystem) Components() []query.Component {
+func (v *EFSFileSystem) Components() []resource.Component {
 	usagetype := ".*-TimedStorage-ByteHrs"
 	if v.availabilityZoneName != "" {
 		usagetype = ".*-TimedStorage-Z-ByteHrs"
 	}
 
-	components := []query.Component{v.efsFileSystemComponent(usagetype, v.storageGB)}
+	components := []resource.Component{v.efsFileSystemComponent(usagetype, v.storageGB)}
 
 	if v.provisionedThroughputInMibps.GreaterThan(decimal.NewFromInt(0)) {
 		components = append(components, v.provisionedThroughputComponent())
@@ -157,8 +156,8 @@ func (v *EFSFileSystem) Components() []query.Component {
 	return components
 }
 
-func (v *EFSFileSystem) efsFileSystemComponent(usagetype string, storageGB decimal.Decimal) query.Component {
-	return query.Component{
+func (v *EFSFileSystem) efsFileSystemComponent(usagetype string, storageGB decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            fmt.Sprintf("Storage %s", usagetype),
 		MonthlyQuantity: storageGB,
 		Unit:            "GB",
@@ -176,8 +175,8 @@ func (v *EFSFileSystem) efsFileSystemComponent(usagetype string, storageGB decim
 	}
 }
 
-func (v *EFSFileSystem) provisionedThroughputComponent() query.Component {
-	return query.Component{
+func (v *EFSFileSystem) provisionedThroughputComponent() resource.Component {
+	return resource.Component{
 		Name:            "Provisioned throughput",
 		MonthlyQuantity: v.provisionedThroughputInMibps,
 		Unit:            "MBps",
@@ -195,7 +194,7 @@ func (v *EFSFileSystem) provisionedThroughputComponent() query.Component {
 	}
 }
 
-func (v *EFSFileSystem) requestsComponent(accessType string) query.Component {
+func (v *EFSFileSystem) requestsComponent(accessType string) resource.Component {
 	var requestsGB decimal.Decimal
 	if accessType == "Read" {
 		requestsGB = v.monthlyInfrequentAccessReadGB
@@ -203,7 +202,7 @@ func (v *EFSFileSystem) requestsComponent(accessType string) query.Component {
 		requestsGB = v.monthlyInfrequentAccessWriteGB
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            fmt.Sprintf("Requests %s", accessType),
 		MonthlyQuantity: requestsGB,
 		Unit:            "GB",

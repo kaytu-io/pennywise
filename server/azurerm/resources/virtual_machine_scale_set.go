@@ -1,7 +1,7 @@
 package resources
 
 import (
-	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -122,8 +122,8 @@ func (p *Provider) newVirtualMachineScaleSet(vals virtualMachineScaleSetValues) 
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *VirtualMachineScaleSet) Components() []query.Component {
-	var components []query.Component
+func (inst *VirtualMachineScaleSet) Components() []resource.Component {
+	var components []resource.Component
 
 	instances := inst.sku[0].Capacity
 	if inst.instances != nil {

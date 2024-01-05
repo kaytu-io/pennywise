@@ -5,8 +5,8 @@ import (
 	"github.com/kaytu-io/infracost/external/usage"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -82,11 +82,11 @@ func decodeCDNEndpoint(tfVals map[string]interface{}) (AzureRMCDNEndpointValue, 
 	return v, nil
 }
 
-func (inst AzureRMCDNEndpoint) Component() []query.Component {
+func (inst AzureRMCDNEndpoint) Component() []resource.Component {
 	region := getLocationName(inst.location)
 	region = regionToZone(region)
 
-	var costComponents []query.Component
+	var costComponents []resource.Component
 	sku := ""
 	if inst.sku != nil {
 		sku = *inst.sku
@@ -155,8 +155,8 @@ func (inst AzureRMCDNEndpoint) Component() []query.Component {
 	return costComponents
 }
 
-func cdnOutboundDataCostComponents(key string, region, sku string, monthlyOutboundGBInput *int64) []query.Component {
-	var costComponents []query.Component
+func cdnOutboundDataCostComponents(key string, region, sku string, monthlyOutboundGBInput *int64) []resource.Component {
+	var costComponents []resource.Component
 
 	type dataTier struct {
 		name       string
@@ -219,8 +219,8 @@ func cdnOutboundDataCostComponents(key string, region, sku string, monthlyOutbou
 	return costComponents
 }
 
-func cdnAccelerationDataTransfersCostComponents(key, region, sku string, monthlyOutboundGBInput *int64) []query.Component {
-	var costComponents []query.Component
+func cdnAccelerationDataTransfersCostComponents(key, region, sku string, monthlyOutboundGBInput *int64) []resource.Component {
+	var costComponents []resource.Component
 
 	type dataTier struct {
 		name       string
@@ -280,8 +280,8 @@ func cdnAccelerationDataTransfersCostComponents(key, region, sku string, monthly
 	return costComponents
 }
 
-func cdnCostComponent(key, name, unit, region, productName, skuName, meterName, startUsage string, quantity decimal.Decimal) query.Component {
-	return query.Component{
+func cdnCostComponent(key, name, unit, region, productName, skuName, meterName, startUsage string, quantity decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            unit,
 		MonthlyQuantity: quantity,

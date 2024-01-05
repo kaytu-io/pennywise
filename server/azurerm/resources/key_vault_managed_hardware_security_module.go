@@ -3,8 +3,8 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -52,8 +52,8 @@ func (p *Provider) newKeyVaultManagedHardwareSecurityModule(vals keyVaultManaged
 	return inst
 }
 
-func (inst *KeyVaultManagedHardwareSecurityModule) Components() []query.Component {
-	var components []query.Component
+func (inst *KeyVaultManagedHardwareSecurityModule) Components() []resource.Component {
+	var components []resource.Component
 
 	components = append(components, inst.hsmPoolComponent())
 	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
@@ -61,8 +61,8 @@ func (inst *KeyVaultManagedHardwareSecurityModule) Components() []query.Componen
 	return components
 }
 
-func (inst *KeyVaultManagedHardwareSecurityModule) hsmPoolComponent() query.Component {
-	return query.Component{
+func (inst *KeyVaultManagedHardwareSecurityModule) hsmPoolComponent() resource.Component {
+	return resource.Component{
 		Name:           "HSM pools",
 		Unit:           "hours",
 		HourlyQuantity: decimal.NewFromInt(1),

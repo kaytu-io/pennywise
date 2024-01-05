@@ -3,6 +3,7 @@ package resources
 import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/azurerm/resources"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"go.uber.org/zap"
 	"strings"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/kaytu-io/pennywise/server/aws/region"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 )
 
@@ -151,8 +151,8 @@ func (p *Provider) newInstance(vals instanceValues) *Instance {
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *Instance) Components() []query.Component {
-	components := []query.Component{inst.computeComponent()}
+func (inst *Instance) Components() []resource.Component {
+	components := []resource.Component{inst.computeComponent()}
 
 	if inst.rootVolume != nil {
 		for _, comp := range inst.rootVolume.Components() {
@@ -177,13 +177,13 @@ func (inst *Instance) Components() []query.Component {
 	return components
 }
 
-func (inst *Instance) cpuCreditCostComponent() query.Component {
+func (inst *Instance) cpuCreditCostComponent() resource.Component {
 
 	// Used to generate the UsageType
 	region := strings.ToUpper(strings.Split(inst.region.String(), "-")[0])
 	instType := strings.Split(inst.instanceType, ".")[0]
 
-	return query.Component{
+	return resource.Component{
 		Name:           "CPUCreditCost",
 		Details:        []string{inst.operatingSystem, "on-demand", inst.instanceType},
 		HourlyQuantity: inst.instanceCount,
@@ -206,11 +206,11 @@ func (inst *Instance) cpuCreditCostComponent() query.Component {
 	}
 }
 
-func (inst *Instance) detailedMonitoringCostComponent() query.Component {
+func (inst *Instance) detailedMonitoringCostComponent() resource.Component {
 	var defaultEC2InstanceMetricCount = decimal.NewFromInt(7)
 	quantity := defaultEC2InstanceMetricCount.Mul(inst.instanceCount)
 
-	return query.Component{
+	return resource.Component{
 		Name:            "EC2 detailed monitoring",
 		Details:         []string{"on-demand", "monitoring"},
 		MonthlyQuantity: quantity,
@@ -231,11 +231,11 @@ func (inst *Instance) detailedMonitoringCostComponent() query.Component {
 	}
 }
 
-func (inst *Instance) ebsOptimizedCostComponent() query.Component {
+func (inst *Instance) ebsOptimizedCostComponent() resource.Component {
 
 	// Used to generate the UsageType
 	region := strings.ToUpper(strings.Split(inst.region.String(), "-")[0])
-	return query.Component{
+	return resource.Component{
 		Name:           "EBS-optimized usage",
 		Details:        []string{"EBS", "Optimizes", inst.instanceType},
 		HourlyQuantity: inst.instanceCount,
@@ -258,8 +258,8 @@ func (inst *Instance) ebsOptimizedCostComponent() query.Component {
 	}
 }
 
-func (inst *Instance) computeComponent() query.Component {
-	return query.Component{
+func (inst *Instance) computeComponent() resource.Component {
+	return resource.Component{
 		Name:           "Compute",
 		Details:        []string{inst.operatingSystem, "on-demand", inst.instanceType},
 		HourlyQuantity: inst.instanceCount,

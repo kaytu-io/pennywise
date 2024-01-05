@@ -1,7 +1,7 @@
 package resources
 
 import (
-	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -49,7 +49,7 @@ func (p *Provider) newDNSCNAMERecord(vals dnsCNAMERecordValues) *DNSCNAMERecord 
 	return inst
 }
 
-func (inst *DNSCNAMERecord) component() []query.Component {
+func (inst *DNSCNAMERecord) component() []resource.Component {
 	region := getLocationName(inst.location)
 	costComponents := DNSQueriesCostComponent(inst.provider.key, region, inst.monthlyQueries)
 	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)

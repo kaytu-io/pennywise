@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -61,7 +61,7 @@ func (p *Provider) newVirtualNetworkGatewayConnection(vals VirtualNetworkGateway
 	return inst
 }
 
-func (inst *VirtualNetworkGatewayConnection) Component() []query.Component {
+func (inst *VirtualNetworkGatewayConnection) Component() []resource.Component {
 	sku := "Basic"
 	if inst.sku != nil {
 		sku = *inst.sku
@@ -72,7 +72,7 @@ func (inst *VirtualNetworkGatewayConnection) Component() []query.Component {
 		return nil
 	}
 
-	costComponents := make([]query.Component, 0)
+	costComponents := make([]resource.Component, 0)
 	if inst.typeName != nil {
 		if strings.ToLower(*inst.typeName) == "ipsec" {
 			costComponents = append(costComponents, vpnGatewayS2S(region, sku))
@@ -83,8 +83,8 @@ func (inst *VirtualNetworkGatewayConnection) Component() []query.Component {
 	return costComponents
 }
 
-func vpnGatewayS2S(region, sku string) query.Component {
-	return query.Component{
+func vpnGatewayS2S(region, sku string) resource.Component {
+	return resource.Component{
 		Name:           fmt.Sprintf("VPN gateway (%s)", sku),
 		Unit:           "hours",
 		HourlyQuantity: decimal.NewFromInt(1),

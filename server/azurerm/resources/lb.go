@@ -2,8 +2,8 @@ package resources
 
 import (
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -77,8 +77,8 @@ func (p *Provider) newLoadBalancer(vals loadBalancerValues) *LoadBalancer {
 	return inst
 }
 
-func (inst *LoadBalancer) Components() []query.Component {
-	var components []query.Component
+func (inst *LoadBalancer) Components() []resource.Component {
+	var components []resource.Component
 
 	if inst.sku == "Basic" {
 		return nil
@@ -110,8 +110,8 @@ func (inst *LoadBalancer) Components() []query.Component {
 	return components
 }
 
-func regionalDataProceedComponent(key, location string, dataProceed decimal.Decimal) query.Component {
-	return query.Component{
+func regionalDataProceedComponent(key, location string, dataProceed decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            "Regional Data Proceed",
 		Unit:            "GB",
 		MonthlyQuantity: dataProceed,
@@ -128,8 +128,8 @@ func regionalDataProceedComponent(key, location string, dataProceed decimal.Deci
 	}
 }
 
-func (inst *LoadBalancer) globalDataProceedComponent(key, location string, dataProceed decimal.Decimal) query.Component {
-	return query.Component{
+func (inst *LoadBalancer) globalDataProceedComponent(key, location string, dataProceed decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            "Global Data Proceed",
 		Unit:            "GB",
 		MonthlyQuantity: dataProceed,

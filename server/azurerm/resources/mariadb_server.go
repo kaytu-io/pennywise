@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -75,8 +75,8 @@ func (p *Provider) newMariadbServer(vals mariadbServerValues) *MariadbServer {
 	return inst
 }
 
-func (inst *MariadbServer) Components() []query.Component {
-	var components []query.Component
+func (inst *MariadbServer) Components() []resource.Component {
+	var components []resource.Component
 
 	var tier, family, cores string
 	if sku := strings.Split(inst.skuName, "_"); len(sku) == 3 {
@@ -125,8 +125,8 @@ func (inst *MariadbServer) Components() []query.Component {
 	return components
 }
 
-func (inst *MariadbServer) databaseComputeInstance(name, productNameRegex, skuName string) query.Component {
-	return query.Component{
+func (inst *MariadbServer) databaseComputeInstance(name, productNameRegex, skuName string) resource.Component {
+	return resource.Component{
 		Name:           name,
 		Unit:           "hours",
 		HourlyQuantity: decimal.NewFromInt(1),
@@ -148,8 +148,8 @@ func (inst *MariadbServer) databaseComputeInstance(name, productNameRegex, skuNa
 	}
 }
 
-func (inst *MariadbServer) databaseStorageComponent(productNameRegex string, storageGB int64) query.Component {
-	return query.Component{
+func (inst *MariadbServer) databaseStorageComponent(productNameRegex string, storageGB int64) resource.Component {
+	return resource.Component{
 		Name:            "Storage",
 		Unit:            "GB",
 		MonthlyQuantity: decimal.NewFromInt(storageGB),
@@ -165,8 +165,8 @@ func (inst *MariadbServer) databaseStorageComponent(productNameRegex string, sto
 	}
 }
 
-func (inst *MariadbServer) databaseBackupStorageComponent(skuName string, backupStorageGB decimal.Decimal) query.Component {
-	return query.Component{
+func (inst *MariadbServer) databaseBackupStorageComponent(skuName string, backupStorageGB decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            "Additional backup storage",
 		Unit:            "GB",
 		MonthlyQuantity: backupStorageGB,

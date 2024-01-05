@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -79,9 +79,9 @@ func (p *Provider) newLinuxVirtualMachine(vals linuxVirtualMachineValues) *Linux
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *LinuxVirtualMachine) Components() []query.Component {
+func (inst *LinuxVirtualMachine) Components() []resource.Component {
 	// TODO: check if we have ultra ssd or not
-	components := []query.Component{inst.linuxVirtualMachineComponent()}
+	components := []resource.Component{inst.linuxVirtualMachineComponent()}
 	components = append(components, osDiskSubResource(inst.provider, inst.location, inst.osDisk, nil)...)
 	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
@@ -89,17 +89,17 @@ func (inst *LinuxVirtualMachine) Components() []query.Component {
 }
 
 // linuxVirtualMachineComponent returns the query needed to be able to calculate the price
-func (inst *LinuxVirtualMachine) linuxVirtualMachineComponent() query.Component {
+func (inst *LinuxVirtualMachine) linuxVirtualMachineComponent() resource.Component {
 	return linuxVirtualMachineComponent(inst.provider.key, inst.location, inst.size, inst.monthlyHours)
 }
 
 // linuxVirtualMachineComponent is the abstraction of the same LinuxVirtualMachine.linuxVirtualMachineComponent
 // so it can be reused
-func linuxVirtualMachineComponent(key, location, size string, qty *decimal.Decimal) query.Component {
+func linuxVirtualMachineComponent(key, location, size string, qty *decimal.Decimal) resource.Component {
 	if qty == nil {
 		qty = util.DecimalPtr(decimal.NewFromInt(730))
 	}
-	return query.Component{
+	return resource.Component{
 		Name:            fmt.Sprintf("Compute %s", size),
 		Unit:            "Monthly Hours",
 		MonthlyQuantity: *qty,

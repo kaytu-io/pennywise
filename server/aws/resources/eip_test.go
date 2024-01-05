@@ -11,7 +11,6 @@ import (
 
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 )
 
@@ -23,7 +22,7 @@ func TestElasticIP_Components(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("EIP", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_eip.test",
 			Type:         "aws_eip",
 			Name:         "test",
@@ -32,9 +31,9 @@ func TestElasticIP_Components(t *testing.T) {
 				"vpc": true,
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Elastic IP",
 				Details:        []string{"ElasticIP:IdleAddress"},
@@ -63,7 +62,7 @@ func TestElasticIP_Components(t *testing.T) {
 	})
 
 	t.Run("EIPCustomerOwnedIpv4Pool", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_eip.test",
 			Type:         "aws_eip",
 			Name:         "test",
@@ -72,16 +71,16 @@ func TestElasticIP_Components(t *testing.T) {
 				"customer_owned_ipv4_pool": "customer-owned-ipv4-pool-id",
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{}
+		expected := []resource.Component{}
 
 		actual := p.ResourceComponents(rss, tfres)
 		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("EIPInstance", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_eip.test",
 			Type:         "aws_eip",
 			Name:         "test",
@@ -90,16 +89,16 @@ func TestElasticIP_Components(t *testing.T) {
 				"instance": "instance-id",
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{}
+		expected := []resource.Component{}
 
 		actual := p.ResourceComponents(rss, tfres)
 		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("EIPNetworkInterface", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_eip.test",
 			Type:         "aws_eip",
 			Name:         "test",
@@ -108,9 +107,9 @@ func TestElasticIP_Components(t *testing.T) {
 				"network_interface": "network-interface-id",
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{}
+		expected := []resource.Component{}
 
 		actual := p.ResourceComponents(rss, tfres)
 		assert.Equal(t, expected, actual)

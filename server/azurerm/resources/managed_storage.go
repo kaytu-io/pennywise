@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -80,8 +80,8 @@ func (p *Provider) newManagedStorage(vals managedDiskValues) *ManagedDisk {
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *ManagedDisk) Components() []query.Component {
-	var components []query.Component
+func (inst *ManagedDisk) Components() []resource.Component {
+	var components []resource.Component
 
 	sku := strings.Split(inst.storageAccountType, "_")
 	if sku[0] == "PremiumV2" {
@@ -115,7 +115,7 @@ func (inst *ManagedDisk) Components() []query.Component {
 		if !ok {
 			return nil
 		}
-		components = []query.Component{inst.managedStorageComponent(inst.provider.key, inst.location, skuName, sku[1], productName)}
+		components = []resource.Component{inst.managedStorageComponent(inst.provider.key, inst.location, skuName, sku[1], productName)}
 
 		if (sku[0] == "Premium") && (inst.diskSizeGb >= 1000) && inst.burstingEnabled {
 			components = append(components, inst.enableBurstingComponent(inst.provider.key, inst.location))
@@ -136,8 +136,8 @@ func (inst *ManagedDisk) Components() []query.Component {
 }
 
 // ultraLRSThroughputComponent Throughput of Ultra LRS
-func (inst *ManagedDisk) ultraLRSThroughputComponent(key, location string, throughput float64) query.Component {
-	return query.Component{
+func (inst *ManagedDisk) ultraLRSThroughputComponent(key, location string, throughput float64) resource.Component {
+	return resource.Component{
 		Name:           "Ultra LRS Throughput",
 		HourlyQuantity: decimal.NewFromFloat(throughput),
 		ProductFilter: &product.Filter{
@@ -160,8 +160,8 @@ func (inst *ManagedDisk) ultraLRSThroughputComponent(key, location string, throu
 }
 
 // ultraLRSCapacityComponent Capacity of Ultra LRS
-func (inst *ManagedDisk) ultraLRSCapacityComponent(key, location string, diskSize float64) query.Component {
-	return query.Component{
+func (inst *ManagedDisk) ultraLRSCapacityComponent(key, location string, diskSize float64) resource.Component {
+	return resource.Component{
 		Name:           "Ultra LRS Capacity",
 		HourlyQuantity: decimal.NewFromFloat(diskSize),
 		ProductFilter: &product.Filter{
@@ -184,8 +184,8 @@ func (inst *ManagedDisk) ultraLRSCapacityComponent(key, location string, diskSiz
 }
 
 // ultraLRSIOPsComponent IOPs for Ultra LRS
-func (inst *ManagedDisk) ultraLRSIOPsComponent(key, location string, iops float64) query.Component {
-	return query.Component{
+func (inst *ManagedDisk) ultraLRSIOPsComponent(key, location string, iops float64) resource.Component {
+	return resource.Component{
 		Name:           "Ultra LRS IOPs",
 		HourlyQuantity: decimal.NewFromFloat(iops),
 		ProductFilter: &product.Filter{
@@ -208,8 +208,8 @@ func (inst *ManagedDisk) ultraLRSIOPsComponent(key, location string, iops float6
 }
 
 // managedStorageComponent is the component for Premium and Standard Managed Storages
-func (inst *ManagedDisk) managedStorageComponent(key, location, diskName, storageReplicationType, productName string) query.Component {
-	return query.Component{
+func (inst *ManagedDisk) managedStorageComponent(key, location, diskName, storageReplicationType, productName string) resource.Component {
+	return resource.Component{
 		Name:            "Managed Storage",
 		MonthlyQuantity: decimal.NewFromInt(1),
 		ProductFilter: &product.Filter{
@@ -233,8 +233,8 @@ func (inst *ManagedDisk) managedStorageComponent(key, location, diskName, storag
 }
 
 // diskOperationsComponent is the component for Standard Managed Storages disk operations
-func (inst *ManagedDisk) diskOperationsComponent(key, location, skuName string, quantity decimal.Decimal) query.Component {
-	return query.Component{
+func (inst *ManagedDisk) diskOperationsComponent(key, location, skuName string, quantity decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            "Disk operations",
 		MonthlyQuantity: quantity,
 		ProductFilter: &product.Filter{
@@ -258,8 +258,8 @@ func (inst *ManagedDisk) diskOperationsComponent(key, location, skuName string, 
 }
 
 // enableBurstingComponent component for when the Bursting is enabled for the managed storage
-func (inst *ManagedDisk) enableBurstingComponent(key, location string) query.Component {
-	return query.Component{
+func (inst *ManagedDisk) enableBurstingComponent(key, location string) resource.Component {
+	return resource.Component{
 		Name:            "Enable Bursting",
 		MonthlyQuantity: decimal.NewFromInt(1),
 		ProductFilter: &product.Filter{

@@ -61,7 +61,7 @@ func (v *FSxFileSystem) getOpenzfsDeployOption(deploymentType string) string {
 }
 
 // newFSxOpenzfsFileSystem creates a new FSxOpenzfsFileSystem from fsxOpenzfsFileSystemValues.
-func (p *Provider) newFSxOpenzfsFileSystem(rss map[string]resource.Resource, vals fsxOpenzfsFileSystemValues) *FSxFileSystem {
+func (p *Provider) newFSxOpenzfsFileSystem(rss map[string]resource.ResourceDef, vals fsxOpenzfsFileSystemValues) *FSxFileSystem {
 	v := &FSxFileSystem{
 		provider:           p,
 		region:             p.region,

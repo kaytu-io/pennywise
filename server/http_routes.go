@@ -5,7 +5,6 @@ import (
 	awsres "github.com/kaytu-io/pennywise/server/aws/resources"
 	azurermres "github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/cost"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -38,7 +37,7 @@ func bindValidate(ctx echo.Context, i any) error {
 
 func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 	var req resource.State
-	var qResources []query.Resource
+	var qResources []resource.Resource
 	if err := bindValidate(ctx, &req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -48,10 +47,10 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 			if err != nil {
 				return err
 			}
-			resources := make(map[string]resource.Resource)
+			resources := make(map[string]resource.ResourceDef)
 			resources[res.Address] = res
 			components := provider.ResourceComponents(resources, res)
-			qResources = append(qResources, query.Resource{
+			qResources = append(qResources, resource.Resource{
 				Address:    res.Address,
 				Provider:   res.ProviderName,
 				Type:       res.Type,
@@ -62,10 +61,10 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 			if err != nil {
 				return err
 			}
-			resources := make(map[string]resource.Resource)
+			resources := make(map[string]resource.ResourceDef)
 			resources[res.Address] = res
 			components := provider.ResourceComponents(resources, res)
-			qResources = append(qResources, query.Resource{
+			qResources = append(qResources, resource.Resource{
 				Address:    res.Address,
 				Provider:   res.ProviderName,
 				Type:       res.Type,
@@ -82,8 +81,8 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 }
 
 func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
-	var req resource.Resource
-	var qResource query.Resource
+	var req resource.ResourceDef
+	var qResource resource.Resource
 	if err := bindValidate(ctx, &req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -92,10 +91,10 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 		if err != nil {
 			return err
 		}
-		resources := make(map[string]resource.Resource)
+		resources := make(map[string]resource.ResourceDef)
 		resources[req.Address] = req
 		components := provider.ResourceComponents(resources, req)
-		qResource = query.Resource{
+		qResource = resource.Resource{
 			Address:    req.Address,
 			Provider:   req.ProviderName,
 			Type:       req.Type,
@@ -106,17 +105,17 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 		if err != nil {
 			return err
 		}
-		resources := make(map[string]resource.Resource)
+		resources := make(map[string]resource.ResourceDef)
 		resources[req.Address] = req
 		components := provider.ResourceComponents(resources, req)
-		qResource = query.Resource{
+		qResource = resource.Resource{
 			Address:    req.Address,
 			Provider:   req.ProviderName,
 			Type:       req.Type,
 			Components: components,
 		}
 	}
-	state, err := cost.NewState(ctx.Request().Context(), h.backend, []query.Resource{qResource}, h.logger)
+	state, err := cost.NewState(ctx.Request().Context(), h.backend, []resource.Resource{qResource}, h.logger)
 	if err != nil {
 		return err
 	}

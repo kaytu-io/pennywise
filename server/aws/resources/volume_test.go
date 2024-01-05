@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 )
 
@@ -22,7 +21,7 @@ func TestVolume_Components(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("DefaultValues", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_ebs_volume.test",
 			Type:         "aws_ebs_volume",
 			Name:         "test",
@@ -31,9 +30,9 @@ func TestVolume_Components(t *testing.T) {
 				"size": float64(42),
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:            "Storage",
 				MonthlyQuantity: decimal.NewFromFloat(42),
@@ -56,7 +55,7 @@ func TestVolume_Components(t *testing.T) {
 	})
 
 	t.Run("WithAllValues", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_ebs_volume.test",
 			Type:         "aws_ebs_volume",
 			Name:         "test",
@@ -68,9 +67,9 @@ func TestVolume_Components(t *testing.T) {
 				"iops":              float64(123),
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:            "Storage",
 				MonthlyQuantity: decimal.NewFromFloat(42),

@@ -3,8 +3,8 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -61,8 +61,8 @@ func (p *Provider) newNatGateway(vals natGatewayValues) *NatGateway {
 	return inst
 }
 
-func (inst *NatGateway) Components() []query.Component {
-	var components []query.Component
+func (inst *NatGateway) Components() []resource.Component {
+	var components []resource.Component
 
 	var monthlyDataProcessedGb decimal.Decimal
 	if inst.monthlyDataProcessedGb != nil {
@@ -76,8 +76,8 @@ func (inst *NatGateway) Components() []query.Component {
 	return components
 }
 
-func (inst *NatGateway) natGatewayCostComponent(name string) query.Component {
-	return query.Component{
+func (inst *NatGateway) natGatewayCostComponent(name string) resource.Component {
+	return resource.Component{
 
 		Name:           name,
 		Unit:           "hours",
@@ -98,8 +98,8 @@ func (inst *NatGateway) natGatewayCostComponent(name string) query.Component {
 		},
 	}
 }
-func (inst *NatGateway) dataProcessedCostComponent(name string, monthlyDataProcessedGb decimal.Decimal) query.Component {
-	return query.Component{
+func (inst *NatGateway) dataProcessedCostComponent(name string, monthlyDataProcessedGb decimal.Decimal) resource.Component {
+	return resource.Component{
 
 		Name:            name,
 		Unit:            "GB",

@@ -61,7 +61,7 @@ func (v *FSxFileSystem) getOntapDeployOption(deploymentType string) string {
 }
 
 // newFSxOntapFileSystem creates a new FSxOntapFileSystem from fsxOntapFileSystemValues.
-func (p *Provider) newFSxOntapFileSystem(rss map[string]resource.Resource, vals fsxOntapFileSystemValues) *FSxFileSystem {
+func (p *Provider) newFSxOntapFileSystem(rss map[string]resource.ResourceDef, vals fsxOntapFileSystemValues) *FSxFileSystem {
 	v := &FSxFileSystem{
 		provider:           p,
 		region:             p.region,

@@ -7,7 +7,6 @@ import (
 
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/shopspring/decimal"
@@ -23,7 +22,7 @@ func TestAutoscalingGroup_Components(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("LaunchTemplate", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "module.test.aws_autoscaling_group.lt",
 			Type:         "aws_autoscaling_group",
 			Name:         "lt",
@@ -37,8 +36,8 @@ func TestAutoscalingGroup_Components(t *testing.T) {
 			},
 		}
 
-		rss := map[string]resource.Resource{
-			"aws_launch_template.test": resource.Resource{
+		rss := map[string]resource.ResourceDef{
+			"aws_launch_template.test": resource.ResourceDef{
 				Address:      "aws_launch_template.test",
 				Type:         "aws_launch_template",
 				Name:         "test",
@@ -61,7 +60,7 @@ func TestAutoscalingGroup_Components(t *testing.T) {
 			},
 		}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Compute",
 				HourlyQuantity: decimal.NewFromInt(2),
@@ -169,7 +168,7 @@ func TestAutoscalingGroup_Components(t *testing.T) {
 	})
 
 	t.Run("MixedInstancesPolicyLaunchTemplate", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_autoscaling_group.mixlt",
 			Type:         "aws_autoscaling_group",
 			Name:         "mixlt",
@@ -198,8 +197,8 @@ func TestAutoscalingGroup_Components(t *testing.T) {
 			},
 		}
 
-		rss := map[string]resource.Resource{
-			"aws_launch_template.testmix": resource.Resource{
+		rss := map[string]resource.ResourceDef{
+			"aws_launch_template.testmix": resource.ResourceDef{
 				Address:      "aws_launch_template.testmix",
 				Type:         "aws_launch_template",
 				Name:         "testmix",
@@ -219,7 +218,7 @@ func TestAutoscalingGroup_Components(t *testing.T) {
 			},
 		}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Compute",
 				HourlyQuantity: decimal.NewFromInt(3),
@@ -266,7 +265,7 @@ func TestAutoscalingGroup_Components(t *testing.T) {
 	})
 
 	t.Run("LaunchConfiguration", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "module.test.aws_autoscaling_group.lt",
 			Type:         "aws_autoscaling_group",
 			Name:         "lt",
@@ -280,8 +279,8 @@ func TestAutoscalingGroup_Components(t *testing.T) {
 			},
 		}
 
-		rss := map[string]resource.Resource{
-			"aws_launch_configuration.test": resource.Resource{
+		rss := map[string]resource.ResourceDef{
+			"aws_launch_configuration.test": resource.ResourceDef{
 				Address:      "aws_launch_configuration.test",
 				Type:         "aws_launch_configuration",
 				Name:         "test",
@@ -301,7 +300,7 @@ func TestAutoscalingGroup_Components(t *testing.T) {
 			},
 		}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Compute",
 				HourlyQuantity: decimal.NewFromInt(2),

@@ -86,19 +86,20 @@ type Resource struct {
 	Values       map[string]interface{} `json:"values"`
 }
 
-func (r *Resource) ToResource(region string) resource.Resource {
-	resource := resource.Resource{
-		Address:      r.Address,
-		Type:         r.Type,
-		Name:         r.Name,
-		RegionCode:   region,
-		ProviderName: r.ProviderName,
-		Values:       r.Values,
+func (r *Resource) ToResource(region string) resource.ResourceDef {
+	resourceDef := resource.ResourceDef{
+		Address:    r.Address,
+		Type:       r.Type,
+		Name:       r.Name,
+		RegionCode: region,
+		Values:     r.Values,
 	}
 	if strings.Contains(r.ProviderName, "azurerm") {
-		resource.ProviderName = "azurerm"
+		resourceDef.ProviderName = resource.AzureProvider
+	} else {
+		resourceDef.ProviderName = resource.AWSProvider
 	}
-	return resource
+	return resourceDef
 }
 
 // Module is a collection of resources.

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -89,8 +89,8 @@ func (p *Provider) newSqlManagedInstance(vals sqlManagedInstanceValues) *SqlMana
 	return inst
 }
 
-func (inst *SqlManagedInstance) Components() []query.Component {
-	var components []query.Component
+func (inst *SqlManagedInstance) Components() []resource.Component {
+	var components []resource.Component
 
 	components = append(components, inst.managedInstanceComponent())
 
@@ -108,8 +108,8 @@ func (inst *SqlManagedInstance) Components() []query.Component {
 	return components
 }
 
-func (inst *SqlManagedInstance) managedInstanceComponent() query.Component {
-	return query.Component{
+func (inst *SqlManagedInstance) managedInstanceComponent() resource.Component {
+	return resource.Component{
 		Name:           fmt.Sprintf("Compute (%s %d Cores)", strings.ToTitle(inst.sku), inst.cores),
 		Unit:           "hours",
 		HourlyQuantity: decimal.NewFromInt(1),
@@ -153,8 +153,8 @@ func (inst *SqlManagedInstance) meteredName() *string {
 	return util.StringPtr(meterName)
 }
 
-func (inst *SqlManagedInstance) sqlMIStorageCostComponent() query.Component {
-	return query.Component{
+func (inst *SqlManagedInstance) sqlMIStorageCostComponent() resource.Component {
+	return resource.Component{
 		Name:            "Additional Storage",
 		Unit:            "GB",
 		MonthlyQuantity: decimal.NewFromInt(inst.storageSizeInGb - 32),
@@ -176,14 +176,14 @@ func (inst *SqlManagedInstance) sqlMIStorageCostComponent() query.Component {
 	}
 }
 
-func (inst *SqlManagedInstance) sqlMIBackupCostComponent() query.Component {
+func (inst *SqlManagedInstance) sqlMIBackupCostComponent() resource.Component {
 	var backup decimal.Decimal
 
 	if inst.backupStorageGB != nil {
 		backup = decimal.NewFromInt(*inst.backupStorageGB)
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            fmt.Sprintf("PITR backup storage (%s)", inst.storageAccountType),
 		Unit:            "GB",
 		MonthlyQuantity: backup,
@@ -205,8 +205,8 @@ func (inst *SqlManagedInstance) sqlMIBackupCostComponent() query.Component {
 	}
 }
 
-func (inst *SqlManagedInstance) sqlMILicenseCostComponent() query.Component {
-	return query.Component{
+func (inst *SqlManagedInstance) sqlMILicenseCostComponent() resource.Component {
+	return resource.Component{
 		Name:           "SQL license",
 		Unit:           "vCore-hours",
 		HourlyQuantity: decimal.NewFromInt(inst.cores),
@@ -228,14 +228,14 @@ func (inst *SqlManagedInstance) sqlMILicenseCostComponent() query.Component {
 	}
 }
 
-func (inst *SqlManagedInstance) sqlMILongTermRetentionStorageGBCostComponent() query.Component {
+func (inst *SqlManagedInstance) sqlMILongTermRetentionStorageGBCostComponent() resource.Component {
 	var retention decimal.Decimal
 
 	if inst.longTermRetentionStorageGB != nil {
 		retention = decimal.NewFromInt(*inst.longTermRetentionStorageGB)
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            fmt.Sprintf("LTR backup storage (%s)", inst.storageAccountType),
 		Unit:            "GB",
 		MonthlyQuantity: retention,

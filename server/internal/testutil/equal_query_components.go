@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/stretchr/testify/assert"
 )
 
 // EqualQueryComponents will compare the components but the MonthlyQuantity will be
 // compared via String and the rest with assert.Equal
-func EqualQueryComponents(t *testing.T, eqcs, aqcs []query.Component) {
+func EqualQueryComponents(t *testing.T, eqcs, aqcs []resource.Component) {
 	t.Helper()
 
 	for i, eqc := range eqcs {

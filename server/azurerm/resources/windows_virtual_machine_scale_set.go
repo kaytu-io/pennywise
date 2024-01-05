@@ -1,7 +1,7 @@
 package resources
 
 import (
-	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -94,12 +94,12 @@ func (p *Provider) newWindowsVirtualMachineScaleSet(vals windowsVirtualMachineSc
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *WindowsVirtualMachineScaleSet) Components() []query.Component {
+func (inst *WindowsVirtualMachineScaleSet) Components() []resource.Component {
 	purchaseOption := "Consumption"
 	if strings.ToLower(inst.licenseType) == "windows_client" || strings.ToLower(inst.licenseType) == "windows_server" {
 		purchaseOption = "DevTestConsumption"
 	}
-	var components []query.Component
+	var components []resource.Component
 
 	for i := int64(0); i < inst.instances; i++ {
 		components = append(components, windowsVirtualMachineComponent(inst.provider.key, inst.location, inst.sku, purchaseOption, inst.monthlyHours))
