@@ -54,20 +54,34 @@ type storageAccountValues struct {
 	AccountReplicationType string  `mapstructure:"account_replication_type"`
 
 	Usage struct {
-		MonthlyStorageGB                        *float64 `mapstructure:"storage_gb"`
-		MonthlyIterativeReadOperations          *float64 `mapstructure:"monthly_iterative_read_operations"`
-		MonthlyReadOperations                   *float64 `mapstructure:"monthly_read_operations"`
-		MonthlyIterativeWriteOperations         *float64 `mapstructure:"monthly_iterative_write_operations"`
-		MonthlyWriteOperations                  *float64 `mapstructure:"monthly_write_operations"`
+		// receive total size of storage in GB.
+		MonthlyStorageGB *float64 `mapstructure:"storage_gb"`
+		// receive monthly number of Iterative read operations (GPv2).
+		MonthlyIterativeReadOperations *float64 `mapstructure:"monthly_iterative_read_operations"`
+		// receive monthly number of Read operations.
+		MonthlyReadOperations *float64 `mapstructure:"monthly_read_operations"`
+		// receive monthly number of Iterative write operations (GPv2).
+		MonthlyIterativeWriteOperations *float64 `mapstructure:"monthly_iterative_write_operations"`
+		// receive monthly number of Write operations.
+		MonthlyWriteOperations *float64 `mapstructure:"monthly_write_operations"`
+		// receive monthly number of List and Create Container operations
 		MonthlyListAndCreateContainerOperations *float64 `mapstructure:"monthly_list_and_create_container_operations"`
-		MonthlyOtherOperations                  *float64 `mapstructure:"monthly_other_operations"`
-		MonthlyDataRetrievalGB                  *float64 `mapstructure:"monthly_data_retrieval_gb"`
-		MonthlyDataWriteGB                      *float64 `mapstructure:"monthly_data_write_gb"`
-		BlobIndexTags                           *float64 `mapstructure:"blob_index_tags"`
-		DataAtRestStorageGB                     *float64 `mapstructure:"data_at_rest_storage_gb"`
-		SnapshotsStorageGB                      *float64 `mapstructure:"snapshots_storage_gb"`
-		MetadataAtRestStorageGB                 *float64 `mapstructure:"metadata_at_rest_storage_gb"`
-		EarlyDeletionGB                         *float64 `mapstructure:"early_deletion_gb"`
+		// receive monthly number of All other operations.
+		MonthlyOtherOperations *float64 `mapstructure:"monthly_other_operations"`
+		// receive monthly number of data retrieval in GB.
+		MonthlyDataRetrievalGB *float64 `mapstructure:"monthly_data_retrieval_gb"`
+		// receive monthly number of data write in GB.
+		MonthlyDataWriteGB *float64 `mapstructure:"monthly_data_write_gb"`
+		// receive total number of Blob indexes.
+		BlobIndexTags *float64 `mapstructure:"blob_index_tags"`
+		// receive total size of Data at Rest in GB (File storage).
+		DataAtRestStorageGB *float64 `mapstructure:"data_at_rest_storage_gb"`
+		// receive total size of Snapshots in GB (File storage).
+		SnapshotsStorageGB *float64 `mapstructure:"snapshots_storage_gb"`
+		// receive total size of Metadata in GB (File storage).
+		MetadataAtRestStorageGB *float64 `mapstructure:"metadata_at_rest_storage_gb"`
+		// receive total size of Early deletion data in GB.
+		EarlyDeletionGB *float64 `mapstructure:"early_deletion_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
 
@@ -117,7 +131,7 @@ func (p *Provider) newStorageAccount(vals storageAccountValues) *StorageAccount 
 		nfsv3 = *vals.NFSv3
 	}
 
-	return &StorageAccount{
+	inst := StorageAccount{
 		provider: p,
 
 		location:               vals.Location,
@@ -142,6 +156,7 @@ func (p *Provider) newStorageAccount(vals storageAccountValues) *StorageAccount 
 		metadataAtRestStorageGB:                 util.FloatToDecimal(vals.Usage.MetadataAtRestStorageGB),
 		earlyDeletionGB:                         util.FloatToDecimal(vals.Usage.EarlyDeletionGB),
 	}
+	return &inst
 }
 
 func (inst *StorageAccount) Components() []query.Component {
@@ -151,11 +166,11 @@ func (inst *StorageAccount) Components() []query.Component {
 		return nil
 	}
 
-	if inst.isPremium() {
+	if strings.ToLower(inst.accountTier) == "premium" {
 		inst.accessTier = "Premium"
 	}
 
-	if inst.isStorageV1() {
+	if strings.ToLower(inst.accountKind) == "storage" {
 		inst.accessTier = "Standard"
 	}
 
@@ -177,6 +192,7 @@ func (inst *StorageAccount) Components() []query.Component {
 
 	components = append(components, inst.earlyDeletionCostComponents()...)
 
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 	return components
 }
 
@@ -185,23 +201,23 @@ func (inst *StorageAccount) buildProductFilter(meterName string) *product.Filter
 	var productName string
 
 	switch {
-	case inst.isBlockBlobStorage():
+	case strings.ToLower(inst.accountKind) == "blockblobstorage":
 		productName = map[string]string{
 			"Standard": "Blob Storage",
 			"Premium":  "Premium Block Blob",
 		}[inst.accountTier]
-	case inst.isStorageV1():
+	case strings.ToLower(inst.accountKind) == "storage":
 		productName = map[string]string{
 			"Standard": "General Block Blob",
 			"Premium":  "Premium Block Blob",
 		}[inst.accountTier]
-	case inst.isStorageV2():
+	case strings.ToLower(inst.accountKind) == "storagev2":
 		if inst.nfsv3 {
 			productName = map[string]string{
 				"Standard": "General Block Blob v2 Hierarchical Namespace",
 				"Premium":  "Premium Block Blob v2 Hierarchical Namespace",
 			}[inst.accountTier]
-		} else if strings.EqualFold(inst.accountReplicationType, "lrs") && inst.isHot() {
+		} else if strings.EqualFold(inst.accountReplicationType, "lrs") && strings.ToLower(inst.accessTier) == "hot" {
 			// For some reason the Azure pricing doesn't contain all the LRS costs for all regions under "General Block Blob v2" product name.
 			// But, the same pricing is available under "Blob Storage" product name.
 			productName = map[string]string{
@@ -214,12 +230,12 @@ func (inst *StorageAccount) buildProductFilter(meterName string) *product.Filter
 				"Premium":  "Premium Block Blob",
 			}[inst.accountTier]
 		}
-	case inst.isBlobStorage():
+	case strings.ToLower(inst.accountKind) == "blobstorage":
 		productName = map[string]string{
 			"Standard": "Blob Storage",
 			"Premium":  "Premium Block Blob",
 		}[inst.accountTier]
-	case inst.isFileStorage():
+	case strings.ToLower(inst.accountKind) == "filestorage":
 		productName = map[string]string{
 			"Standard": "Files v2",
 			"Premium":  "Premium Files",
@@ -241,39 +257,10 @@ func (inst *StorageAccount) buildProductFilter(meterName string) *product.Filter
 	}
 }
 
-// storageCostComponents returns one or several tier cost components for monthly
-// storage capacity in Blob Storage.
-//
-// BlockBlobStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       cost exists
-//
-// BlobStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       cost exists
-//
-// Storage:
-//
-// Standard: cost exists
-//
-// StorageV2:
-//
-//	Standard Hot:        cost exists
-//	Standard Hot NFSv3:  cost exists
-//	Standard Cool:       cost exists
-//	Standard Cool NFSv3: cost exists
-//	Premium:             cost exists
-//	Premium NFSv3:       cost exists
-//
-// FileStorage: see dataAtRestCostComponents()
 func (inst *StorageAccount) storageCostComponents() []query.Component {
 	var components []query.Component
 
-	if inst.isFileStorage() {
+	if strings.ToLower(inst.accountKind) == "filestorage" {
 		return components
 	}
 
@@ -295,7 +282,7 @@ func (inst *StorageAccount) storageCostComponents() []query.Component {
 
 	// Only Hot storage has pricing tiers, others have a single price for any
 	// amount.
-	if !inst.isHot() {
+	if !(strings.ToLower(inst.accessTier) == "hot") {
 		components = append(components, inst.buildStorageCostComponent(
 			name,
 			"0",
@@ -327,33 +314,13 @@ func (inst *StorageAccount) storageCostComponents() []query.Component {
 			))
 		}
 	}
-
 	return components
 }
 
-// iterativeWriteOperationsCostComponents returns a cost component for Iterative
-// Write Operations.
-//
-// BlockBlobStorage: n/a
-//
-// BlobStorage: n/a
-//
-// Storage: n/a
-//
-// StorageV2:
-//
-//	Standard Hot:        no cost
-//	Standard Hot NFSv3:  cost exists
-//	Standard Cool:       no cost
-//	Standard Cool NFSv3: cost exists
-//	Premium:             no cost
-//	Premium NFSv3:       no cost
-//
-// FileStorage: n/a
 func (inst *StorageAccount) iterativeWriteOperationsCostComponents() []query.Component {
 	var components []query.Component
 
-	if !inst.isStorageV2() || !inst.nfsv3 || inst.isPremium() {
+	if !(strings.ToLower(inst.accountKind) == "storagev2") || !inst.nfsv3 || strings.ToLower(inst.accountTier) == "premium" {
 		return components
 	}
 
@@ -382,42 +349,10 @@ func (inst *StorageAccount) iterativeWriteOperationsCostComponents() []query.Com
 	return components
 }
 
-// writeOperationsCostComponents returns a cost component for Write Operations.
-//
-// BlockBlobStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       cost exists
-//
-// BlobStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       cost exists
-//
-// Storage:
-//
-// Standard: cost exists
-//
-// StorageV2:
-//
-//	Standard Hot:        cost exists
-//	Standard Hot NFSv3:  cost exists
-//	Standard Cool:       cost exists
-//	Standard Cool NFSv3: cost exists
-//	Premium:             cost exists
-//	Premium NFSv3:       cost exists
-//
-// FileStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       no cost
 func (inst *StorageAccount) writeOperationsCostComponents() []query.Component {
 	var components []query.Component
 
-	if inst.isFileStorage() && inst.isPremium() {
+	if strings.ToLower(inst.accountKind) == "filestorage" && strings.ToLower(inst.accountTier) == "premium" {
 		return components
 	}
 
@@ -430,7 +365,7 @@ func (inst *StorageAccount) writeOperationsCostComponents() []query.Component {
 	}
 
 	meterName := "Write Operations"
-	if inst.isStorageV2() && inst.nfsv3 {
+	if strings.ToLower(inst.accountKind) == "storagev2" && inst.nfsv3 {
 		meterName = "(?<!Iterative) Write Operations"
 	}
 
@@ -449,43 +384,10 @@ func (inst *StorageAccount) writeOperationsCostComponents() []query.Component {
 	return components
 }
 
-// listAndCreateContainerOperationsCostComponents returns a cost component for
-// List and Create Container Operations (List Operations for File storage).
-//
-// BlockBlobStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       cost exists
-//
-// BlobStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       cost exists
-//
-// Storage:
-//
-// Standard: cost exists
-//
-// StorageV2:
-//
-//	Standard Hot:        cost exists
-//	Standard Hot NFSv3:  no cost
-//	Standard Cool:       cost exists
-//	Standard Cool NFSv3: no cost
-//	Premium:             cost exists
-//	Premium NFSv3:       cost exists
-//
-// FileStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       no cost
 func (inst *StorageAccount) listAndCreateContainerOperationsCostComponents() []query.Component {
 	var components []query.Component
 
-	if inst.isFileStorage() && inst.isPremium() {
+	if strings.ToLower(inst.accountKind) == "filestorage" && strings.ToLower(inst.accountTier) == "premium" {
 		return components
 	}
 
@@ -500,7 +402,7 @@ func (inst *StorageAccount) listAndCreateContainerOperationsCostComponents() []q
 	name := "List and create container operations"
 	meterName := "List and Create Container Operations"
 
-	if inst.isFileStorage() {
+	if strings.ToLower(inst.accountKind) == "filestorage" {
 		name = "List operations"
 		meterName = "List Operations"
 	}
@@ -520,28 +422,10 @@ func (inst *StorageAccount) listAndCreateContainerOperationsCostComponents() []q
 	return components
 }
 
-// iterativeReadOperationsCostComponents returns a cost component for Iterative Read Operations.
-//
-// BlockBlobStorage: n/a
-//
-// BlobStorage: n/a
-//
-// Storage: n/a
-//
-// StorageV2:
-//
-//	Standard Hot:        no cost
-//	Standard Hot NFSv3:  cost exists
-//	Standard Cool:       no cost
-//	Standard Cool NFSv3: cost exists
-//	Premium:             no cost
-//	Premium NFSv3:       no cost
-//
-// FileStorage: n/a
 func (inst *StorageAccount) iterativeReadOperationsCostComponents() []query.Component {
 	var components []query.Component
 
-	if !inst.isStorageV2() || !inst.nfsv3 || inst.isPremium() {
+	if !(strings.ToLower(inst.accountKind) == "storagev2") || !inst.nfsv3 || strings.ToLower(inst.accountTier) == "premium" {
 		return components
 	}
 
@@ -570,36 +454,10 @@ func (inst *StorageAccount) iterativeReadOperationsCostComponents() []query.Comp
 	return components
 }
 
-// readOperationsCostComponents returns a cost component for Read Operations.
-//
-// BlockBlobStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       cost exists
-//
-// Storage:
-//
-// Standard: cost exists
-//
-// StorageV2:
-//
-//	Standard Hot:        cost exists
-//	Standard Hot NFSv3:  cost exists
-//	Standard Cool:       cost exists
-//	Standard Cool NFSv3: cost exists
-//	Premium:             cost exists
-//	Premium NFSv3:       cost exists
-//
-// FileStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       no cost
 func (inst *StorageAccount) readOperationsCostComponents() []query.Component {
 	var components []query.Component
 
-	if inst.isFileStorage() && inst.isPremium() {
+	if strings.ToLower(inst.accountKind) == "filestorage" && strings.ToLower(inst.accountTier) == "premium" {
 		return components
 	}
 
@@ -612,10 +470,10 @@ func (inst *StorageAccount) readOperationsCostComponents() []query.Component {
 	}
 
 	meterName := "Read Operations"
-	if inst.isStorageV2() && inst.nfsv3 {
+	if strings.ToLower(inst.accountKind) == "storagev2" && inst.nfsv3 {
 		meterName = "(?<!Iterative) Read Operations"
 	}
-	if inst.isStorageV1() && contains([]string{"LRS", "GRS", "RA-GRS"}, strings.ToUpper(inst.accountReplicationType)) {
+	if strings.ToLower(inst.accountKind) == "storage" && contains([]string{"LRS", "GRS", "RA-GRS"}, strings.ToUpper(inst.accountReplicationType)) {
 		// Storage V1 GRS/LRS/RA-GRS doesn't always have a Read Operations meter name, but we can use this regex
 		// to match Read or Other Operations meter since they are the same price.
 		meterName = "(Other|Read) Operations"
@@ -637,42 +495,10 @@ func (inst *StorageAccount) readOperationsCostComponents() []query.Component {
 	return components
 }
 
-// otherOperationsCostComponents returns a cost component for All Other Operations.
-//
-// BlockBlobStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       cost exists
-//
-// BlobStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       cost exists
-//
-// Storage:
-//
-// Standard: cost exists
-//
-// StorageV2:
-//
-//	Standard Hot:        cost exists
-//	Standard Hot NFSv3:  cost exists
-//	Standard Cool:       cost exists
-//	Standard Cool NFSv3: cost exists
-//	Premium:             cost exists
-//	Premium NFSv3:       cost exists
-//
-// FileStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       no cost
 func (inst *StorageAccount) otherOperationsCostComponents() []query.Component {
 	var components []query.Component
 
-	if inst.isFileStorage() && inst.isPremium() {
+	if strings.ToLower(inst.accountKind) == "filestorage" && strings.ToLower(inst.accountTier) == "premium" {
 		return components
 	}
 
@@ -685,9 +511,7 @@ func (inst *StorageAccount) otherOperationsCostComponents() []query.Component {
 	}
 
 	meterName := "Other Operations"
-	if inst.isStorageV1() {
-		// Most StorageV1 rows don't have a meter name called Other Operations,
-		// but they do have Delete Operations which is the same price.
+	if strings.ToLower(inst.accountKind) == "storage" {
 		meterName = "Delete Operations"
 	}
 
@@ -706,41 +530,10 @@ func (inst *StorageAccount) otherOperationsCostComponents() []query.Component {
 	return components
 }
 
-// dataRetrievalCostComponents returns a cost component for Data Retrieval
-// amount.
-//
-// BlockBlobStorage:
-//
-//	Standard Hot:  no cost
-//	Standard Cool: cost exists
-//	Premium:       no cost
-//
-// BlobStorage:
-//
-//	Standard Hot:  no cost
-//	Standard Cool: cost exists
-//	Premium:       no cost
-//
-// Storage: n/a
-//
-// StorageV2:
-//
-//	Standard Hot:        no cost
-//	Standard Hot NFSv3:  no cost
-//	Standard Cool:       cost exists
-//	Standard Cool NFSv3: cost exists
-//	Premium:             no cost
-//	Premium NFSv3:       no cost
-//
-// FileStorage:
-//
-//	Standard Hot:  no cost
-//	Standard Cool: cost exists
-//	Premium:       no cost
 func (inst *StorageAccount) dataRetrievalCostComponents() []query.Component {
 	var components []query.Component
 
-	if !inst.isCool() {
+	if !(strings.ToLower(inst.accessTier) == "cool") {
 		return components
 	}
 
@@ -767,40 +560,10 @@ func (inst *StorageAccount) dataRetrievalCostComponents() []query.Component {
 	return components
 }
 
-// dataWriteCostComponents returns a cost component for Data Write amount.
-//
-// BlockBlobStorage:
-//
-//	Standard Hot:  no cost
-//	Standard Cool: cost exists
-//	Premium:       no cost
-//
-// BlobStorage:
-//
-//	Standard Hot:  no cost
-//	Standard Cool: cost exists
-//	Premium:       no cost
-//
-// Storage: n/a
-//
-// StorageV2:
-//
-//	Standard Hot:        no cost
-//	Standard Hot NFSv3:  no cost
-//	Standard Cool:       no cost
-//	Standard Cool NFSv3: no cost
-//	Premium:             no cost
-//	Premium NFSv3:       no cost
-//
-// FileStorage:
-//
-//	Standard Hot:  no cost
-//	Standard Cool: no cost
-//	Premium:       no cost
 func (inst *StorageAccount) dataWriteCostComponents() []query.Component {
 	var components []query.Component
 
-	if !(inst.isBlockBlobStorage() && !inst.isBlobStorage()) || !inst.isCool() {
+	if !(strings.ToLower(inst.accountKind) == "blockblobstorage" && !(strings.ToLower(inst.accountKind) == "blobstorage")) || !(strings.ToLower(inst.accessTier) == "cool") {
 		return components
 	}
 
@@ -827,44 +590,13 @@ func (inst *StorageAccount) dataWriteCostComponents() []query.Component {
 	return components
 }
 
-// blobIndexTagsCostComponents returns a cost component for Blob Index
-// subresources amount.
-//
-// BlockBlobStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       no cost
-//
-// BlobStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       no cost
-//
-// Storage: n/a
-//
-// StorageV2:
-//
-//	Standard Hot:        cost exists
-//	Standard Hot NFSv3:  no cost
-//	Standard Cool:       cost exists
-//	Standard Cool NFSv3: no cost
-//	Premium:             no cost
-//	Premium NFSv3:       no cost
-//
-// FileStorage:
-//
-//	Standard Hot:  no cost
-//	Standard Cool: no cost
-//	Premium:       no cost
 func (inst *StorageAccount) blobIndexTagsCostComponents() []query.Component {
 	var components []query.Component
 
-	isBlockPremium := inst.isBlockBlobStorage() && inst.isPremium()
-	isBlobPremium := inst.isBlobStorage() && inst.isPremium()
-	isV2NFSv3 := inst.isStorageV2() && (inst.nfsv3 || inst.isPremium())
-	if inst.isFileStorage() || inst.isStorageV1() || isBlockPremium || isBlobPremium || isV2NFSv3 {
+	isBlockPremium := strings.ToLower(inst.accountKind) == "blockblobstorage" && strings.ToLower(inst.accountTier) == "premium"
+	isBlobPremium := strings.ToLower(inst.accountKind) == "blobstorage" && strings.ToLower(inst.accountTier) == "premium"
+	isV2NFSv3 := strings.ToLower(inst.accountKind) == "storagev2" && (inst.nfsv3 || strings.ToLower(inst.accountTier) == "premium")
+	if strings.ToLower(inst.accountKind) == "filestorage" || strings.ToLower(inst.accountKind) == "storage" || isBlockPremium || isBlobPremium || isV2NFSv3 {
 		return components
 	}
 
@@ -893,26 +625,10 @@ func (inst *StorageAccount) blobIndexTagsCostComponents() []query.Component {
 	return components
 }
 
-// dataAtRestCostComponents returns a cost component for Data at Rest amount in
-// File Storage.
-//
-// BlockBlobStorage: n/a
-//
-// BlobStorage: n/a
-//
-// Storage: n/a
-//
-// StorageV2: n/a
-//
-// FileStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       cost exists
 func (inst *StorageAccount) dataAtRestCostComponents() []query.Component {
 	var components []query.Component
 
-	if !inst.isFileStorage() {
+	if !(strings.ToLower(inst.accountKind) == "filestorage") {
 		return components
 	}
 
@@ -923,7 +639,7 @@ func (inst *StorageAccount) dataAtRestCostComponents() []query.Component {
 	}
 
 	meterName := "Data Stored"
-	if inst.isPremium() {
+	if strings.ToLower(inst.accountTier) == "premium" {
 		meterName = "Provisioned"
 	}
 
@@ -942,26 +658,10 @@ func (inst *StorageAccount) dataAtRestCostComponents() []query.Component {
 	return components
 }
 
-// snapshotsCostComponents returns a cost component for Snapshots amount in
-// File Storage.
-//
-// BlockBlobStorage: n/a
-//
-// BlobStorage: n/a
-//
-// Storage: n/a
-//
-// StorageV2: n/a
-//
-// FileStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       cost exists
 func (inst *StorageAccount) snapshotsCostComponents() []query.Component {
 	var components []query.Component
 
-	if !inst.isFileStorage() {
+	if !(strings.ToLower(inst.accountKind) == "filestorage") {
 		return components
 	}
 
@@ -972,7 +672,7 @@ func (inst *StorageAccount) snapshotsCostComponents() []query.Component {
 	}
 
 	meterName := "Data Stored"
-	if inst.isPremium() {
+	if strings.ToLower(inst.accountTier) == "premium" {
 		meterName = "Snapshots"
 	}
 
@@ -991,26 +691,10 @@ func (inst *StorageAccount) snapshotsCostComponents() []query.Component {
 	return components
 }
 
-// metadataAtRestCostComponents returns a cost component for Metadata at-rest amount in
-// File Storage.
-//
-// BlockBlobStorage: n/a
-//
-// BlobStorage: n/a
-//
-// Storage: n/a
-//
-// StorageV2: n/a
-//
-// FileStorage:
-//
-//	Standard Hot:  cost exists
-//	Standard Cool: cost exists
-//	Premium:       no cost
 func (inst *StorageAccount) metadataAtRestCostComponents() []query.Component {
 	var components []query.Component
 
-	if !inst.isFileStorage() || inst.isPremium() {
+	if !(strings.ToLower(inst.accountKind) == "filestorage") || strings.ToLower(inst.accountTier) == "premium" {
 		return components
 	}
 
@@ -1037,33 +721,10 @@ func (inst *StorageAccount) metadataAtRestCostComponents() []query.Component {
 	return components
 }
 
-// earlyDeletionCostComponents returns a cost component for Metadata at-rest amount in
-// File Storage.
-//
-// BlockBlobStorage: n/a
-//
-// BlobStorage: n/a
-//
-// Storage: n/a
-//
-// StorageV2:
-//
-//	Standard Hot:        no cost
-//	Standard Hot NFSv3:  no cost
-//	Standard Cool:       cost exists
-//	Standard Cool NFSv3: cost exists
-//	Premium:             no cost
-//	Premium NFSv3:       no cost
-//
-// FileStorage:
-//
-//	Standard Hot:  no cost
-//	Standard Cool: cost exists
-//	Premium:       no cost
 func (inst *StorageAccount) earlyDeletionCostComponents() []query.Component {
 	var components []query.Component
 
-	if inst.isStorageV1() || inst.isBlockBlobStorage() || inst.isBlobStorage() || !inst.isCool() {
+	if strings.ToLower(inst.accountKind) == "storage" || strings.ToLower(inst.accountKind) == "blockblobstorage" || strings.ToLower(inst.accountKind) == "blobstorage" || !(strings.ToLower(inst.accessTier) == "cool") {
 		return components
 	}
 
@@ -1107,53 +768,25 @@ func (inst *StorageAccount) buildStorageCostComponent(name string, startUsage st
 	}
 }
 
-func (inst *StorageAccount) isBlockBlobStorage() bool {
-	return strings.EqualFold(inst.accountKind, "blockblobstorage")
-}
-
 func (inst *StorageAccount) isFileStorage() bool {
-	return strings.EqualFold(inst.accountKind, "filestorage")
-}
-
-func (inst *StorageAccount) isBlobStorage() bool {
-	return strings.EqualFold(inst.accountKind, "blobstorage")
-}
-
-func (inst *StorageAccount) isStorageV1() bool {
-	return strings.EqualFold(inst.accountKind, "storage")
-}
-
-func (inst *StorageAccount) isStorageV2() bool {
-	return strings.EqualFold(inst.accountKind, "storagev2")
-}
-
-func (inst *StorageAccount) isHot() bool {
-	return strings.EqualFold(inst.accessTier, "hot")
-}
-
-func (inst *StorageAccount) isCool() bool {
-	return strings.EqualFold(inst.accessTier, "cool")
-}
-
-func (inst *StorageAccount) isPremium() bool {
-	return strings.EqualFold(inst.accountTier, "premium")
+	return strings.ToLower(inst.accountKind) == "filestorage"
 }
 
 func (inst *StorageAccount) isReplicationTypeSupported() bool {
 	var validReplicationTypes []string
 
 	switch {
-	case inst.isPremium():
+	case strings.ToLower(inst.accountTier) == "premium":
 		validReplicationTypes = []string{"LRS", "ZRS"}
-	case inst.isBlockBlobStorage():
+	case strings.ToLower(inst.accountKind) == "blockblobstorage":
 		validReplicationTypes = []string{"LRS", "GRS", "RA-GRS"}
-	case inst.isStorageV1():
+	case strings.ToLower(inst.accountKind) == "storage":
 		validReplicationTypes = []string{"LRS", "ZRS", "GRS", "RA-GRS"}
-	case inst.isStorageV2():
+	case strings.ToLower(inst.accountKind) == "storagev2":
 		validReplicationTypes = []string{"LRS", "ZRS", "GRS", "RA-GRS", "GZRS", "RA-GZRS"}
-	case inst.isBlobStorage():
+	case strings.ToLower(inst.accountKind) == "blobstorage":
 		validReplicationTypes = []string{"LRS", "GRS", "RA-GRS"}
-	case inst.isFileStorage():
+	case strings.ToLower(inst.accountKind) == "filestorage":
 		validReplicationTypes = []string{"LRS", "GRS", "ZRS"}
 	}
 
@@ -1162,11 +795,4 @@ func (inst *StorageAccount) isReplicationTypeSupported() bool {
 	}
 
 	return true
-}
-
-func (inst *StorageAccount) canSkipPrice() bool {
-	// Not all regions support GZRS/RA-GZRS redundancy types. Some operations miss
-	// prices for specific regions.
-	// Read more: https://docs.microsoft.com/en-us/azure/storage/common/storage-redundancy
-	return inst.isStorageV2()
 }

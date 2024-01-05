@@ -78,6 +78,7 @@ func (inst *VirtualNetworkGatewayConnection) Component() []query.Component {
 			costComponents = append(costComponents, vpnGatewayS2S(region, sku))
 		}
 	}
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 
 	return costComponents
 }

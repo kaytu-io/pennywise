@@ -23,6 +23,7 @@ type MariadbServer struct {
 	geoRedundantBackupEnabled *bool
 
 	// Usage
+	// receive additional consumption of backup storage in GB.
 	additionalBackupStorageGb *int64
 }
 
@@ -120,7 +121,7 @@ func (inst *MariadbServer) Components() []query.Component {
 	}
 
 	components = append(components, inst.databaseBackupStorageComponent(skuName, backupStorageGB))
-
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 	return components
 }
 

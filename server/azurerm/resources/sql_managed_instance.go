@@ -25,8 +25,10 @@ type SqlManagedInstance struct {
 	mssql              bool
 
 	// Usage
+	// receive number of GBs used by long-term retention backup storage.
 	longTermRetentionStorageGB *int64
-	backupStorageGB            *int64
+	// receive number of GBs used by Point-In-Time Restore (PITR) backup storage.
+	backupStorageGB *int64
 }
 
 // sqlManagedInstanceValues is holds the values that we need to be able
@@ -101,6 +103,7 @@ func (inst *SqlManagedInstance) Components() []query.Component {
 	}
 
 	components = append(components, inst.sqlMILongTermRetentionStorageGBCostComponent())
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

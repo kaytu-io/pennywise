@@ -22,7 +22,8 @@ type LinuxVirtualMachineScaleSet struct {
 	osDisk                 []OsDisk
 
 	// Usage
-	monthlyHours            *decimal.Decimal
+	monthlyHours *decimal.Decimal
+	// receive number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
 	osDiskMonthlyOperations *decimal.Decimal
 }
 
@@ -108,6 +109,7 @@ func (inst *LinuxVirtualMachineScaleSet) Components() []query.Component {
 			components = append(components, osDiskSubResource(inst.provider, inst.location, inst.osDisk, inst.osDiskMonthlyOperations)...)
 		}
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

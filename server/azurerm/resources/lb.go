@@ -20,6 +20,7 @@ type LoadBalancer struct {
 	skuTier     string
 
 	// Usage
+	// receives monthly inbound and outbound data processed in GB
 	monthlyDataProceed decimal.Decimal
 }
 
@@ -104,6 +105,7 @@ func (inst *LoadBalancer) Components() []query.Component {
 
 		components = append(components, inst.globalDataProceedComponent(inst.provider.key, inst.location, inst.monthlyDataProceed))
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

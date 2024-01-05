@@ -13,7 +13,7 @@ func (ts *AzureTestSuite) TestManagedDisk() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/managed_disk/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/managed_disk/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/managed_disk", *usg)

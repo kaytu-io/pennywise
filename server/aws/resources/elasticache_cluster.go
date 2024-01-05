@@ -1,10 +1,12 @@
 package resources
 
 import (
+	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"go.uber.org/zap"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
@@ -17,6 +19,7 @@ import (
 type ElastiCache struct {
 	providerKey string
 
+	logger       *zap.Logger
 	region       region.Code
 	instanceType string
 
@@ -71,6 +74,7 @@ func (p *Provider) newElastiCache(vals elastiCacheValues) *ElastiCache {
 	inst := &ElastiCache{
 		providerKey:            p.key,
 		region:                 p.region,
+		logger:                 p.logger,
 		instanceType:           vals.NodeType,
 		cacheEngine:            cacheType,
 		numCacheNodes:          decimal.NewFromInt(vals.NumCacheNodes),
@@ -98,6 +102,7 @@ func (inst *ElastiCache) Components() []query.Component {
 		components = append(components, inst.backupStorageComponent())
 	}
 
+	resources.GetCostComponentNamesAndSetLogger(components, inst.logger)
 	return components
 }
 

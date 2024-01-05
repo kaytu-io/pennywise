@@ -10,6 +10,7 @@ type PrivateDNSMXRecord struct {
 
 	location string
 	// Usage
+	// receive monthly number of DNS queries
 	monthlyQueries *int64
 }
 
@@ -50,7 +51,9 @@ func decoderPrivateDnsMXRecord(tfVals map[string]interface{}) (privateDNSMXRecor
 
 func (inst *PrivateDNSMXRecord) component() []query.Component {
 	region := getLocationName(inst.location)
-	return privateDNSMXRecord(inst.provider.key, region, inst.monthlyQueries)
+	costComponents := privateDNSMXRecord(inst.provider.key, region, inst.monthlyQueries)
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
+	return costComponents
 }
 
 func privateDNSMXRecord(key, region string, monthlyQueries *int64) []query.Component {

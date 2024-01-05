@@ -25,6 +25,7 @@ type PostgresqlFlexibleServer struct {
 	storage         int64
 
 	// Usage
+	// receive additional backup storage in GB. If geo-redundancy is enabled, you should set this to twice the required storage capacity.
 	additionalBackupStorageGb *float64
 }
 
@@ -107,6 +108,7 @@ func (inst *PostgresqlFlexibleServer) Components() []query.Component {
 	var components []query.Component
 
 	components = append(components, inst.computeCostComponent(), inst.backupCostComponent(), inst.storageCostComponent())
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

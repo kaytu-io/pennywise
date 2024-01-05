@@ -16,7 +16,7 @@ func (ts *AzureTestSuite) TestVirtualMachineScaleSet() {
 	ts.IngestService("Storage", "westeurope")
 	fmt.Println("Storage data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/virtual_machine_scale_set/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/virtual_machine_scale_set/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	stat := ts.getDirCosts("../../testdata/azure/virtual_machine_scale_set", *usg)

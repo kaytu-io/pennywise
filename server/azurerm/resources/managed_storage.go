@@ -24,6 +24,7 @@ type ManagedDisk struct {
 	diskIopsReadWrite  float64
 
 	// Usage
+	//receive number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 	monthlyDiskOperations *decimal.Decimal
 }
 
@@ -129,6 +130,8 @@ func (inst *ManagedDisk) Components() []query.Component {
 		}
 		inst.diskOperationsComponent(inst.provider.key, inst.location, inst.storageAccountType, opsQty)
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
+
 	return components
 }
 

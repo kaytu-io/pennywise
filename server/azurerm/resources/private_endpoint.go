@@ -18,7 +18,9 @@ type PrivateEndpoint struct {
 	location string
 
 	// Usage
-	monthlyInboundDataProcessedGb  *int64
+	// receive monthly inbound data processed in GB.
+	monthlyInboundDataProcessedGb *int64
+	// receive monthly outbound data processed in GB.
 	monthlyOutboundDataProcessedGb *int64
 }
 
@@ -104,6 +106,7 @@ func (inst *PrivateEndpoint) Components() []query.Component {
 	} else {
 		components = append(components, inst.privateEndpointDataCostComponent("Outbound data processed (first 1PB)", "Standard Data Processed - Egress", "0", decimal.Zero))
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

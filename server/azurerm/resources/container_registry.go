@@ -120,6 +120,8 @@ func (inst *ContainerRegistry) component() []query.Component {
 		monthlyBuildVCPU = decimalPtr(decimal.NewFromFloat(*inst.monthlyBuildVCPUHrs * 3600))
 	}
 	costComponents = append(costComponents, containerRegistryCPUCostComponent("Build vCPU", sku, "westeurope", *monthlyBuildVCPU))
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
+
 	return costComponents
 }
 

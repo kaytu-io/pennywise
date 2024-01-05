@@ -26,6 +26,10 @@ type mssqlDatabaseValues struct {
 	ElasticPoolId      *string  `mapstructure:"elastic_pool_id"`
 
 	Usage struct {
+		ExtraDataStorageGB         *float64 `mapstructure:"extra_data_storage_gb"`
+		MonthlyVCoreHours          *int64   `mapstructure:"monthly_vcore_hours"`
+		LongTermRetentionStorageGB *int64   `mapstructure:"long_term_retention_storage_gb"`
+		BackupStorageGB            *int64   `mapstructure:"backup_storage_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
 
@@ -122,6 +126,11 @@ func (p *Provider) newMssqlDatabase(vals mssqlDatabaseValues) *SQLDatabase {
 		readReplicaCount:  replicaCount,
 		zoneRedundant:     zoneRedundant,
 		backupStorageType: storageAccountType,
+
+		extraDataStorageGB:         vals.Usage.ExtraDataStorageGB,
+		monthlyVCoreHours:          vals.Usage.MonthlyVCoreHours,
+		longTermRetentionStorageGB: vals.Usage.LongTermRetentionStorageGB,
+		backupStorageGB:            vals.Usage.BackupStorageGB,
 	}
 
 	if strings.ToLower(sku) == "elasticpool" || vals.ElasticPoolId != nil {

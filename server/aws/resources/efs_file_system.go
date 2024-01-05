@@ -2,10 +2,12 @@ package resources
 
 import (
 	"fmt"
+	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/kaytu-io/pennywise/server/resource"
+	"go.uber.org/zap"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
@@ -16,6 +18,7 @@ import (
 // EFSFileSystem represents an EFS that can be cost-estimated.
 type EFSFileSystem struct {
 	provider                     *Provider
+	logger                       *zap.Logger
 	region                       region.Code
 	availabilityZoneName         string
 	throughputMode               string
@@ -71,6 +74,7 @@ func decodeEFSFileSystemValues(tfVals map[string]interface{}) (efsFileSystemValu
 func (p *Provider) newEFSFileSystem(rss map[string]resource.Resource, vals efsFileSystemValues) *EFSFileSystem {
 	v := &EFSFileSystem{
 		provider:       p,
+		logger:         p.logger,
 		region:         p.region,
 		throughputMode: "bursting",
 		// only available if ThroughputMode=provisioned
@@ -147,9 +151,9 @@ func (v *EFSFileSystem) Components() []query.Component {
 		if v.monthlyInfrequentAccessWriteGB.GreaterThan(decimal.NewFromInt(0)) {
 			components = append(components, v.requestsComponent("Write"))
 		}
-
 	}
 
+	resources.GetCostComponentNamesAndSetLogger(components, v.logger)
 	return components
 }
 

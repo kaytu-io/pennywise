@@ -11,6 +11,7 @@ type PrivateDNSTXTRecord struct {
 	location string
 
 	// Usage
+	// receive monthly number of DNS queries
 	monthlyQueries *int64
 }
 
@@ -51,7 +52,9 @@ func decoderPrivateDnsTXTRecord(tfVals map[string]interface{}) (privateDNSTXTRec
 
 func (inst *PrivateDNSTXTRecord) component() []query.Component {
 	region := getLocationName(inst.location)
-	return privateDNSTXTRecord(inst.provider.key, region, inst.monthlyQueries)
+	costComponents := privateDNSTXTRecord(inst.provider.key, region, inst.monthlyQueries)
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
+	return costComponents
 }
 
 func privateDNSTXTRecord(key, region string, monthlyQueries *int64) []query.Component {

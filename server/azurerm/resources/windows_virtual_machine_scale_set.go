@@ -36,7 +36,8 @@ type windowsVirtualMachineScaleSetValues struct {
 	OsDisk                 []OsDisk                                     `mapstructure:"os_disk"`
 
 	Usage struct {
-		MonthlyHours            *float64 `mapstructure:"monthly_hours"`
+		MonthlyHours *float64 `mapstructure:"monthly_hours"`
+		// receive Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
 		OsDiskMonthlyOperations *float64 `mapstructure:"os_disk_monthly_operations"`
 	} `mapstructure:"pennywise_usage"`
 }
@@ -111,6 +112,7 @@ func (inst *WindowsVirtualMachineScaleSet) Components() []query.Component {
 			components = append(components, osDiskSubResource(inst.provider, inst.location, inst.osDisk, inst.osDiskMonthlyOperations)...)
 		}
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

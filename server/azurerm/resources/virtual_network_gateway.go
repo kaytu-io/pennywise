@@ -25,7 +25,9 @@ type VirtualNetworkGatewayValue struct {
 	Location string `mapstructure:"location"`
 
 	Usage struct {
-		P2sConnection         int64 `mapstructure:"p2s_connection"`
+		// receive total number of p2s tunnels.
+		P2sConnection int64 `mapstructure:"p2s_connection"`
+		// receive monthly data transfer in GB.
 		MonthlyDataTransferGB int64 `mapstructure:"monthly_data_transfer_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
@@ -99,6 +101,7 @@ func (inst *VirtualNetworkGateway) Components() []query.Component {
 		costComponents = append(costComponents, vpnGatewayDataTransfers(zone, sku, dataTransfers))
 	}
 
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 	return costComponents
 }
 

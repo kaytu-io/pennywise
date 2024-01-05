@@ -43,11 +43,12 @@ func decoderPrivateDnsZone(tfVals map[string]interface{}) (privateDNSZoneValue, 
 }
 
 func (inst *PrivateDNSZone) component() []query.Component {
-	costComponent := make([]query.Component, 0)
+	costComponents := make([]query.Component, 0)
 	region := getLocationName(inst.location)
-	costComponent = append(costComponent, PrivateDNSZoneCostComponent(inst.provider.key, region))
+	costComponents = append(costComponents, PrivateDNSZoneCostComponent(inst.provider.key, region))
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
 
-	return costComponent
+	return costComponents
 }
 
 func PrivateDNSZoneCostComponent(key string, region string) query.Component {

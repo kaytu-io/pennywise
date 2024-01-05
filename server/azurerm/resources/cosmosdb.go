@@ -77,6 +77,7 @@ func (inst *Cosmosdb) Components() []query.Component {
 		return components
 	}
 	components = append(components, inst.cosmosDBCostComponents()...)
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

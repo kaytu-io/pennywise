@@ -16,6 +16,7 @@ import (
 	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/zap"
 	"golang.org/x/net/context"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -35,6 +36,7 @@ type AzureTestSuite struct {
 	suite.Suite
 
 	backend *mysql.Backend
+	logger  *zap.Logger
 }
 
 func TestAzure(t *testing.T) {
@@ -47,7 +49,11 @@ func (ts *AzureTestSuite) SetupSuite() {
 	require.NoError(ts.T(), err)
 	err = mysql.Migrate(context.Background(), db, "pricing_migrations")
 
+	logger, err := zap.NewProduction()
+	require.NoError(ts.T(), err)
+
 	ts.backend = mysql.NewBackend(db)
+	ts.logger = logger
 }
 
 func (ts *AzureTestSuite) IngestService(service, region string) {
@@ -93,7 +99,7 @@ func (ts *AzureTestSuite) getDirCosts(projectDir string, usg usage.Usage) *cost.
 
 	var qResources []query.Resource
 	resources := make(map[string]resource.Resource)
-	provider, err := resources2.NewProvider(resources2.ProviderName)
+	provider, err := resources2.NewProvider(resources2.ProviderName, ts.logger)
 	require.NoError(ts.T(), err)
 
 	for _, rs := range hclResources {
@@ -112,7 +118,7 @@ func (ts *AzureTestSuite) getDirCosts(projectDir string, usg usage.Usage) *cost.
 		qResources = append(qResources, qResource)
 	}
 
-	state, err := cost.NewState(context.Background(), ts.backend, qResources)
+	state, err := cost.NewState(context.Background(), ts.backend, qResources, ts.logger)
 	require.NoError(ts.T(), err)
 
 	return state

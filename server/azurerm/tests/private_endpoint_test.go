@@ -22,7 +22,7 @@ func (ts *AzureTestSuite) TestPrivateEndpoint() {
 	ts.IngestService("Storage", "Global")
 	fmt.Println("Storage ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/private_endpoint/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/private_endpoint/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	stat := ts.getDirCosts("../../testdata/azure/private_endpoint", *usg)

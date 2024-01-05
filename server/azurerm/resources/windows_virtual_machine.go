@@ -38,6 +38,7 @@ type windowsVirtualMachineValues struct {
 	} `mapstructure:"os_disk"`
 
 	Usage struct {
+		// receive monthly number of hours the instance ran for.
 		MonthlyHours *float64 `mapstructure:"monthly_hours"`
 	} `mapstructure:"pennywise_usage"`
 }
@@ -85,6 +86,8 @@ func (inst *WindowsVirtualMachine) Components() []query.Component {
 	// TODO: check if we have ultra ssd or not
 	components := []query.Component{inst.windowsVirtualMachineComponent()}
 	components = append(components, osDiskSubResource(inst.provider, inst.location, inst.osDisk, nil)...)
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
+
 	return components
 }
 

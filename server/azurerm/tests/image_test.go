@@ -12,8 +12,10 @@ func (ts *AzureTestSuite) TestImage() {
 	fmt.Println("Suite Setup")
 	ts.IngestService("Storage", "westeurope")
 	fmt.Println("Storage ingested")
+	ts.IngestService("Virtual Machines", "westeurope")
+	fmt.Println("Virtual Machine data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/image/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/image/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/image", *usg)

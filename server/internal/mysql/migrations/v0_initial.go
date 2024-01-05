@@ -32,5 +32,17 @@ var v0Initial = Migration{
 			UNIQUE KEY (product_id, hash),
 			FOREIGN KEY (product_id) REFERENCES pricing_products (id)
 		);
+
+		CREATE TABLE ingestion_jobs (
+			id INT(8) UNSIGNED AUTO_INCREMENT,
+		    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			provider VARCHAR(16) NOT NULL,
+			location VARCHAR(100) NOT NULL,
+			service VARCHAR(100) NOT NULL,
+			status VARCHAR(16) NOT NULL,
+			error_msg VARCHAR(500),
+			PRIMARY KEY (id)
+		);
 	`,
 }

@@ -16,7 +16,7 @@ func (ts *AzureTestSuite) TestWindowsVirtualMachine() {
 	ts.IngestService("Storage", "eastus")
 	fmt.Println("Storage data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/windows_virtual_machine/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/windows_virtual_machine/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	stat := ts.getDirCosts("../../testdata/azure/windows_virtual_machine", *usg)

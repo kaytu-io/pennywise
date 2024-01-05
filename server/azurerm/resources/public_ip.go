@@ -78,6 +78,7 @@ func (inst *PublicIP) Components() []query.Component {
 	}
 
 	components = append(components, inst.publicIPCostComponent(fmt.Sprintf("IP address (%s)", strings.ToLower(inst.allocationMethod)), sku, meterName))
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }

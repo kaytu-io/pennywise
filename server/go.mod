@@ -17,12 +17,14 @@ require (
 	github.com/spf13/afero v1.11.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
+	github.com/terraform-linters/tflint-plugin-sdk v0.17.0
 	go.uber.org/zap v1.10.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/net v0.19.0
 	golang.org/x/text v0.14.0
 	golang.org/x/tools v0.13.0
 	gopkg.in/go-playground/validator.v9 v9.31.0
+	gopkg.in/yaml.v2 v2.4.0
 
 )
 
@@ -157,7 +159,6 @@ require (
 	github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87 // indirect
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
-	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
@@ -211,7 +212,6 @@ require (
 	github.com/sourcegraph/jsonrpc2 v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/terraform-linters/tflint v0.47.0 // indirect
-	github.com/terraform-linters/tflint-plugin-sdk v0.17.0 // indirect
 	github.com/terraform-linters/tflint-ruleset-terraform v0.4.0 // indirect
 	github.com/tidwall/gjson v1.17.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
@@ -252,7 +252,6 @@ require (
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/urfave/cli.v1 v1.20.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
@@ -261,7 +260,5 @@ replace github.com/hashicorp/terraform => github.com/cycloidio/terraform v1.1.9-
 replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e
 
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
-
-replace github.com/kaytu-io/pennywise/cli => /home/arta/data/codes/Work/Kaytu/pennywise/cli
 
 replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20231103101711-77c5e7d4d795

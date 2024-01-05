@@ -13,7 +13,7 @@ func (ts *AzureTestSuite) TestMariadbServer() {
 	ts.IngestService("Azure Database for MariaDB", "eastus")
 	fmt.Println("Databases ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/mariadb_server/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/mariadb_server/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	state := ts.getDirCosts("../../testdata/azure/mariadb_server", *usg)

@@ -1,12 +1,14 @@
 package resources
 
 import (
+	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
+	"go.uber.org/zap"
 
 	"github.com/kaytu-io/pennywise/server/aws/region"
 )
@@ -14,6 +16,7 @@ import (
 // NatGateway represents an NatGateway instance definition that can be cost-estimated.
 type NatGateway struct {
 	providerKey string
+	logger      *zap.Logger
 	region      region.Code
 
 	// Usage
@@ -49,6 +52,7 @@ func (p *Provider) newNatGateway(vals natGatewayValues) *NatGateway {
 
 	inst := &NatGateway{
 		providerKey:            p.key,
+		logger:                 p.logger,
 		region:                 p.region,
 		monthlyDataProcessedGB: decimal.NewFromFloat(vals.Usage.MonthlyDataProcessedGB),
 	}
@@ -61,6 +65,7 @@ func (inst *NatGateway) Components() []query.Component {
 	components := []query.Component{inst.natGatewayInstanceComponent()}
 	components = append(components, inst.natGatewayDataProcessedComponent())
 
+	resources.GetCostComponentNamesAndSetLogger(components, inst.logger)
 	return components
 }
 

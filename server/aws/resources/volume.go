@@ -1,11 +1,13 @@
 package resources
 
 import (
+	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/product"
 	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
+	"go.uber.org/zap"
 
 	"github.com/kaytu-io/pennywise/server/aws/region"
 )
@@ -13,6 +15,7 @@ import (
 // Volume represents an EBS volume that can be cost-estimated.
 type Volume struct {
 	provider *Provider
+	logger   *zap.Logger
 	region   region.Code
 
 	volumeType string
@@ -51,6 +54,7 @@ func decodeVolumeValues(tfVals map[string]interface{}) (volumeValues, error) {
 func (p *Provider) newVolume(vals volumeValues) *Volume {
 	v := &Volume{
 		provider:   p,
+		logger:     p.logger,
 		region:     p.region,
 		volumeType: "gp3",
 		size:       decimal.NewFromInt(8),
@@ -84,6 +88,7 @@ func (v *Volume) Components() []query.Component {
 		comps = append(comps, v.iopsComponent())
 	}
 
+	resources.GetCostComponentNamesAndSetLogger(comps, v.logger)
 	return comps
 }
 

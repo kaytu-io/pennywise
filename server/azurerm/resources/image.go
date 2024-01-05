@@ -39,6 +39,7 @@ type imageValues struct {
 	SourceVirtualMachine *sourceVirtualMachineValues `mapstructure:"source_virtual_machine_id"`
 
 	Usage struct {
+		// receives total size of image storage in GB
 		StorageGB *float64 `mapstructure:"storage_gb"`
 	} `mapstructure:"pennywise_usage"`
 }
@@ -147,7 +148,7 @@ func (inst *Image) Components() []query.Component {
 		qty = *inst.storageGB
 	}
 
-	return []query.Component{{
+	costComponent := []query.Component{{
 		Name:            "Storage",
 		Unit:            "1 GB/Month",
 		MonthlyQuantity: qty,
@@ -166,4 +167,7 @@ func (inst *Image) Components() []query.Component {
 			},
 		},
 	}}
+	GetCostComponentNamesAndSetLogger(costComponent, inst.provider.logger)
+
+	return costComponent
 }

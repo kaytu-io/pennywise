@@ -23,7 +23,7 @@ func (ts *AzureTestSuite) TestVirtualNetworkPeering() {
 	ts.IngestService("Virtual Network", "Zone 1")
 	fmt.Println("Virtual Network ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/virtual_network_peering/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/virtual_network_peering/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	stat := ts.getDirCosts("../../testdata/azure/virtual_network_peering", *usg)

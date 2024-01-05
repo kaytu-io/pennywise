@@ -17,7 +17,7 @@ func (ts *AzureTestSuite) TestApplicationGateway() {
 	ts.IngestService("Virtual Network", "eastus")
 	fmt.Println("Virtual Network data ingested")
 
-	usg, err := ts.getUsage("../../testdata/azure/application_gateway/usage.yml")
+	usg, err := ts.getUsage("../../testdata/azure/application_gateway/usage.yaml")
 	require.NoError(ts.T(), err)
 
 	stat := ts.getDirCosts("../../testdata/azure/application_gateway", *usg)

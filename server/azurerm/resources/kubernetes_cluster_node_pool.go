@@ -22,7 +22,9 @@ type kubernetesClusterNodePool struct {
 	osDiskSizeGB *int
 	osType       *string
 	// Usage
-	nodes      *int64
+	// receives node count for the default node pool
+	nodes *int64
+	// receives monthly hours for the default node pool
 	monthlyHrs *float64
 }
 type KubernetesClusterIdStruct struct {
@@ -100,8 +102,11 @@ func (inst *kubernetesClusterNodePool) Components() []query.Component {
 		nodeCount = decimal.NewFromInt(*inst.nodes)
 	}
 
-	return aksClusterNodePool(inst.provider.key, inst.osDiskSizeGB, inst.osDiskType, inst.osSku, inst.osType,
+	costComponents := aksClusterNodePool(inst.provider.key, inst.osDiskSizeGB, inst.osDiskType, inst.osSku, inst.osType,
 		inst.vmSize, region, nodeCount, inst.monthlyHrs)
+
+	GetCostComponentNamesAndSetLogger(costComponents, inst.provider.logger)
+	return costComponents
 }
 
 func aksClusterNodePool(key string, osDiskSizeGB *int, OSDiskType *string, osSku *string, osType *string,

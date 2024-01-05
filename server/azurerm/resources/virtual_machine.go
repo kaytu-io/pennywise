@@ -59,9 +59,12 @@ type virtualMachineValues struct {
 	StorageImageReference []StorageImageReference `mapstructure:"storage_image_reference"`
 
 	Usage struct {
-		MonthlyOsDiskOperations   *float64 `mapstructure:"monthly_os_disk_operations"`
+		// receive monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB.
+		MonthlyOsDiskOperations *float64 `mapstructure:"monthly_os_disk_operations"`
+		// receive monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
 		MonthlyDataDiskOperations *float64 `mapstructure:"monthly_data_disk_operations"`
-		MonthlyHours              *float64 `mapstructure:"monthly_hours"`
+		// receive monthly number of hours the instance ran for.
+		MonthlyHours *float64 `mapstructure:"monthly_hours"`
 	} `mapstructure:"pennywise_usage"`
 }
 
@@ -167,6 +170,7 @@ func (inst *VirtualMachine) Components() []query.Component {
 			components = append(components, managedStorage.Components()...)
 		}
 	}
+	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
 
 	return components
 }
