@@ -3,6 +3,7 @@ package query
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/shopspring/decimal"
 )
 
@@ -13,7 +14,7 @@ type Resource struct {
 	Address string
 
 	// Provider is the cloud provider that this Resource belongs to.
-	Provider string
+	Provider resource.ProviderName
 
 	// Type describes the type of the Resource.
 	Type string

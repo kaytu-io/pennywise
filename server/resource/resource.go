@@ -6,7 +6,7 @@ type Resource struct {
 	Type         string                 `json:"type"`
 	Name         string                 `json:"name"`
 	RegionCode   string                 `json:"region_code"`
-	ProviderName string                 `json:"provider_name"`
+	ProviderName ProviderName           `json:"provider_name"`
 	Values       map[string]interface{} `json:"values"`
 }
 

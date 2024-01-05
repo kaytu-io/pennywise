@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	awsrg "github.com/kaytu-io/pennywise/server/aws/region"
 	awsres "github.com/kaytu-io/pennywise/server/aws/resources"
 	azurermres "github.com/kaytu-io/pennywise/server/azurerm/resources"
@@ -44,10 +43,10 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	for _, res := range req.Resources {
-		if res.ProviderName == "azurerm" {
+		if res.ProviderName == resource.AzureProvider {
 			provider, err := azurermres.NewProvider(azurermres.ProviderName, h.logger)
 			if err != nil {
-				return ctx.JSON(http.StatusInternalServerError, err.Error())
+				return err
 			}
 			resources := make(map[string]resource.Resource)
 			resources[res.Address] = res
@@ -58,10 +57,10 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 				Type:       res.Type,
 				Components: components,
 			})
-		} else if res.ProviderName == "aws" {
+		} else if res.ProviderName == resource.AWSProvider {
 			provider, err := awsres.NewProvider(awsres.ProviderName, awsrg.Code(res.RegionCode), h.logger)
 			if err != nil {
-				return ctx.JSON(http.StatusInternalServerError, err.Error())
+				return err
 			}
 			resources := make(map[string]resource.Resource)
 			resources[res.Address] = res
@@ -77,7 +76,7 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 
 	state, err := cost.NewState(ctx.Request().Context(), h.backend, qResources, h.logger)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		return err
 	}
 	return ctx.JSON(http.StatusOK, state)
 }
@@ -88,10 +87,10 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 	if err := bindValidate(ctx, &req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if req.ProviderName == "azurerm" {
+	if req.ProviderName == resource.AzureProvider {
 		provider, err := azurermres.NewProvider(azurermres.ProviderName, h.logger)
 		if err != nil {
-			return ctx.JSON(http.StatusInternalServerError, err.Error())
+			return err
 		}
 		resources := make(map[string]resource.Resource)
 		resources[req.Address] = req
@@ -102,10 +101,10 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 			Type:       req.Type,
 			Components: components,
 		}
-	} else if req.ProviderName == "aws" {
+	} else if req.ProviderName == resource.AWSProvider {
 		provider, err := awsres.NewProvider(awsres.ProviderName, awsrg.Code(req.RegionCode), h.logger)
 		if err != nil {
-			return ctx.JSON(http.StatusInternalServerError, err.Error())
+			return err
 		}
 		resources := make(map[string]resource.Resource)
 		resources[req.Address] = req
@@ -119,10 +118,7 @@ func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
 	}
 	state, err := cost.NewState(ctx.Request().Context(), h.backend, []query.Resource{qResource}, h.logger)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
-	}
-	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		return err
 	}
 	return ctx.JSON(http.StatusOK, state)
 }
@@ -135,11 +131,11 @@ func (h *HttpHandler) IngestTables(ctx echo.Context) error {
 	region := ctx.QueryParam("region")
 	lastId, err := h.scheduler.MakeJob(provider, service, region)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, fmt.Errorf(err.Error()))
+		return err
 	}
 	job, err := h.scheduler.GetJobById(int32(lastId))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, fmt.Errorf(err.Error()))
+		return err
 	}
 	return ctx.JSON(http.StatusOK, job)
 }
@@ -164,7 +160,7 @@ func (h *HttpHandler) GetIngestionJob(ctx echo.Context) error {
 	idStr := ctx.Param("id")
 	id64, err := strconv.ParseInt(idStr, 10, 32)
 	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, "invalid id")
+		return err
 	}
 	id := int32(id64)
 	job, err := h.scheduler.GetJobById(id)

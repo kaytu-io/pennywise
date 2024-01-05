@@ -42,12 +42,12 @@ func NewScheduler(b backend.Backend, logger *zap.Logger, db *sql.DB) Scheduler {
 }
 
 type IngestionJob struct {
-	ID       int32
-	Provider string
-	Location string
-	Service  string
-	Status   IngestionJobStatus
-	ErrorMsg string
+	ID       int32              `json:"id"`
+	Provider string             `json:"provider"`
+	Location string             `json:"location"`
+	Service  string             `json:"service"`
+	Status   IngestionJobStatus `json:"status"`
+	ErrorMsg string             `json:"error_msg"`
 }
 
 func (s Scheduler) MakeJob(provider, service, region string) (int64, error) {

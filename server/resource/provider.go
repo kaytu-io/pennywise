@@ -7,6 +7,13 @@ import (
 
 //go:generate mockgen -destination=../mock/terraform_provider.go -mock_names=Provider=TerraformProvider -package mock github.com/kaytu-io/pennywise/server/terraform Provider
 
+type ProviderName string
+
+const (
+	AzureProvider ProviderName = "azurerm"
+	AWSProvider   ProviderName = "aws"
+)
+
 // Provider represents a Terraform provider. It extracts price queries from Terraform resources.
 type Provider interface {
 	// Name returns the common name of this Provider.
