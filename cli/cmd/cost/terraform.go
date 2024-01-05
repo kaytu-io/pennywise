@@ -86,7 +86,7 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
 	if err != nil {
 		return err
 	}
-	var resources []resource.Resource
+	var resources []resource.ResourceDef
 	for _, rs := range hclResources {
 		res := rs.ToResource(provider, nil)
 		resources = append(resources, res)
