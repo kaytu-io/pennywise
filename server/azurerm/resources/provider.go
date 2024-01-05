@@ -591,6 +591,13 @@ func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes re
 		}
 		logger.Info(fmt.Sprintf("%v.%v decoded ", tfRes.Type, tfRes.Name))
 		return p.newIntegrationServiceEnvironment(vals).Component()
+	case "azurerm_search_service":
+		vals, err := decodesearchService(tfRes.Values)
+		if err != nil {
+			return nil
+		}
+		logger.Info(fmt.Sprintf("%v.%v decoded ", tfRes.Type, tfRes.Name))
+		return p.newSearchService(vals).Component()
 	default:
 		return nil
 	}
