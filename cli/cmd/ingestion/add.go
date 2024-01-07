@@ -16,8 +16,8 @@ var add = &cobra.Command{
 		service := flags.ReadStringFlag(cmd, "service")
 		region := flags.ReadStringFlag(cmd, "region")
 
-		serverClient := client.NewPennywiseServerClient(ServerClientAddress)
-		job, err := serverClient.Ingest(provider, service, region)
+		serverClient := client.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+		job, err := serverClient.AddIngestion(provider, service, region)
 		if err != nil {
 			return err
 		}
