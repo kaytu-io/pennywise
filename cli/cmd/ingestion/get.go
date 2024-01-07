@@ -14,7 +14,7 @@ var get = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id := flags.ReadStringFlag(cmd, "id")
 
-		serverClient := client.NewPennywiseServerClient(ServerClientAddress)
+		serverClient := client.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
 		job, err := serverClient.GetIngestionJob(id)
 		if err != nil {
 			return err

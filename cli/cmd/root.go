@@ -23,6 +23,7 @@ func init() {
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(ingestion.IngestCmd)
 	rootCmd.AddCommand(cost.CostCmd)
+	rootCmd.PersistentFlags().String("server-url", "http://localhost:8080", "define the server http address")
 }
 
 func Execute() {
