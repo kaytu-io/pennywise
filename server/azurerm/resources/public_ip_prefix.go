@@ -3,8 +3,8 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -52,8 +52,8 @@ func (p *Provider) newPublicIPPrefix(vals publicIPPrefixValues) *PublicIPPrefix 
 	return inst
 }
 
-func (inst *PublicIPPrefix) Components() []query.Component {
-	var components []query.Component
+func (inst *PublicIPPrefix) Components() []resource.Component {
+	var components []resource.Component
 
 	components = append(components, inst.publicIPPrefixCostComponent("IP prefix"))
 	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
@@ -61,8 +61,8 @@ func (inst *PublicIPPrefix) Components() []query.Component {
 	return components
 }
 
-func (inst *PublicIPPrefix) publicIPPrefixCostComponent(name string) query.Component {
-	return query.Component{
+func (inst *PublicIPPrefix) publicIPPrefixCostComponent(name string) resource.Component {
+	return resource.Component{
 		Name:           name,
 		HourlyQuantity: decimal.NewFromInt(1),
 		ProductFilter: &product.Filter{

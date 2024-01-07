@@ -12,7 +12,6 @@ import (
 	"github.com/kaytu-io/pennywise/server/cost"
 	ingester2 "github.com/kaytu-io/pennywise/server/internal/ingester"
 	"github.com/kaytu-io/pennywise/server/internal/mysql"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -97,8 +96,8 @@ func (ts *AzureTestSuite) getDirCosts(projectDir string, usg usage.Usage) *cost.
 	providerName, hclResources, err := hcl.ParseHclResources(projectDir, usg)
 	require.NoError(ts.T(), err)
 
-	var qResources []query.Resource
-	resources := make(map[string]resource.Resource)
+	var qResources []resource.Resource
+	resources := make(map[string]resource.ResourceDef)
 	provider, err := resources2.NewProvider(resources2.ProviderName, ts.logger)
 	require.NoError(ts.T(), err)
 
@@ -109,7 +108,7 @@ func (ts *AzureTestSuite) getDirCosts(projectDir string, usg usage.Usage) *cost.
 
 	for _, res := range resources {
 		components := provider.ResourceComponents(resources, res)
-		qResource := query.Resource{
+		qResource := resource.Resource{
 			Address:    res.Address,
 			Provider:   res.ProviderName,
 			Type:       res.Type,

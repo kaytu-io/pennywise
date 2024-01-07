@@ -2,7 +2,6 @@ package resources
 
 import (
 	"fmt"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 	"go.uber.org/zap"
@@ -92,7 +91,7 @@ func NewProvider(key string, logger *zap.Logger) (*Provider, error) {
 func (p *Provider) Name() string { return p.key }
 
 // ResourceComponents returns Component queries for a given terraform.Resource.
-func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes resource.Resource) []query.Component {
+func (p *Provider) ResourceComponents(rss map[string]resource.ResourceDef, tfRes resource.ResourceDef) []resource.Component {
 	switch tfRes.Type {
 	case "azurerm_linux_virtual_machine":
 		vals, err := decodeLinuxVirtualMachineValues(tfRes.Values)
@@ -571,7 +570,7 @@ func getLocationName(l string) string {
 	return ln
 }
 
-func GetCostComponentNamesAndSetLogger(costComponents []query.Component, logger *zap.Logger) {
+func GetCostComponentNamesAndSetLogger(costComponents []resource.Component, logger *zap.Logger) {
 	costComponentsName := ""
 	for k, v := range costComponents {
 		if k != 0 {

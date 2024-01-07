@@ -4,8 +4,8 @@ import (
 	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"go.uber.org/zap"
 	"strings"
 
@@ -90,13 +90,13 @@ func (p *Provider) newElastiCache(vals elastiCacheValues) *ElastiCache {
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *ElastiCache) Components() []query.Component {
+func (inst *ElastiCache) Components() []resource.Component {
 	// If replicationGroupID is set, aws_elasticache_replication_group will be use to define the cost
 	if len(inst.replicationGroupID) > 0 {
-		return []query.Component{}
+		return []resource.Component{}
 	}
 
-	components := []query.Component{inst.elastiCacheInstanceComponent()}
+	components := []resource.Component{inst.elastiCacheInstanceComponent()}
 
 	if inst.snapshotRetentionLimit.GreaterThan(decimal.NewFromInt(0)) && strings.HasPrefix(inst.cacheEngine, "Redis") {
 		components = append(components, inst.backupStorageComponent())
@@ -106,14 +106,14 @@ func (inst *ElastiCache) Components() []query.Component {
 	return components
 }
 
-func (inst *ElastiCache) elastiCacheInstanceComponent() query.Component {
+func (inst *ElastiCache) elastiCacheInstanceComponent() resource.Component {
 	instClass := inst.cacheEngine
 	attrFilters := []*product.AttributeFilter{
 		{Key: "InstanceType", Value: util.StringPtr(inst.instanceType)},
 		{Key: "CacheEngine", Value: util.StringPtr(inst.cacheEngine)},
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:           "Cache instance",
 		Details:        []string{instClass},
 		HourlyQuantity: inst.numCacheNodes,
@@ -133,14 +133,14 @@ func (inst *ElastiCache) elastiCacheInstanceComponent() query.Component {
 	}
 }
 
-func (inst *ElastiCache) backupStorageComponent() query.Component {
+func (inst *ElastiCache) backupStorageComponent() resource.Component {
 	// MonthlyQuantity = snapshotRetentionLimit * backupSnapshotSize
 	// TODO: If/When usage estimation will be supported, backupSnapshotSize might have a different value from 0
 
 	backupSnapshotSize := decimal.NewFromInt(0)
 	monthlyQuantityTotal := backupSnapshotSize.Mul(inst.snapshotRetentionLimit)
 
-	return query.Component{
+	return resource.Component{
 		Name:            "Backup storage",
 		Details:         []string{monthlyQuantityTotal.String()},
 		MonthlyQuantity: monthlyQuantityTotal,

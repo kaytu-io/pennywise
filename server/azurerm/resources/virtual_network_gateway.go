@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/tier_request"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -60,7 +60,7 @@ func (p *Provider) newVirtualNetworkGateway(vals VirtualNetworkGatewayValue) *Vi
 	return inst
 }
 
-func (inst *VirtualNetworkGateway) Components() []query.Component {
+func (inst *VirtualNetworkGateway) Components() []resource.Component {
 	var connection, dataTransfers *decimal.Decimal
 	sku := "Basic"
 	region := inst.location
@@ -71,7 +71,7 @@ func (inst *VirtualNetworkGateway) Components() []query.Component {
 	}
 	meterName := sku
 
-	costComponents := make([]query.Component, 0)
+	costComponents := make([]resource.Component, 0)
 
 	if sku == "Basic" {
 		meterName = "Basic Gateway"
@@ -105,8 +105,8 @@ func (inst *VirtualNetworkGateway) Components() []query.Component {
 	return costComponents
 }
 
-func vpnGateway(region, sku, meterName string) query.Component {
-	return query.Component{
+func vpnGateway(region, sku, meterName string) resource.Component {
+	return resource.Component{
 		Name:           fmt.Sprintf("VPN gateway (%s)", sku),
 		Unit:           "hours",
 		HourlyQuantity: decimal.NewFromInt(1),
@@ -126,8 +126,8 @@ func vpnGateway(region, sku, meterName string) query.Component {
 	}
 }
 
-func vpnGatewayP2S(region, sku string, connection *decimal.Decimal) query.Component {
-	return query.Component{
+func vpnGatewayP2S(region, sku string, connection *decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:           "VPN gateway P2S tunnels (over 128)",
 		Unit:           "tunnel",
 		HourlyQuantity: *connection,
@@ -148,8 +148,8 @@ func vpnGatewayP2S(region, sku string, connection *decimal.Decimal) query.Compon
 	}
 }
 
-func vpnGatewayDataTransfers(zone, sku string, dataTransfers *decimal.Decimal) query.Component {
-	return query.Component{
+func vpnGatewayDataTransfers(zone, sku string, dataTransfers *decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            "VPN gateway data tranfer",
 		Unit:            "GB",
 		MonthlyQuantity: *dataTransfers,

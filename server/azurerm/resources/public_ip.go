@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -60,8 +60,8 @@ func (p *Provider) newPublicIP(vals publicIPValues) *PublicIP {
 	return inst
 }
 
-func (inst *PublicIP) Components() []query.Component {
-	var components []query.Component
+func (inst *PublicIP) Components() []resource.Component {
+	var components []resource.Component
 
 	var meterName string
 	sku := "Basic"
@@ -83,8 +83,8 @@ func (inst *PublicIP) Components() []query.Component {
 	return components
 }
 
-func (inst *PublicIP) publicIPCostComponent(name, sku, meterName string) query.Component {
-	return query.Component{
+func (inst *PublicIP) publicIPCostComponent(name, sku, meterName string) resource.Component {
+	return resource.Component{
 		Name:           name,
 		Unit:           "hours",
 		HourlyQuantity: decimal.NewFromInt(1),

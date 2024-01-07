@@ -12,7 +12,6 @@ import (
 	"github.com/kaytu-io/pennywise/cli/usage"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 )
 
@@ -24,7 +23,7 @@ func TestNatGateway_Components(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("NAT", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_nat_gateway.test",
 			Type:         "aws_nat_gateway",
 			Name:         "test",
@@ -33,9 +32,9 @@ func TestNatGateway_Components(t *testing.T) {
 				"allocation_id": "id",
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "NAT gateway",
 				Details:        []string{"NatGateway"},

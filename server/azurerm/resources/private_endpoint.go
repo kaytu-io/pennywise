@@ -3,9 +3,9 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/tier_request"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -66,8 +66,8 @@ func (p *Provider) newPrivateEndpoint(vals privateEndpointValues) *PrivateEndpoi
 	return inst
 }
 
-func (inst *PrivateEndpoint) Components() []query.Component {
-	var components []query.Component
+func (inst *PrivateEndpoint) Components() []resource.Component {
+	var components []resource.Component
 
 	components = append(components, inst.privateEndpointCostComponent("Private endpoint", "Standard Private Endpoint"))
 
@@ -111,8 +111,8 @@ func (inst *PrivateEndpoint) Components() []query.Component {
 	return components
 }
 
-func (inst *PrivateEndpoint) privateEndpointCostComponent(name, meterName string) query.Component {
-	return query.Component{
+func (inst *PrivateEndpoint) privateEndpointCostComponent(name, meterName string) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            "hour",
 		MonthlyQuantity: decimal.NewFromInt(730),
@@ -129,8 +129,8 @@ func (inst *PrivateEndpoint) privateEndpointCostComponent(name, meterName string
 	}
 }
 
-func (inst *PrivateEndpoint) privateEndpointDataCostComponent(name, meterName, startUsage string, quantity decimal.Decimal) query.Component {
-	return query.Component{
+func (inst *PrivateEndpoint) privateEndpointDataCostComponent(name, meterName, startUsage string, quantity decimal.Decimal) resource.Component {
+	return resource.Component{
 		Name:            name,
 		Unit:            "GB",
 		MonthlyQuantity: quantity,

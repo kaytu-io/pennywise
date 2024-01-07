@@ -61,7 +61,7 @@ func decodeAutoscalingGroupValues(tfVals map[string]interface{}) (autoscalingGro
 }
 
 // newInstance creates a new Instance from instanceValues.
-func (p *Provider) newAutoscalingGroup(rss map[string]resource.Resource, vals autoscalingGroupValues) *Instance {
+func (p *Provider) newAutoscalingGroup(rss map[string]resource.ResourceDef, vals autoscalingGroupValues) *Instance {
 
 	inst := &Instance{
 		provider: p,

@@ -11,7 +11,6 @@ import (
 
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 )
 
@@ -23,7 +22,7 @@ func TestElastiCache_Components(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("RedisEngine", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_elasticache_cluster.test",
 			Type:         "aws_elasticache_cluster",
 			Name:         "test",
@@ -34,9 +33,9 @@ func TestElastiCache_Components(t *testing.T) {
 				"num_cache_nodes": 1,
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Cache instance",
 				HourlyQuantity: decimal.NewFromInt(1),
@@ -65,7 +64,7 @@ func TestElastiCache_Components(t *testing.T) {
 	})
 
 	t.Run("RedisSnapShotRetentionLimit", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_elasticache_cluster.test",
 			Type:         "aws_elasticache_cluster",
 			Name:         "test",
@@ -77,9 +76,9 @@ func TestElastiCache_Components(t *testing.T) {
 				"snapshot_retention_limit": 5,
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Cache instance",
 				HourlyQuantity: decimal.NewFromInt(1),
@@ -125,7 +124,7 @@ func TestElastiCache_Components(t *testing.T) {
 	})
 
 	t.Run("RedisReplicationGroupID", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_elasticache_cluster.test",
 			Type:         "aws_elasticache_cluster",
 			Name:         "test",
@@ -136,16 +135,16 @@ func TestElastiCache_Components(t *testing.T) {
 				"replication_group_id": "replication-group-1",
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{}
+		expected := []resource.Component{}
 
 		actual := p.ResourceComponents(rss, tfres)
 		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("MemcacheEngine", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_elasticache_cluster.test",
 			Type:         "aws_elasticache_cluster",
 			Name:         "test",
@@ -156,9 +155,9 @@ func TestElastiCache_Components(t *testing.T) {
 				"num_cache_nodes": 1,
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Cache instance",
 				HourlyQuantity: decimal.NewFromInt(1),
@@ -187,7 +186,7 @@ func TestElastiCache_Components(t *testing.T) {
 	})
 
 	t.Run("MemcacheNumCacheNodes", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_elasticache_cluster.test",
 			Type:         "aws_elasticache_cluster",
 			Name:         "test",
@@ -198,9 +197,9 @@ func TestElastiCache_Components(t *testing.T) {
 				"num_cache_nodes": 2,
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Cache instance",
 				HourlyQuantity: decimal.NewFromInt(2),

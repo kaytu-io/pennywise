@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -112,8 +112,8 @@ func (p *Provider) newStorageQueue(vals storageQueueValues) *StorageQueue {
 	return inst
 }
 
-func (inst *StorageQueue) Components() []query.Component {
-	var components []query.Component
+func (inst *StorageQueue) Components() []resource.Component {
+	var components []resource.Component
 
 	if !inst.isAccountKindSupported() {
 		fmt.Println("Account kind is not supported for this resource")
@@ -170,13 +170,13 @@ func (inst *StorageQueue) productName() string {
 	return "Queues v2"
 }
 
-func (inst *StorageQueue) dataStorageCostComponent() query.Component {
+func (inst *StorageQueue) dataStorageCostComponent() resource.Component {
 	var qty decimal.Decimal
 	if inst.monthlyStorageGB != nil {
 		qty = decimal.NewFromInt(*inst.monthlyStorageGB)
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            "Capacity",
 		Unit:            "GB",
 		MonthlyQuantity: qty,
@@ -200,8 +200,8 @@ func (inst *StorageQueue) dataStorageCostComponent() query.Component {
 	}
 }
 
-func (inst *StorageQueue) operationsCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageQueue) operationsCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if !contains([]string{"GZRS", "RA-GZRS"}, strings.ToUpper(inst.accountReplicationType)) {
 		var class1Qty decimal.Decimal
@@ -209,7 +209,7 @@ func (inst *StorageQueue) operationsCostComponents() []query.Component {
 			class1Qty = decimal.NewFromInt(*inst.monthlyClass1Operations).Div(decimal.NewFromInt(10000))
 		}
 
-		components = append(components, query.Component{
+		components = append(components, resource.Component{
 			Name:            "Class 1 operations",
 			Unit:            "10k operations",
 			MonthlyQuantity: class1Qty,
@@ -238,7 +238,7 @@ func (inst *StorageQueue) operationsCostComponents() []query.Component {
 		class2Qty = decimal.NewFromInt(*inst.monthlyClass2Operations).Div(decimal.NewFromInt(10000))
 	}
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Class 2 operations",
 		Unit:            "10k operations",
 		MonthlyQuantity: class2Qty,
@@ -264,9 +264,9 @@ func (inst *StorageQueue) operationsCostComponents() []query.Component {
 	return components
 }
 
-func (inst *StorageQueue) geoReplicationDataTransferCostComponents() []query.Component {
+func (inst *StorageQueue) geoReplicationDataTransferCostComponents() []resource.Component {
 	if contains([]string{"LRS", "ZRS"}, strings.ToUpper(inst.accountReplicationType)) {
-		return []query.Component{}
+		return []resource.Component{}
 	}
 
 	var qty decimal.Decimal
@@ -274,7 +274,7 @@ func (inst *StorageQueue) geoReplicationDataTransferCostComponents() []query.Com
 		qty = decimal.NewFromInt(*inst.monthlyGeoReplicationDataTransferGB)
 	}
 
-	return []query.Component{
+	return []resource.Component{
 		{
 			Name:            "Geo-replication data transfer",
 			Unit:            "GB",

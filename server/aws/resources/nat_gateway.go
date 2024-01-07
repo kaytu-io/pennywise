@@ -4,8 +4,8 @@ import (
 	"github.com/kaytu-io/pennywise/server/azurerm/resources"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
@@ -61,16 +61,16 @@ func (p *Provider) newNatGateway(vals natGatewayValues) *NatGateway {
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *NatGateway) Components() []query.Component {
-	components := []query.Component{inst.natGatewayInstanceComponent()}
+func (inst *NatGateway) Components() []resource.Component {
+	components := []resource.Component{inst.natGatewayInstanceComponent()}
 	components = append(components, inst.natGatewayDataProcessedComponent())
 
 	resources.GetCostComponentNamesAndSetLogger(components, inst.logger)
 	return components
 }
 
-func (inst *NatGateway) natGatewayInstanceComponent() query.Component {
-	return query.Component{
+func (inst *NatGateway) natGatewayInstanceComponent() resource.Component {
+	return resource.Component{
 		Name:           "NAT gateway",
 		Details:        []string{"NatGateway"},
 		HourlyQuantity: decimal.NewFromInt(1),
@@ -92,8 +92,8 @@ func (inst *NatGateway) natGatewayInstanceComponent() query.Component {
 	}
 }
 
-func (inst *NatGateway) natGatewayDataProcessedComponent() query.Component {
-	return query.Component{
+func (inst *NatGateway) natGatewayDataProcessedComponent() resource.Component {
+	return resource.Component{
 		Name:            "NAT Data processed",
 		Details:         []string{"NatGateway Data processed"},
 		Usage:           true,

@@ -3,8 +3,8 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -106,8 +106,8 @@ func (p *Provider) newVirtualMachine(vals virtualMachineValues) *VirtualMachine 
 }
 
 // Components returns the price component queries that make up this Instance.
-func (inst *VirtualMachine) Components() []query.Component {
-	var components []query.Component
+func (inst *VirtualMachine) Components() []resource.Component {
+	var components []resource.Component
 
 	os := "Linux"
 	if len(inst.storageImageReference) > 0 {
@@ -125,12 +125,12 @@ func (inst *VirtualMachine) Components() []query.Component {
 		windowsInst := inst.provider.newWindowsVirtualMachine(windowsVirtualMachineValues{Size: inst.vmSize, Location: inst.location, LicenseType: inst.licenseType, Usage: struct {
 			MonthlyHours *float64 `mapstructure:"monthly_hours"`
 		}{MonthlyHours: util.DecimalToFloat(inst.monthlyHours)}})
-		components = []query.Component{windowsInst.windowsVirtualMachineComponent()}
+		components = []resource.Component{windowsInst.windowsVirtualMachineComponent()}
 	} else if os == "Linux" {
 		linuxInst := inst.provider.newLinuxVirtualMachine(linuxVirtualMachineValues{Size: inst.vmSize, Location: inst.location, Usage: struct {
 			MonthlyHours *float64 `mapstructure:"monthly_hours"`
 		}{MonthlyHours: util.DecimalToFloat(inst.monthlyHours)}})
-		components = []query.Component{linuxInst.linuxVirtualMachineComponent()}
+		components = []resource.Component{linuxInst.linuxVirtualMachineComponent()}
 	}
 	components = append(components, ultraSSDReservationCostComponent(inst.provider.key, inst.location))
 	if len(inst.storageOsDisk) > 0 {
@@ -175,8 +175,8 @@ func (inst *VirtualMachine) Components() []query.Component {
 	return components
 }
 
-func ultraSSDReservationCostComponent(key, location string) query.Component {
-	return query.Component{
+func ultraSSDReservationCostComponent(key, location string) resource.Component {
+	return resource.Component{
 		Name:           "Ultra disk reservation (if unattached)",
 		Unit:           "vCPU",
 		HourlyQuantity: decimal.NewFromInt(1),
@@ -200,7 +200,7 @@ func ultraSSDReservationCostComponent(key, location string) query.Component {
 	}
 }
 
-func osDiskSubResource(provider *Provider, location string, osDisk []OsDisk, monthlyDiskOperations *decimal.Decimal) []query.Component {
+func osDiskSubResource(provider *Provider, location string, osDisk []OsDisk, monthlyDiskOperations *decimal.Decimal) []resource.Component {
 	var diskOperations *float64
 	if monthlyDiskOperations != nil {
 		diskOperations = util.FloatPtr(monthlyDiskOperations.InexactFloat64())

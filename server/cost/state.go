@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/backend"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
 	"go.uber.org/zap"
 )
@@ -22,15 +21,15 @@ var (
 	ErrPriceNotFound   = fmt.Errorf("price not found")
 )
 
-// NewState returns a new State from a query.Resource slice by using the Backend to fetch the pricing data.
-func NewState(ctx context.Context, backend backend.Backend, resources []query.Resource, logger *zap.Logger) (*State, error) {
+// NewState returns a new State from a resource.Resource slice by using the Backend to fetch the pricing data.
+func NewState(ctx context.Context, backend backend.Backend, resources []resource.Resource, logger *zap.Logger) (*State, error) {
 	state := &State{Resources: make(map[string]Resource)}
 	if len(resources) == 0 {
 		return nil, resource.ErrNoResources
 	}
 	for _, res := range resources {
 		// Mark the Resource as skipped if there are no valid Components.
-		state.ensureResource(res.Address, res.Provider, res.Type, len(res.Components) == 0)
+		state.ensureResource(res.Address, res.Type, res.Provider, len(res.Components) == 0)
 		for _, comp := range res.Components {
 			prods, err := backend.Products().Filter(ctx, comp.ProductFilter)
 			if err != nil {
@@ -61,10 +60,10 @@ func NewState(ctx context.Context, backend backend.Backend, resources []query.Re
 
 			component := Component{
 				Name:            comp.Name,
-				MonthlyQuantity: comp.MonthlyQuantity,
-				HourlyQuantity:  comp.HourlyQuantity,
+				MonthlyQuantity: comp.MonthlyQuantity.Round(5),
+				HourlyQuantity:  comp.HourlyQuantity.Round(5),
 				Unit:            comp.Unit,
-				Rate:            Cost{Decimal: prices[0].Value, Currency: prices[0].Currency},
+				Rate:            Cost{Decimal: prices[0].Value.Round(5), Currency: prices[0].Currency},
 				Details:         comp.Details,
 				Usage:           comp.Usage,
 			}
@@ -125,7 +124,7 @@ func (s *State) CostString() (string, error) {
 }
 
 // ensureResource creates Resource at the given address if it doesn't already exist.
-func (s *State) ensureResource(address, provider, typ string, skipped bool) {
+func (s *State) ensureResource(address, typ string, provider resource.ProviderName, skipped bool) {
 	if _, ok := s.Resources[address]; !ok {
 		res := Resource{
 			Provider: provider,

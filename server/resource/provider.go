@@ -1,11 +1,17 @@
 package resource
 
 import (
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"go.uber.org/zap"
 )
 
 //go:generate mockgen -destination=../mock/terraform_provider.go -mock_names=Provider=TerraformProvider -package mock github.com/kaytu-io/pennywise/server/terraform Provider
+
+type ProviderName string
+
+const (
+	AzureProvider ProviderName = "azurerm"
+	AWSProvider   ProviderName = "aws"
+)
 
 // Provider represents a Terraform provider. It extracts price queries from Terraform resources.
 type Provider interface {
@@ -16,7 +22,7 @@ type Provider interface {
 	// which signifies a resource that is not supported by this Provider.
 	// It also expects all the resources in case it needs to check the configuration of another
 	// resource
-	ResourceComponents(rss map[string]Resource, res Resource, logger *zap.Logger) []query.Component
+	ResourceComponents(rss map[string]ResourceDef, res ResourceDef, logger *zap.Logger) []Component
 }
 
 // ProviderInitializer is used to initialize a Provider for each provider name that matches one of the MatchNames.

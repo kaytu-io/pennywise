@@ -5,8 +5,8 @@ import (
 	"github.com/kaytu-io/infracost/external/usage"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"golang.org/x/text/cases"
@@ -159,8 +159,8 @@ func (p *Provider) newStorageAccount(vals storageAccountValues) *StorageAccount 
 	return &inst
 }
 
-func (inst *StorageAccount) Components() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) Components() []resource.Component {
+	var components []resource.Component
 
 	if !inst.isReplicationTypeSupported() {
 		return nil
@@ -257,8 +257,8 @@ func (inst *StorageAccount) buildProductFilter(meterName string) *product.Filter
 	}
 }
 
-func (inst *StorageAccount) storageCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) storageCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if strings.ToLower(inst.accountKind) == "filestorage" {
 		return components
@@ -317,8 +317,8 @@ func (inst *StorageAccount) storageCostComponents() []query.Component {
 	return components
 }
 
-func (inst *StorageAccount) iterativeWriteOperationsCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) iterativeWriteOperationsCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if !(strings.ToLower(inst.accountKind) == "storagev2") || !inst.nfsv3 || strings.ToLower(inst.accountTier) == "premium" {
 		return components
@@ -334,7 +334,7 @@ func (inst *StorageAccount) iterativeWriteOperationsCostComponents() []query.Com
 
 	meterName := "Iterative Write Operations"
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Iterative write operations",
 		Unit:            "100 operations",
 		MonthlyQuantity: quantity,
@@ -349,8 +349,8 @@ func (inst *StorageAccount) iterativeWriteOperationsCostComponents() []query.Com
 	return components
 }
 
-func (inst *StorageAccount) writeOperationsCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) writeOperationsCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if strings.ToLower(inst.accountKind) == "filestorage" && strings.ToLower(inst.accountTier) == "premium" {
 		return components
@@ -369,7 +369,7 @@ func (inst *StorageAccount) writeOperationsCostComponents() []query.Component {
 		meterName = "(?<!Iterative) Write Operations"
 	}
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Write operations",
 		Unit:            "10k operations",
 		MonthlyQuantity: quantity,
@@ -384,8 +384,8 @@ func (inst *StorageAccount) writeOperationsCostComponents() []query.Component {
 	return components
 }
 
-func (inst *StorageAccount) listAndCreateContainerOperationsCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) listAndCreateContainerOperationsCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if strings.ToLower(inst.accountKind) == "filestorage" && strings.ToLower(inst.accountTier) == "premium" {
 		return components
@@ -407,7 +407,7 @@ func (inst *StorageAccount) listAndCreateContainerOperationsCostComponents() []q
 		meterName = "List Operations"
 	}
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            name,
 		Unit:            "10k operations",
 		MonthlyQuantity: quantity,
@@ -422,8 +422,8 @@ func (inst *StorageAccount) listAndCreateContainerOperationsCostComponents() []q
 	return components
 }
 
-func (inst *StorageAccount) iterativeReadOperationsCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) iterativeReadOperationsCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if !(strings.ToLower(inst.accountKind) == "storagev2") || !inst.nfsv3 || strings.ToLower(inst.accountTier) == "premium" {
 		return components
@@ -439,7 +439,7 @@ func (inst *StorageAccount) iterativeReadOperationsCostComponents() []query.Comp
 
 	meterName := "Iterative Read Operations"
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Iterative read operations",
 		Unit:            "10k operations",
 		MonthlyQuantity: quantity,
@@ -454,8 +454,8 @@ func (inst *StorageAccount) iterativeReadOperationsCostComponents() []query.Comp
 	return components
 }
 
-func (inst *StorageAccount) readOperationsCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) readOperationsCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if strings.ToLower(inst.accountKind) == "filestorage" && strings.ToLower(inst.accountTier) == "premium" {
 		return components
@@ -480,7 +480,7 @@ func (inst *StorageAccount) readOperationsCostComponents() []query.Component {
 	}
 
 	filter := inst.buildProductFilter(meterName)
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Read operations",
 		Unit:            "10k operations",
 		MonthlyQuantity: quantity,
@@ -495,8 +495,8 @@ func (inst *StorageAccount) readOperationsCostComponents() []query.Component {
 	return components
 }
 
-func (inst *StorageAccount) otherOperationsCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) otherOperationsCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if strings.ToLower(inst.accountKind) == "filestorage" && strings.ToLower(inst.accountTier) == "premium" {
 		return components
@@ -515,7 +515,7 @@ func (inst *StorageAccount) otherOperationsCostComponents() []query.Component {
 		meterName = "Delete Operations"
 	}
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "All other operations",
 		Unit:            "10k operations",
 		MonthlyQuantity: quantity,
@@ -530,8 +530,8 @@ func (inst *StorageAccount) otherOperationsCostComponents() []query.Component {
 	return components
 }
 
-func (inst *StorageAccount) dataRetrievalCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) dataRetrievalCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if !(strings.ToLower(inst.accessTier) == "cool") {
 		return components
@@ -545,7 +545,7 @@ func (inst *StorageAccount) dataRetrievalCostComponents() []query.Component {
 
 	meterName := "Data Retrieval"
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Data retrieval",
 		Unit:            "GB",
 		MonthlyQuantity: quantity,
@@ -560,8 +560,8 @@ func (inst *StorageAccount) dataRetrievalCostComponents() []query.Component {
 	return components
 }
 
-func (inst *StorageAccount) dataWriteCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) dataWriteCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if !(strings.ToLower(inst.accountKind) == "blockblobstorage" && !(strings.ToLower(inst.accountKind) == "blobstorage")) || !(strings.ToLower(inst.accessTier) == "cool") {
 		return components
@@ -575,7 +575,7 @@ func (inst *StorageAccount) dataWriteCostComponents() []query.Component {
 
 	meterName := "Data Write"
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Data write",
 		Unit:            "GB",
 		MonthlyQuantity: quantity,
@@ -590,8 +590,8 @@ func (inst *StorageAccount) dataWriteCostComponents() []query.Component {
 	return components
 }
 
-func (inst *StorageAccount) blobIndexTagsCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) blobIndexTagsCostComponents() []resource.Component {
+	var components []resource.Component
 
 	isBlockPremium := strings.ToLower(inst.accountKind) == "blockblobstorage" && strings.ToLower(inst.accountTier) == "premium"
 	isBlobPremium := strings.ToLower(inst.accountKind) == "blobstorage" && strings.ToLower(inst.accountTier) == "premium"
@@ -610,7 +610,7 @@ func (inst *StorageAccount) blobIndexTagsCostComponents() []query.Component {
 
 	meterName := "Index Tags"
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Blob index",
 		Unit:            "10k tags",
 		MonthlyQuantity: quantity,
@@ -625,8 +625,8 @@ func (inst *StorageAccount) blobIndexTagsCostComponents() []query.Component {
 	return components
 }
 
-func (inst *StorageAccount) dataAtRestCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) dataAtRestCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if !(strings.ToLower(inst.accountKind) == "filestorage") {
 		return components
@@ -643,7 +643,7 @@ func (inst *StorageAccount) dataAtRestCostComponents() []query.Component {
 		meterName = "Provisioned"
 	}
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Data at rest",
 		Unit:            "GB",
 		MonthlyQuantity: quantity,
@@ -658,8 +658,8 @@ func (inst *StorageAccount) dataAtRestCostComponents() []query.Component {
 	return components
 }
 
-func (inst *StorageAccount) snapshotsCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) snapshotsCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if !(strings.ToLower(inst.accountKind) == "filestorage") {
 		return components
@@ -676,7 +676,7 @@ func (inst *StorageAccount) snapshotsCostComponents() []query.Component {
 		meterName = "Snapshots"
 	}
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Snapshots",
 		Unit:            "GB",
 		MonthlyQuantity: quantity,
@@ -691,8 +691,8 @@ func (inst *StorageAccount) snapshotsCostComponents() []query.Component {
 	return components
 }
 
-func (inst *StorageAccount) metadataAtRestCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) metadataAtRestCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if !(strings.ToLower(inst.accountKind) == "filestorage") || strings.ToLower(inst.accountTier) == "premium" {
 		return components
@@ -706,7 +706,7 @@ func (inst *StorageAccount) metadataAtRestCostComponents() []query.Component {
 
 	meterName := "Metadata"
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Metadata at rest",
 		Unit:            "GB",
 		MonthlyQuantity: quantity,
@@ -721,8 +721,8 @@ func (inst *StorageAccount) metadataAtRestCostComponents() []query.Component {
 	return components
 }
 
-func (inst *StorageAccount) earlyDeletionCostComponents() []query.Component {
-	var components []query.Component
+func (inst *StorageAccount) earlyDeletionCostComponents() []resource.Component {
+	var components []resource.Component
 
 	if strings.ToLower(inst.accountKind) == "storage" || strings.ToLower(inst.accountKind) == "blockblobstorage" || strings.ToLower(inst.accountKind) == "blobstorage" || !(strings.ToLower(inst.accessTier) == "cool") {
 		return components
@@ -735,7 +735,7 @@ func (inst *StorageAccount) earlyDeletionCostComponents() []query.Component {
 
 	meterName := "Early Delete"
 
-	components = append(components, query.Component{
+	components = append(components, resource.Component{
 		Name:            "Early deletion",
 		Unit:            "GB",
 		MonthlyQuantity: quantity,
@@ -751,10 +751,10 @@ func (inst *StorageAccount) earlyDeletionCostComponents() []query.Component {
 }
 
 // buildStorageCostComponent builds one cost component for storage amount costs.
-func (inst *StorageAccount) buildStorageCostComponent(name string, startUsage string, quantity decimal.Decimal) query.Component {
+func (inst *StorageAccount) buildStorageCostComponent(name string, startUsage string, quantity decimal.Decimal) resource.Component {
 	meterName := "Data Stored"
 
-	return query.Component{
+	return resource.Component{
 		Name:            name,
 		Unit:            "GB",
 		MonthlyQuantity: quantity,

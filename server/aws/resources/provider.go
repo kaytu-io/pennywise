@@ -3,7 +3,6 @@ package resources
 import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/aws/region"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/resource"
 	"go.uber.org/zap"
 )
@@ -30,7 +29,7 @@ func NewProvider(key string, regionCode region.Code, logger *zap.Logger) (*Provi
 func (p *Provider) Name() string { return p.key }
 
 // ResourceComponents returns Component queries for a given terraform.Resource.
-func (p *Provider) ResourceComponents(rss map[string]resource.Resource, tfRes resource.Resource) []query.Component {
+func (p *Provider) ResourceComponents(rss map[string]resource.ResourceDef, tfRes resource.ResourceDef) []resource.Component {
 	switch tfRes.Type {
 	case "aws_instance":
 		vals, err := decodeInstanceValues(tfRes.Values)

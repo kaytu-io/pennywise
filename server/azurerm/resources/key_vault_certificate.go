@@ -1,7 +1,7 @@
 package resources
 
 import (
-	"github.com/kaytu-io/pennywise/server/internal/query"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"golang.org/x/text/cases"
@@ -67,8 +67,8 @@ func (p *Provider) newKeyVaultCertificate(vals keyVaultCertificateValues) *KeyVa
 	return inst
 }
 
-func (inst *KeyVaultCertificate) Components() []query.Component {
-	var components []query.Component
+func (inst *KeyVaultCertificate) Components() []resource.Component {
+	var components []resource.Component
 
 	skuName := cases.Title(language.English).String(inst.keyVaultId.Values.SkuName)
 

@@ -2,8 +2,8 @@ package resources
 
 import (
 	"fmt"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"regexp"
@@ -86,7 +86,7 @@ func (p *Provider) newAzureRMKubernetesClusterNodePool(vals kubernetesClusterNod
 	return inst
 }
 
-func (inst *kubernetesClusterNodePool) Components() []query.Component {
+func (inst *kubernetesClusterNodePool) Components() []resource.Component {
 	nodeCount := decimal.NewFromInt(1)
 	region := getLocationName(inst.location)
 	// if the node count is not set explicitly let's take the min_count.
@@ -110,8 +110,8 @@ func (inst *kubernetesClusterNodePool) Components() []query.Component {
 }
 
 func aksClusterNodePool(key string, osDiskSizeGB *int, OSDiskType *string, osSku *string, osType *string,
-	vmsSize string, region string, nodeCount decimal.Decimal, monthlyHrsUsage *float64) []query.Component {
-	var costComponents []query.Component
+	vmsSize string, region string, nodeCount decimal.Decimal, monthlyHrsUsage *float64) []resource.Component {
+	var costComponents []resource.Component
 
 	for i := int64(0); i < nodeCount.CoefficientInt64(); i++ {
 		var monthlyHrs *decimal.Decimal
@@ -159,7 +159,7 @@ func aksClusterNodePool(key string, osDiskSizeGB *int, OSDiskType *string, osSku
 	return costComponents
 }
 
-func aksOSDiskSubResource(key string, region string, instanceType string, diskSize int) *query.Component {
+func aksOSDiskSubResource(key string, region string, instanceType string, diskSize int) *resource.Component {
 	diskType := aksGetStorageType(instanceType)
 	storageReplicationType := "LRS"
 

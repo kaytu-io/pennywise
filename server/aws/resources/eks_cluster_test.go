@@ -11,7 +11,6 @@ import (
 
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 )
 
@@ -23,16 +22,16 @@ func TestEKSCluster_Components(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("EKSCluster", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_eks_cluster.test",
 			Type:         "aws_eks_cluster",
 			Name:         "test",
 			ProviderName: "aws",
 			Values:       map[string]interface{}{},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "EKS Cluster",
 				Details:        []string{"EKSCluster:Compute"},

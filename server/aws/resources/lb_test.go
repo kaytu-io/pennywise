@@ -7,7 +7,6 @@ import (
 
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -22,15 +21,15 @@ func TestLB_Components(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("DefaultValues", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_lb.test",
 			Type:         "aws_lb",
 			Name:         "test",
 			ProviderName: "aws",
 			Values:       map[string]interface{}{},
 		}
-		rss := map[string]resource.Resource{}
-		expected := []query.Component{
+		rss := map[string]resource.ResourceDef{}
+		expected := []resource.Component{
 			{
 				Name:           "Application Load Balancer",
 				HourlyQuantity: decimal.NewFromInt(1),
@@ -54,7 +53,7 @@ func TestLB_Components(t *testing.T) {
 	})
 
 	t.Run("NetworkLoadBalancer", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_lb.test",
 			Type:         "aws_lb",
 			Name:         "test",
@@ -63,8 +62,8 @@ func TestLB_Components(t *testing.T) {
 				"load_balancer_type": "network",
 			},
 		}
-		rss := map[string]resource.Resource{}
-		expected := []query.Component{
+		rss := map[string]resource.ResourceDef{}
+		expected := []resource.Component{
 			{
 				Name:           "Network Load Balancer",
 				HourlyQuantity: decimal.NewFromInt(1),
@@ -88,7 +87,7 @@ func TestLB_Components(t *testing.T) {
 	})
 
 	t.Run("GatewayLoadBalancer", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_lb.test",
 			Type:         "aws_lb",
 			Name:         "test",
@@ -97,9 +96,9 @@ func TestLB_Components(t *testing.T) {
 				"load_balancer_type": "gateway",
 			},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Gateway Load Balancer",
 				HourlyQuantity: decimal.NewFromInt(1),
@@ -123,16 +122,16 @@ func TestLB_Components(t *testing.T) {
 	})
 
 	t.Run("ClassicLoadBalancer", func(t *testing.T) {
-		tfres := resource.Resource{
+		tfres := resource.ResourceDef{
 			Address:      "aws_elb.test",
 			Type:         "aws_elb",
 			Name:         "test",
 			ProviderName: "aws",
 			Values:       map[string]interface{}{},
 		}
-		rss := map[string]resource.Resource{}
+		rss := map[string]resource.ResourceDef{}
 
-		expected := []query.Component{
+		expected := []resource.Component{
 			{
 				Name:           "Classic Load Balancer",
 				HourlyQuantity: decimal.NewFromInt(1),

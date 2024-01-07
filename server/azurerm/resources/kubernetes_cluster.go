@@ -3,8 +3,8 @@ package resources
 import (
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"strings"
@@ -128,11 +128,11 @@ func (p *Provider) NewAzureRMKubernetesCluster(vals kubernetesClusterValues) *Ku
 	return inst
 }
 
-func (inst KubernetesCluster) Components() []query.Component {
+func (inst KubernetesCluster) Components() []resource.Component {
 	region := inst.location
 	region = getLocationName(region)
 
-	var costComponents []query.Component
+	var costComponents []resource.Component
 
 	skuTier := "Free"
 	if inst.skuTier != nil {
@@ -142,7 +142,7 @@ func (inst KubernetesCluster) Components() []query.Component {
 	// Azure switched from "Paid" to "Standard" in API version 2023-02-01
 	// (Terraform Azure provider version v3.51.0)
 	if contains([]string{"paid", "standard"}, strings.ToLower(skuTier)) {
-		costComponents = append(costComponents, query.Component{
+		costComponents = append(costComponents, resource.Component{
 			Name:           "Uptime SLA",
 			Unit:           "hours",
 			HourlyQuantity: decimal.NewFromInt(1),

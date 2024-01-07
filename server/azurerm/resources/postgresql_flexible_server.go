@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/server/internal/price"
 	"github.com/kaytu-io/pennywise/server/internal/product"
-	"github.com/kaytu-io/pennywise/server/internal/query"
 	"github.com/kaytu-io/pennywise/server/internal/util"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	"regexp"
@@ -104,8 +104,8 @@ func (p *Provider) newPostgresqlFlexibleServer(vals postgresqlFlexibleServerValu
 	return inst
 }
 
-func (inst *PostgresqlFlexibleServer) Components() []query.Component {
-	var components []query.Component
+func (inst *PostgresqlFlexibleServer) Components() []resource.Component {
+	var components []resource.Component
 
 	components = append(components, inst.computeCostComponent(), inst.backupCostComponent(), inst.storageCostComponent())
 	GetCostComponentNamesAndSetLogger(components, inst.provider.logger)
@@ -113,10 +113,10 @@ func (inst *PostgresqlFlexibleServer) Components() []query.Component {
 	return components
 }
 
-func (inst *PostgresqlFlexibleServer) computeCostComponent() query.Component {
+func (inst *PostgresqlFlexibleServer) computeCostComponent() resource.Component {
 	attrs := getFlexibleServerFilterAttributes(inst.tier, inst.instanceType, inst.instanceVersion)
 
-	return query.Component{
+	return resource.Component{
 		Name:           fmt.Sprintf("Compute (%s)", inst.sku),
 		Unit:           "hours",
 		HourlyQuantity: decimal.NewFromInt(1),
@@ -140,13 +140,13 @@ func (inst *PostgresqlFlexibleServer) computeCostComponent() query.Component {
 	}
 }
 
-func (inst *PostgresqlFlexibleServer) storageCostComponent() query.Component {
+func (inst *PostgresqlFlexibleServer) storageCostComponent() resource.Component {
 	var quantity decimal.Decimal
 	if inst.storage > 0 {
 		quantity = decimal.NewFromInt(inst.storage / 1024)
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            "Storage",
 		Unit:            "GB",
 		MonthlyQuantity: quantity,
@@ -163,13 +163,13 @@ func (inst *PostgresqlFlexibleServer) storageCostComponent() query.Component {
 	}
 }
 
-func (inst *PostgresqlFlexibleServer) backupCostComponent() query.Component {
+func (inst *PostgresqlFlexibleServer) backupCostComponent() resource.Component {
 	var quantity decimal.Decimal
 	if inst.additionalBackupStorageGb != nil {
 		quantity = decimal.NewFromFloat(*inst.additionalBackupStorageGb)
 	}
 
-	return query.Component{
+	return resource.Component{
 		Name:            "Additional backup storage",
 		Unit:            "GB",
 		MonthlyQuantity: quantity,
