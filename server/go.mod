@@ -5,14 +5,21 @@ go 1.21.3
 require (
 	github.com/brpaz/echozap v1.1.3
 	github.com/cycloidio/sqlr v1.0.0
+	github.com/davecgh/go-spew v1.1.1
 	github.com/dmarkham/enumer v1.5.3
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/kaytu-io/infracost v0.0.0-20231207093503-26dcf0b76143
 	github.com/kaytu-io/pennywise/cli v0.0.0-20231220195626-91574b0f7e00
+	github.com/knadh/koanf/parsers/json v0.1.0
+	github.com/knadh/koanf/parsers/yaml v0.1.0
+	github.com/knadh/koanf/providers/env v0.1.0
+	github.com/knadh/koanf/providers/file v0.1.0
+	github.com/knadh/koanf/v2 v2.0.1
 	github.com/labstack/echo/v4 v4.11.3
 	github.com/lopezator/migrator v0.3.0
 	github.com/machinebox/progress v0.2.0
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/rs/zerolog v1.31.0
 	github.com/shopspring/decimal v1.3.1
 	github.com/spf13/afero v1.11.0
 	github.com/spf13/cobra v1.8.0
@@ -98,12 +105,12 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/creack/pty v1.1.11 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/fatih/color v1.16.0 // indirect
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.5.0 // indirect
@@ -172,6 +179,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
+	github.com/knadh/koanf/maps v0.1.1 // indirect
 	github.com/labstack/gommon v0.4.1 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lib/pq v1.10.5 // indirect
@@ -199,7 +207,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
-	github.com/rs/zerolog v1.31.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b // indirect

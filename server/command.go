@@ -9,18 +9,20 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/net/context"
 	"gopkg.in/go-playground/validator.v9"
-	"os"
 )
 
-var (
-	MySQLHost     = os.Getenv("MYSQL_HOST")
-	MySQLPort     = os.Getenv("MYSQL_PORT")
-	MySQLDb       = os.Getenv("MYSQL_DB")
-	MySQLUser     = os.Getenv("MYSQL_USERNAME")
-	MySQLPassword = os.Getenv("MYSQL_PASSWORD")
-
-	HttpAddress = os.Getenv("HTTP_ADDRESS")
-)
+type Config struct {
+	Mysql struct {
+		Host     string `koanf:"host"`
+		Port     string `koanf:"port"`
+		DB       string `koanf:"db"`
+		Username string `koanf:"username"`
+		Password string `koanf:"password"`
+	} `koanf:"mysql"`
+	Http struct {
+		Address string `koanf:"address"`
+	} `koanf:"http"`
+}
 
 type customValidator struct {
 	validate *validator.Validate
@@ -39,16 +41,18 @@ func Command() *cobra.Command {
 }
 
 func start(ctx context.Context) error {
+	config := load(true)
 	logger, err := zap.NewProduction()
 	if err != nil {
 		return fmt.Errorf("new logger: %w", err)
 	}
-	handler, err := InitializeHttpHandler(logger, MySQLUser, MySQLPassword, MySQLHost, MySQLPort, MySQLDb)
+	handler, err := InitializeHttpHandler(logger, config.Mysql.Username, config.Mysql.Password, config.Mysql.Host,
+		config.Mysql.Port, config.Mysql.DB)
 	if err != nil {
 		return fmt.Errorf("init http handler: %w", err)
 	}
 
-	return registerAndStart(logger, HttpAddress, handler)
+	return registerAndStart(logger, config.Http.Address, handler)
 }
 
 func registerAndStart(logger *zap.Logger, address string, handler *HttpHandler) error {
