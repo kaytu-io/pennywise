@@ -2,11 +2,6 @@ package ingestion
 
 import (
 	"github.com/spf13/cobra"
-	"os"
-)
-
-var (
-	ServerClientAddress = os.Getenv("SERVER_CLIENT_URL")
 )
 
 var IngestCmd = &cobra.Command{
