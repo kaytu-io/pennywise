@@ -31,7 +31,6 @@ func ParseHclResources(path string, usage usagePackage.Usage) (resource.Provider
 	var provider resource.ProviderName
 	jsons := h.LoadPlanJSONs()
 	for _, j := range jsons {
-		//fmt.Println("JSON", j.JSON)
 		var res Project
 		err := json.Unmarshal(j.JSON, &res)
 		if err != nil {
