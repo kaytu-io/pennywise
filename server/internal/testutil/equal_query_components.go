@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"fmt"
+	"github.com/kaytu-io/pennywise/server/resource"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

@@ -12,8 +12,3 @@ type IngestionFilter func(pp *price.WithProduct) bool
 func DefaultFilter(_ *price.WithProduct) bool {
 	return true
 }
-
-// MinimalFilter only ingests the supported records, skipping those that would never be used.
-func MinimalFilter(pp *price.WithProduct) bool {
-	return (pp.Price.Attributes["type"] == "Consumption" || pp.Price.Attributes["type"] == "DevTestConsumption") && pp.Product.Attributes["priority"] == "regular"
-}

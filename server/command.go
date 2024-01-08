@@ -52,7 +52,10 @@ func start(ctx context.Context) error {
 		return fmt.Errorf("init http handler: %w", err)
 	}
 
-	return registerAndStart(logger, config.Http.Address, handler)
+	if HttpAddress == "" {
+		HttpAddress = ":8080"
+	}
+	return registerAndStart(logger, HttpAddress, handler)
 }
 
 func registerAndStart(logger *zap.Logger, address string, handler *HttpHandler) error {

@@ -87,7 +87,7 @@ func (ts *AzureTestSuite) getUsage(usagePath string) (*usage.Usage, error) {
 		}
 
 	} else {
-		usg = usage.Default
+		usg = usage.Usage{}
 	}
 	return &usg, nil
 }

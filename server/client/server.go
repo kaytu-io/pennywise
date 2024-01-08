@@ -18,24 +18,23 @@ type EchoError struct {
 	Message string `json:"message"`
 }
 
-type OnboardServiceClient interface {
-	GetResourceCost(req resource.ResourceDef) (*cost.Cost, error)
-	GetStateCost(req resource.State) (*cost.Cost, error)
-	Ingest(provider, service, region string) error
+type ServerClient interface {
+	GetStateCost(req resource.State) (*cost.State, error)
+	AddIngestion(provider, service, region string) (*ingester.IngestionJob, error)
+	ListIngestionJobs(provider, service, region, status string) ([]ingester.IngestionJob, error)
+	GetIngestionJob(id string) (*ingester.IngestionJob, error)
 }
 
 type serverClient struct {
 	baseURL string
 }
 
-func NewPennywiseServerClient(baseURL string) *serverClient {
-	return &serverClient{
-		baseURL: baseURL,
-	}
+func NewPennywiseServerClient(baseURL string) ServerClient {
+	return &serverClient{baseURL: baseURL}
 }
 
 func (s *serverClient) ListIngestionJobs(provider, service, region, status string) ([]ingester.IngestionJob, error) {
-	url := fmt.Sprintf("%s/api/v1/ingest/jobs?status=%s&provider=%s&service=%s&region=%s", s.baseURL, status, provider, service, region)
+	url := fmt.Sprintf("%s/api/v1/ingestion/jobs?status=%s&provider=%s&service=%s&region=%s", s.baseURL, status, provider, service, region)
 	url = strings.ReplaceAll(url, " ", "%20")
 
 	var jobs []ingester.IngestionJob
@@ -49,7 +48,7 @@ func (s *serverClient) ListIngestionJobs(provider, service, region, status strin
 }
 
 func (s *serverClient) GetIngestionJob(id string) (*ingester.IngestionJob, error) {
-	url := fmt.Sprintf("%s/api/v1/ingest/jobs/%s", s.baseURL, id)
+	url := fmt.Sprintf("%s/api/v1/ingestion/jobs/%s", s.baseURL, id)
 
 	var job ingester.IngestionJob
 	if statusCode, err := doRequest(http.MethodGet, url, nil, &job); err != nil {
@@ -61,8 +60,8 @@ func (s *serverClient) GetIngestionJob(id string) (*ingester.IngestionJob, error
 	return &job, nil
 }
 
-func (s *serverClient) Ingest(provider, service, region string) (*ingester.IngestionJob, error) {
-	url := fmt.Sprintf("%s/api/v1/ingest?provider=%s&service=%s&region=%s", s.baseURL, provider, service, region)
+func (s *serverClient) AddIngestion(provider, service, region string) (*ingester.IngestionJob, error) {
+	url := fmt.Sprintf("%s/api/v1/ingestion/jobs?provider=%s&service=%s&region=%s", s.baseURL, provider, service, region)
 	url = strings.ReplaceAll(url, " ", "%20")
 
 	var job ingester.IngestionJob
@@ -73,23 +72,6 @@ func (s *serverClient) Ingest(provider, service, region string) (*ingester.Inges
 		return nil, err
 	}
 	return &job, nil
-}
-
-func (s *serverClient) GetResourceCost(req resource.ResourceDef) (*cost.State, error) {
-	url := fmt.Sprintf("%s/api/v1/cost/resource", s.baseURL)
-
-	payload, err := json.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-	var cost cost.State
-	if statusCode, err := doRequest(http.MethodGet, url, payload, &cost); err != nil {
-		if 400 <= statusCode && statusCode < 500 {
-			return nil, echo.NewHTTPError(statusCode, err.Error())
-		}
-		return nil, err
-	}
-	return &cost, nil
 }
 
 func (s *serverClient) GetStateCost(req resource.State) (*cost.State, error) {

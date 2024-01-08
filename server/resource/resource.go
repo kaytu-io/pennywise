@@ -6,7 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// Resource is a single resource definition.
+// ResourceDef is a single resource definition.
 type ResourceDef struct {
 	Address      string                 `json:"address"`
 	Type         string                 `json:"type"`
