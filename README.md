@@ -22,8 +22,36 @@ git clone https://github.com/kaytu-io/pennywise.git
 cd pennywise/server
 ```
 
-Set up the server configuration by editing config.yaml or by exporting environmental variables:
+Set up the server configuration by creating a folder outside the cli and server folders in Pennywise as config and set config.yaml or config.json inside it or set it another way by exporting environmental variables :
+
 MYSQL_HOST, MYSQL_PORT, MYSQL_DB, MYSQL_USERNAME, MYSQL_PASSWORD, HTTP_ADDRESS
+
+Or by configuring the config.json file:
+````json
+{
+  "mysql": {
+    "host": "host",
+    "port":"port",
+    "db": "database_name",
+    "username": "username",
+    "password": "password"
+  },
+  "http": {
+    "address": ":address"
+  }
+}
+````
+Or by configuring the config.yml file:
+````yaml
+mysql:
+  host: host
+  port: port
+  db: database_name
+  username: username
+  password: password
+http:
+  address: :address
+````
 
 Start the Pennywise server:
 
