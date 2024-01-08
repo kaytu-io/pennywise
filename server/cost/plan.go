@@ -15,11 +15,6 @@ type Plan struct {
 	Prior, Planned *State
 }
 
-// NewPlan returns a new Plan from Prior and Planned State.
-func NewPlan(name string, prior, planned *State) *Plan {
-	return &Plan{Name: name, Prior: prior, Planned: planned}
-}
-
 // PriorCost returns the total cost of the Prior State or decimal.Zero if it isn't included in the plan.
 func (p Plan) PriorCost() (Cost, error) {
 	if p.Prior == nil {

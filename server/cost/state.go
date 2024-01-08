@@ -93,6 +93,8 @@ func (s *State) GetCostComponents() []Component {
 	return components
 }
 
+// CostString returns a string to show the breakdown of the costs for a state
+// containing the resources and their components costs and total cost for the resources and the state
 func (s *State) CostString() (string, error) {
 	cost, err := s.Cost()
 	if err != nil {

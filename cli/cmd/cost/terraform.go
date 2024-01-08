@@ -49,7 +49,7 @@ var terraformCommand = &cobra.Command{
 			}
 
 		} else {
-			usage = usagePackage.Default
+			usage = usagePackage.Usage{}
 		}
 		projectDirectory := flags.ReadStringOptionalFlag(cmd, "project")
 		if projectDirectory != nil {

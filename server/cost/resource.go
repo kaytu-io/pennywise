@@ -31,6 +31,8 @@ func (re Resource) Cost() (Cost, error) {
 	return total, nil
 }
 
+// CostString returns a string to show the breakdown of the costs for a resource
+// containing the components costs and total cost for the resource
 func (re Resource) CostString() (string, error) {
 	cost, err := re.Cost()
 	if err != nil {

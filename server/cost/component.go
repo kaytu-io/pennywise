@@ -19,6 +19,7 @@ type Component struct {
 	Error error
 }
 
+// GetRounded returns component with rounded values to show in the CostString
 func (c Component) GetRounded() Component {
 	return Component{
 		Name:            c.Name,

@@ -40,7 +40,6 @@ type Ingester struct {
 // given options
 func NewIngester(service, region string) (*Ingester, error) {
 	if _, ok := services[service]; !ok {
-		fmt.Println(service, "not supported")
 		return nil, ErrNotSupportedService
 	}
 	ing := &Ingester{
