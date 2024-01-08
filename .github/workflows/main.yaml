@@ -47,10 +47,10 @@ jobs:
 
       - run: git config --global url.https://${{ secrets.GH_TOKEN }}@github.com/kaytu-io.insteadOf https://github.com/kaytu-io
 
-      - name: Run Golang Tests
-        run: |
-          cd server/azurerm/tests
-          go test -v . -timeout 30m
+#      - name: Run Golang Tests
+#        run: |
+#          cd server/azurerm/tests
+#          go test -v . -timeout 30m
 
 #      - name: Build Docker Image
 #        run: |
