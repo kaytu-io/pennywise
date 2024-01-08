@@ -5,6 +5,7 @@ import (
 	"github.com/kaytu-io/pennywise/cli/cmd/cost"
 	"github.com/kaytu-io/pennywise/cli/cmd/ingestion"
 	"github.com/spf13/cobra"
+	"github.com/spf13/cobra/doc"
 	"os"
 )
 
@@ -24,6 +25,10 @@ func init() {
 	rootCmd.AddCommand(ingestion.IngestCmd)
 	rootCmd.AddCommand(cost.CostCmd)
 	rootCmd.PersistentFlags().String("server-url", "http://localhost:8080", "define the server http address")
+	err := doc.GenMarkdownTree(rootCmd, ".")
+	if err != nil {
+		panic(err)
+	}
 }
 
 func Execute() {
