@@ -9,15 +9,15 @@ import (
 
 var list = &cobra.Command{
 	Use:   "list",
-	Short: `Returns list of ingestion jobs with the provided filters`,
-	Long:  `Returns list of ingestion jobs with the provided filters`,
+	Short: `Returns list of ingestion jobs`,
+	Long:  `Returns list of ingestion jobs by the provided filters`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		provider := flags.ReadStringFlag(cmd, "provider")
 		service := flags.ReadStringFlag(cmd, "service")
 		region := flags.ReadStringFlag(cmd, "region")
 		status := flags.ReadStringFlag(cmd, "status")
 
-		serverClient := client.NewPennywiseServerClient(ServerClientAddress)
+		serverClient := client.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
 		jobs, err := serverClient.ListIngestionJobs(provider, service, region, status)
 		if err != nil {
 			return err

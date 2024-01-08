@@ -38,9 +38,8 @@ type Ingester struct {
 
 // NewIngester returns a new Ingester for AzureRM for the specified service and region (ex: francecentral) with the
 // given options
-func NewIngester(service, region string, opts ...Option) (*Ingester, error) {
+func NewIngester(service, region string) (*Ingester, error) {
 	if _, ok := services[service]; !ok {
-		fmt.Println(service, "not supported")
 		return nil, ErrNotSupportedService
 	}
 	ing := &Ingester{
@@ -49,10 +48,6 @@ func NewIngester(service, region string, opts ...Option) (*Ingester, error) {
 		service:         service,
 		endpoint:        "https://prices.azure.com/",
 		ingestionFilter: DefaultFilter,
-	}
-
-	for _, opt := range opts {
-		opt(ing)
 	}
 
 	u, err := url.Parse(ing.endpoint)

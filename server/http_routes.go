@@ -14,13 +14,12 @@ import (
 func (h *HttpHandler) Register(e *echo.Echo) {
 	v1 := e.Group("/api/v1")
 
-	v1.PUT("/ingest", h.IngestTables)
-	v1.GET("/ingest/jobs/:id", h.GetIngestionJob)
-	v1.GET("/ingest/jobs", h.ListIngestionJobs)
+	v1.PUT("/ingestion/jobs", h.IngestTables)
+	v1.GET("/ingestion/jobs/:id", h.GetIngestionJob)
+	v1.GET("/ingestion/jobs", h.ListIngestionJobs)
 
 	cost := v1.Group("/cost")
-	cost.GET("/resource", h.GetResourceCost)
-	cost.GET("/state", h.GetStateCost)
+	cost.GET("/state", h.GetTerraformCost)
 }
 
 func bindValidate(ctx echo.Context, i any) error {
@@ -35,7 +34,15 @@ func bindValidate(ctx echo.Context, i any) error {
 	return nil
 }
 
-func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
+// GetTerraformCost godoc
+//
+//	@Summary	Returns breakdown costs for a terraform file
+//	@Tags		cost
+//	@Param		request	body	resource.State	true	"Terraform state"
+//	@Produce	json
+//	@Success	200	{object}	cost.State
+//	@Router		/api/v1/cost/state [get]
+func (h *HttpHandler) GetTerraformCost(ctx echo.Context) error {
 	var req resource.State
 	var qResources []resource.Resource
 	if err := bindValidate(ctx, &req); err != nil {
@@ -80,50 +87,16 @@ func (h *HttpHandler) GetStateCost(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, state)
 }
 
-func (h *HttpHandler) GetResourceCost(ctx echo.Context) error {
-	var req resource.ResourceDef
-	var qResource resource.Resource
-	if err := bindValidate(ctx, &req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-	if req.ProviderName == resource.AzureProvider {
-		provider, err := azurermres.NewProvider(azurermres.ProviderName, h.logger)
-		if err != nil {
-			return err
-		}
-		resources := make(map[string]resource.ResourceDef)
-		resources[req.Address] = req
-		components := provider.ResourceComponents(resources, req)
-		qResource = resource.Resource{
-			Address:    req.Address,
-			Provider:   req.ProviderName,
-			Type:       req.Type,
-			Components: components,
-		}
-	} else if req.ProviderName == resource.AWSProvider {
-		provider, err := awsres.NewProvider(awsres.ProviderName, awsrg.Code(req.RegionCode), h.logger)
-		if err != nil {
-			return err
-		}
-		resources := make(map[string]resource.ResourceDef)
-		resources[req.Address] = req
-		components := provider.ResourceComponents(resources, req)
-		qResource = resource.Resource{
-			Address:    req.Address,
-			Provider:   req.ProviderName,
-			Type:       req.Type,
-			Components: components,
-		}
-	}
-	state, err := cost.NewState(ctx.Request().Context(), h.backend, []resource.Resource{qResource}, h.logger)
-	if err != nil {
-		return err
-	}
-	return ctx.JSON(http.StatusOK, state)
-}
-
-// IngestTables adds an ingestion job to receive pricing and store in the database
-// Params: provider (query param), service (query param), region (query param)
+// IngestTables godoc
+//
+//	@Summary	Adds an ingestion job to receive pricing and store in the database
+//	@Tags		ingestion
+//	@Param		provider	query	string	true	"provider"
+//	@Param		service		query	string	true	"service"
+//	@Param		region		query	string	false	"region"
+//	@Produce	json
+//	@Success	200	{object}	ingester.IngestionJob
+//	@Router		/api/v1/ingestion/jobs [put]
 func (h *HttpHandler) IngestTables(ctx echo.Context) error {
 	provider := ctx.QueryParam("provider")
 	service := ctx.QueryParam("service")
@@ -139,8 +112,17 @@ func (h *HttpHandler) IngestTables(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, job)
 }
 
-// ListIngestionJobs returns list of ingestion jobs with the provided filters
-// Params: provider (query param), service (query param), region (query param), status (query param)
+// ListIngestionJobs godoc
+//
+//	@Summary	Returns list of ingestion jobs with the provided filters
+//	@Tags		ingestion
+//	@Param		provider	query	string	false	"provider"
+//	@Param		service		query	string	false	"service"
+//	@Param		region		query	string	false	"region"
+//	@Param		status		query	string	false	"status"
+//	@Produce	json
+//	@Success	200	{object}	[]ingester.IngestionJob
+//	@Router		/api/v1/ingestion/jobs [get]
 func (h *HttpHandler) ListIngestionJobs(ctx echo.Context) error {
 	provider := ctx.QueryParam("provider")
 	status := ctx.QueryParam("status")
@@ -153,8 +135,14 @@ func (h *HttpHandler) ListIngestionJobs(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, jobs)
 }
 
-// GetIngestionJob returns an ingestion job with the provided id
-// Params: id (route param)
+// GetIngestionJob godoc
+//
+//	@Summary	Returns an ingestion job with the provided id
+//	@Tags		ingestion
+//	@Param		provider	path	string	true	"provider"
+//	@Produce	json
+//	@Success	200	{object}	ingester.IngestionJob
+//	@Router		/api/v1/ingestion/jobs/{id} [get]
 func (h *HttpHandler) GetIngestionJob(ctx echo.Context) error {
 	idStr := ctx.Param("id")
 	id64, err := strconv.ParseInt(idStr, 10, 32)

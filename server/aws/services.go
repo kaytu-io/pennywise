@@ -17,12 +17,3 @@ func IsServiceSupported(service string) bool {
 	_, ok := supportedServices[service]
 	return ok
 }
-
-// GetSupportedServices returns all the AWS service names that Terracost supports.
-func GetSupportedServices() []string {
-	svcs := make([]string, 0, len(supportedServices))
-	for k := range supportedServices {
-		svcs = append(svcs, k)
-	}
-	return svcs
-}
