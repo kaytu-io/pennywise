@@ -76,6 +76,6 @@ jobs:
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       - name: Semantic Release
-        uses: docker://ghcr.io/semantic-release/semantic-release:latest
+        uses: cycjimmy/semantic-release-action@v4
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
