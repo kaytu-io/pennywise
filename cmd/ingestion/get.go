@@ -2,8 +2,8 @@ package ingestion
 
 import (
 	"fmt"
-	"github.com/kaytu-io/pennywise/cli/cmd/flags"
-	"github.com/kaytu-io/pennywise/server/client"
+	"github.com/kaytu-io/pennywise-server/client"
+	"github.com/kaytu-io/pennywise/cmd/flags"
 	"github.com/spf13/cobra"
 )
 

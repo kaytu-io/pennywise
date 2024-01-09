@@ -2,7 +2,7 @@ package terraform
 
 import (
 	"encoding/json"
-	"github.com/kaytu-io/pennywise/server/resource"
+	"github.com/kaytu-io/pennywise-server/resource"
 	"strings"
 )
 

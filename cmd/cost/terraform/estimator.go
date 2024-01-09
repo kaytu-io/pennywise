@@ -1,12 +1,12 @@
 package terraform
 
 import (
-	"github.com/kaytu-io/pennywise/cli/parser/aws"
-	"github.com/kaytu-io/pennywise/cli/parser/azurerm"
-	"github.com/kaytu-io/pennywise/cli/parser/terraform"
-	"github.com/kaytu-io/pennywise/cli/usage"
-	"github.com/kaytu-io/pennywise/server/client"
-	"github.com/kaytu-io/pennywise/server/resource"
+	"github.com/kaytu-io/pennywise-server/client"
+	"github.com/kaytu-io/pennywise-server/resource"
+	"github.com/kaytu-io/pennywise/parser/aws"
+	"github.com/kaytu-io/pennywise/parser/azurerm"
+	"github.com/kaytu-io/pennywise/parser/terraform"
+	"github.com/kaytu-io/pennywise/usage"
 	"io"
 	"os"
 )

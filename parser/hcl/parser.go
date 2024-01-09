@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"github.com/kaytu-io/infracost/external/config"
 	"github.com/kaytu-io/infracost/external/providers/terraform"
-	usagePackage "github.com/kaytu-io/pennywise/cli/usage"
-	"github.com/kaytu-io/pennywise/server/resource"
+	"github.com/kaytu-io/pennywise-server/resource"
+	usagePackage "github.com/kaytu-io/pennywise/usage"
 	"golang.org/x/net/context"
 )
 

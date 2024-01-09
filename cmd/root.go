@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"errors"
-	"github.com/kaytu-io/pennywise/cli/cmd/cost"
-	"github.com/kaytu-io/pennywise/cli/cmd/ingestion"
+	"github.com/kaytu-io/pennywise/cmd/cost"
+	"github.com/kaytu-io/pennywise/cmd/ingestion"
 	"github.com/spf13/cobra"
 	"os"
 )

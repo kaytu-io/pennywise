@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/kaytu-io/pennywise/cli/usage"
+	"github.com/kaytu-io/pennywise/usage"
 )
 
 // Plan is a representation of a Terraform plan file.

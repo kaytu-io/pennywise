@@ -1,8 +1,8 @@
 package hcl
 
 import (
-	"github.com/kaytu-io/pennywise/cli/parser/azurerm"
-	"github.com/kaytu-io/pennywise/server/resource"
+	"github.com/kaytu-io/pennywise-server/resource"
+	"github.com/kaytu-io/pennywise/parser/azurerm"
 )
 
 type Resource struct {

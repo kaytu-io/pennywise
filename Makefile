@@ -1,6 +1,5 @@
 build:
-	go build -o server ./server
-	go build -o cli ./cli
+	go build -o cli .
 
 release:
 	git tag v1.0.0
