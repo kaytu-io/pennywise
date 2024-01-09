@@ -1,0 +1,15 @@
+package azurerm
+
+import "github.com/kaytu-io/pennywise/parser/terraform"
+
+// RegistryName is the fully qualified name under which this provider is stored in the registry.
+const RegistryName = "registry.terraform.io/hashicorp/azurerm"
+const ProviderName = "azurerm"
+
+// TerraformProviderInitializer is a terraform.ProviderInitializer that initializes the default GCP provider.
+var TerraformProviderInitializer = terraform.ProviderInitializer{
+	MatchNames: []string{ProviderName, RegistryName},
+	Provider: func(values map[string]interface{}) (terraform.Provider, error) {
+		return NewProvider(ProviderName)
+	},
+}

@@ -1,2 +1,0 @@
-azurerm_windows_virtual_machine_scale_set.basic_a2_usage:
-  instances: 4
