@@ -3,6 +3,7 @@ module github.com/kaytu-io/pennywise
 go 1.21.3
 
 require (
+	github.com/hashicorp/hcl/v2 v2.19.1
 	github.com/iancoleman/strcase v0.3.0
 	github.com/kaytu-io/infracost v0.0.0-20231207093503-26dcf0b76143
 	github.com/kaytu-io/pennywise-server v0.0.0-20240109090144-37efa74dbf7b
@@ -127,7 +128,6 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.6 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault // indirect
-	github.com/hashicorp/hcl/v2 v2.19.1 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform v0.15.3 // indirect
 	github.com/hashicorp/terraform-config-inspect v0.0.0-20230925220900-5a6f8d18746d // indirect
