@@ -114,8 +114,9 @@ func (attr *Attribute) Value(mappedBlocks map[string]interface{}) (any, error) {
 			return nil, err
 		}
 		return b, nil
+	default:
+		return nil, fmt.Errorf("value type not implemented")
 	}
-	return nil, fmt.Errorf("invalid value")
 }
 
 func getRefValue(mappedBlocks map[string]interface{}, reference Reference) (any, error) {
