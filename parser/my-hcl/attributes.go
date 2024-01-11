@@ -92,6 +92,9 @@ func (attr *Attribute) Value(mappedBlocks map[string]interface{}) (any, error) {
 			return getRefValue(mappedBlocks, *ref)
 		}
 	}
+	if isList(ctyVal) {
+		return getListValues(ctyVal)
+	}
 	switch ctyVal.Type() {
 	case cty.String:
 		var s string
@@ -116,6 +119,85 @@ func (attr *Attribute) Value(mappedBlocks map[string]interface{}) (any, error) {
 		return b, nil
 	default:
 		return nil, fmt.Errorf("value type not implemented")
+	}
+}
+
+func isList(v cty.Value) bool {
+	sourceTy := v.Type()
+
+	return sourceTy.IsTupleType() || sourceTy.IsListType() || sourceTy.IsSetType()
+}
+
+func getListValues(ctyVal cty.Value) (any, error) {
+	it := ctyVal.ElementIterator()
+	if it.Next() {
+		key, sourceItem := it.Element()
+		switch sourceItem.Type() {
+		case cty.String:
+			items := make([]string, ctyVal.LengthInt())
+			var s string
+			err := gocty.FromCtyValue(sourceItem, &s)
+			if err != nil {
+				return nil, err
+			}
+			i, _ := key.AsBigFloat().Int64()
+			items[i] = s
+			for it.Next() {
+				key, sourceItem = it.Element()
+				var s string
+				err = gocty.FromCtyValue(sourceItem, &s)
+				if err != nil {
+					return nil, err
+				}
+				i, _ = key.AsBigFloat().Int64()
+				items[i] = s
+			}
+			return items, nil
+		case cty.Number:
+			items := make([]int64, ctyVal.LengthInt())
+			var v int64
+			err := gocty.FromCtyValue(sourceItem, &v)
+			if err != nil {
+				return nil, err
+			}
+			i, _ := key.AsBigFloat().Int64()
+			items[i] = v
+			for it.Next() {
+				key, sourceItem = it.Element()
+				var v int64
+				err = gocty.FromCtyValue(sourceItem, &v)
+				if err != nil {
+					return nil, err
+				}
+				i, _ = key.AsBigFloat().Int64()
+				items[i] = v
+			}
+			return items, nil
+		case cty.Bool:
+			items := make([]bool, ctyVal.LengthInt())
+			var b bool
+			err := gocty.FromCtyValue(sourceItem, &b)
+			if err != nil {
+				return nil, err
+			}
+			i, _ := key.AsBigFloat().Int64()
+			items[i] = b
+			for it.Next() {
+				key, sourceItem = it.Element()
+				var b bool
+				err = gocty.FromCtyValue(sourceItem, &b)
+				if err != nil {
+					return nil, err
+				}
+				i, _ = key.AsBigFloat().Int64()
+				items[i] = b
+			}
+			return items, nil
+		default:
+			return nil, fmt.Errorf("list value type not implemented")
+		}
+	} else {
+		return nil, nil
 	}
 }
 

@@ -136,6 +136,12 @@ func (b Block) MakeMapStructure(mappedBlocks map[string]interface{}) (map[string
 				return nil, err
 			}
 			mapStructure[attr.Name] = blockValues
+		case []string:
+			mapStructure[attr.Name] = val.([]string)
+		case []bool:
+			mapStructure[attr.Name] = val.([]bool)
+		case []int64, []int32, []int:
+			mapStructure[attr.Name] = val.([]int64)
 		default:
 			return nil, fmt.Errorf("value type not implemented")
 		}
