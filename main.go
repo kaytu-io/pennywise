@@ -7,8 +7,8 @@ import (
 
 func main() {
 	//cmd.Execute()
-	tp := my_hcl.NewTerraformProject("./testdata/parser")
-	//tp := my_hcl.NewTerraformProject("../pennywise-server/testdata/azure/lb_rule")
+	//tp := my_hcl.NewTerraformProject("./testdata/parser")
+	tp := my_hcl.NewTerraformProject("../pennywise-server/testdata/azure/lb_rule")
 	err := tp.FindFiles()
 	if err != nil {
 		panic(err)
