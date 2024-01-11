@@ -125,6 +125,9 @@ func getRefValue(mappedBlocks map[string]interface{}, reference Reference) (any,
 			return nil, err
 		}
 		if reference.blockType.hasKey {
+			if reference.key == "id" || reference.key == "name" {
+				return *block, nil
+			}
 			attr := findAttribute(*block, reference.key)
 			if attr == nil {
 				return nil, fmt.Errorf("could not find attribute")
