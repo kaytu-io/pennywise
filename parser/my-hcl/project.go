@@ -1,6 +1,7 @@
 package my_hcl
 
 import (
+	"fmt"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"os"
@@ -107,4 +108,22 @@ func makeMappedBlockItem(mappedBlocks map[string]interface{}, labels []string, b
 		mappedBlocks[labels[0]] = makeMappedBlockItem(mappedBlocks[labels[0]].(map[string]interface{}), labels[1:], block)
 		return mappedBlocks
 	}
+}
+
+func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, error) {
+	mapStructure := make(map[string]interface{})
+	for _, b := range tp.Blocks {
+		var blockName string
+		if len(b.Labels) > 0 {
+			blockName = fmt.Sprintf("%s.%s", b.Type, strings.Join(b.Labels, "."))
+		} else {
+			blockName = b.Type
+		}
+		blockMapStructure, err := b.MakeMapStructure(tp.MappedBlocks)
+		if err != nil {
+			return nil, err
+		}
+		mapStructure[blockName] = blockMapStructure
+	}
+	return mapStructure, nil
 }

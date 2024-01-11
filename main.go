@@ -7,8 +7,8 @@ import (
 
 func main() {
 	//cmd.Execute()
-	//tp := my_hcl.NewTerraformProject("./testdata/parser")
-	tp := my_hcl.NewTerraformProject("../pennywise-server/testdata/azure/lb_rule")
+	//tp := my_hcl.NewTerraformProject("./testdata/parser/test1")
+	tp := my_hcl.NewTerraformProject("./testdata/parser/lb_rule")
 	err := tp.FindFiles()
 	if err != nil {
 		panic(err)
@@ -17,10 +17,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	for _, b := range tp.Blocks {
-		fmt.Println("============================")
-		fmt.Println(b)
-		fmt.Println("---------------- attributes")
-		b.ReadAttributes(tp.MappedBlocks)
-	}
+	fmt.Println(tp.MakeProjectMapStructure())
 }

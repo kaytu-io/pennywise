@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"strings"
 )
 
 type Block struct {
@@ -115,13 +116,42 @@ func makeBlocks(blocks *hcl.Blocks, childBlocks *hclsyntax.Blocks) ([]Block, err
 	return myBlocks, nil
 }
 
-func (b Block) ReadAttributes(mappedBlocks map[string]interface{}) {
+func (b Block) MakeMapStructure(mappedBlocks map[string]interface{}) (map[string]interface{}, error) {
+	mapStructure := make(map[string]interface{})
 	for _, attr := range b.Attributes {
 		val, err := attr.Value(mappedBlocks)
 		if err != nil {
-			fmt.Println(attr.Name, "ERROR", err)
-		} else {
-			fmt.Println(fmt.Sprintf("%s : %s", attr.Name, val))
+			return nil, err
+		}
+		switch val.(type) {
+		case int64, int32, int:
+			mapStructure[attr.Name] = val.(int64)
+		case string:
+			mapStructure[attr.Name] = val.(string)
+		case bool:
+			mapStructure[attr.Name] = val.(bool)
+		case Block:
+			blockValues, err := val.(Block).MakeMapStructure(mappedBlocks)
+			if err != nil {
+				return nil, err
+			}
+			mapStructure[attr.Name] = blockValues
+		default:
+			return nil, fmt.Errorf("value type not implemented")
 		}
 	}
+	for _, childBlock := range b.ChildBlocks {
+		var blockName string
+		if len(childBlock.Labels) > 0 {
+			blockName = fmt.Sprintf("%s.%s", childBlock.Type, strings.Join(childBlock.Labels, "."))
+		} else {
+			blockName = childBlock.Type
+		}
+		mappedChildBlock, err := childBlock.MakeMapStructure(mappedBlocks)
+		if err != nil {
+			return nil, err
+		}
+		mapStructure[blockName] = mappedChildBlock
+	}
+	return mapStructure, nil
 }
