@@ -11,14 +11,17 @@ import (
 type Attribute struct {
 	Name         string
 	HclAttribute hcl.Attribute
+	Ctx          *Context
 }
 
 func BuildAttributes(hclAttributes hcl.Attributes) []Attribute {
 	var attributes []Attribute
+	ctx := NewContext(&hcl.EvalContext{}, nil)
 	for _, attr := range hclAttributes {
 		attributes = append(attributes, Attribute{
 			Name:         attr.Name,
 			HclAttribute: *attr,
+			Ctx:          ctx,
 		})
 	}
 	return attributes
