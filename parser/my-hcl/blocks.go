@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/zclconf/go-cty/cty"
 	"strings"
 )
 
@@ -71,7 +72,7 @@ func getFileBlocks(file *hcl.File) ([]Block, error) {
 }
 
 func makeBlocks(blocks *hcl.Blocks, childBlocks *hclsyntax.Blocks) ([]Block, error) {
-	var myBlocks []Block
+	var totalBlocks []Block
 	if blocks != nil {
 		for _, b := range *blocks {
 			if body, ok := b.Body.(*hclsyntax.Body); ok {
@@ -83,13 +84,18 @@ func makeBlocks(blocks *hcl.Blocks, childBlocks *hclsyntax.Blocks) ([]Block, err
 				for _, a := range body.Attributes {
 					attributes[a.Name] = a.AsHCLAttribute()
 				}
-				myBlocks = append(myBlocks, Block{
+				newBlock := Block{
 					Type:        b.Type,
 					Labels:      b.Labels,
 					Body:        b.Body,
 					ChildBlocks: childBlocks,
 					Attributes:  BuildAttributes(attributes),
-				})
+				}
+				err = newBlock.checkForEach()
+				if err != nil {
+					return nil, err
+				}
+				totalBlocks = append(totalBlocks, newBlock)
 			}
 		}
 	} else if childBlocks != nil {
@@ -102,18 +108,22 @@ func makeBlocks(blocks *hcl.Blocks, childBlocks *hclsyntax.Blocks) ([]Block, err
 			if diags.HasErrors() {
 				return nil, diags
 			}
-			myBlocks = append(myBlocks, Block{
+			newBlock := Block{
 				Type:        b.Type,
 				Labels:      b.Labels,
 				Body:        b.Body,
 				ChildBlocks: childBlocks,
 				Attributes:  BuildAttributes(attributes),
-			})
-
+			}
+			err = newBlock.checkForEach()
+			if err != nil {
+				return nil, err
+			}
+			totalBlocks = append(totalBlocks, newBlock)
 		}
 	}
 
-	return myBlocks, nil
+	return totalBlocks, nil
 }
 
 func (b Block) MakeMapStructure(mappedBlocks map[string]interface{}) (map[string]interface{}, error) {
@@ -143,7 +153,7 @@ func (b Block) MakeMapStructure(mappedBlocks map[string]interface{}) (map[string
 		case []int64, []int32, []int:
 			mapStructure[attr.Name] = val.([]int64)
 		default:
-			return nil, fmt.Errorf("value type not implemented")
+			return nil, nil
 		}
 	}
 	for _, childBlock := range b.ChildBlocks {
@@ -160,4 +170,49 @@ func (b Block) MakeMapStructure(mappedBlocks map[string]interface{}) (map[string
 		mapStructure[blockName] = mappedChildBlock
 	}
 	return mapStructure, nil
+}
+
+func (b Block) findAttribute(name string) *Attribute {
+	for _, attr := range b.Attributes {
+		if attr.Name == name {
+			return &attr
+		}
+	}
+	return nil
+}
+
+func (b Block) checkForEach() error {
+	forEach := b.findAttribute("for_each")
+	if forEach == nil {
+		return nil
+	}
+	//ref, err := forEach.readAttributeReference()
+	//if err != nil {
+	//	return err
+	//}
+	//fmt.Println("REF", ref)
+	ctx := hcl.EvalContext{}
+	ctx.Variables = make(map[string]cty.Value)
+	ctyVal, diag := forEach.HclAttribute.Expr.Value(&ctx)
+	if diag.HasErrors() {
+		for _, d := range diag {
+			fmt.Println("diag", d.Summary)
+			if d.Summary == missingAttributeDiagnostic || d.Summary == valueDoesNotHaveAnyIndices {
+				fmt.Println(missingAttributeDiagnostic, valueDoesNotHaveAnyIndices)
+			}
+			if d.Summary == valueIsNonIterableDiagnostic {
+				fmt.Println(valueIsNonIterableDiagnostic)
+			}
+			if d.Summary == invalidFunctionArgumentDiagnostic {
+				fmt.Println(invalidFunctionArgumentDiagnostic)
+			}
+		}
+		return diag
+	}
+	ctyVal.ForEachElement(func(key cty.Value, val cty.Value) bool {
+		fmt.Println("key:", key)
+		fmt.Println("val:", val)
+		return false
+	})
+	return nil
 }

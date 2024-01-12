@@ -118,7 +118,7 @@ func (attr *Attribute) Value(mappedBlocks map[string]interface{}) (any, error) {
 		}
 		return b, nil
 	default:
-		return nil, fmt.Errorf("value type not implemented")
+		return nil, nil
 	}
 }
 
@@ -194,7 +194,7 @@ func getListValues(ctyVal cty.Value) (any, error) {
 			}
 			return items, nil
 		default:
-			return nil, fmt.Errorf("list value type not implemented")
+			return nil, nil
 		}
 	} else {
 		return nil, nil
