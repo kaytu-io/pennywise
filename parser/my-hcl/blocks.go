@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/convert"
 	"strings"
 )
 
@@ -186,17 +187,34 @@ func (b Block) checkForEach() error {
 	if forEach == nil {
 		return nil
 	}
-	//ref, err := forEach.readAttributeReference()
-	//if err != nil {
-	//	return err
-	//}
-	//fmt.Println("REF", ref)
 	ctx := hcl.EvalContext{}
 	ctx.Variables = make(map[string]cty.Value)
+	//ctx.Variables["local"] = cty.ObjectVal(map[string]cty.Value{"permutations": cty.ObjectVal(make(map[string]cty.Value))})
+	//fmt.Println(ctx.Variables)
+
+	for _, traversal := range forEach.HclAttribute.Expr.Variables() {
+		var rootName string
+		for _, traverser := range traversal {
+			fmt.Println("Traversal", traversal)
+			if r, ok := traverser.(hcl.TraverseRoot); ok {
+				rootName = r.Name
+				break
+			}
+		}
+
+		ob := ctx.Variables[rootName]
+		fmt.Println("pb", ob)
+		if ob.IsNull() || !ob.IsKnown() {
+			ob = cty.ObjectVal(make(map[string]cty.Value))
+		}
+
+		ctx.Variables[rootName] = buildObject(traversal, ob, 0)
+		fmt.Println(ctx.Variables)
+	}
 	ctyVal, diag := forEach.HclAttribute.Expr.Value(&ctx)
 	if diag.HasErrors() {
 		for _, d := range diag {
-			fmt.Println("diag", d.Summary)
+			fmt.Println("diag", d.Detail)
 			if d.Summary == missingAttributeDiagnostic || d.Summary == valueDoesNotHaveAnyIndices {
 				fmt.Println(missingAttributeDiagnostic, valueDoesNotHaveAnyIndices)
 			}
@@ -209,10 +227,97 @@ func (b Block) checkForEach() error {
 		}
 		return diag
 	}
+	fmt.Println("ctyVal", ctyVal)
 	ctyVal.ForEachElement(func(key cty.Value, val cty.Value) bool {
+		fmt.Println("here2")
 		fmt.Println("key:", key)
 		fmt.Println("val:", val)
 		return false
 	})
 	return nil
+}
+
+func buildObject(traversal hcl.Traversal, value cty.Value, i int) cty.Value {
+	if i > len(traversal)-1 {
+		return value
+	}
+	traverser := traversal[i]
+
+	var valueMap map[string]cty.Value
+
+	if value.IsKnown() && !value.IsNull() && value.CanIterateElements() {
+		valueMap = value.AsValueMap()
+	}
+
+	if valueMap == nil {
+		valueMap = make(map[string]cty.Value)
+	}
+
+	// traverse splat is a special holding type which means we want to traverse all the attributes on the map.
+	if _, ok := traverser.(hcl.TraverseSplat); ok {
+		for k, v := range valueMap {
+			if v.Type().IsObjectType() {
+				valueMap[k] = buildObject(traversal, v, i+1)
+				continue
+			}
+
+			valueMap[k] = v
+		}
+
+		return cty.ObjectVal(valueMap)
+	}
+
+	if index, ok := traverser.(hcl.TraverseIndex); ok {
+		kc, err := convert.Convert(index.Key, cty.String)
+		if err != nil {
+			kc = cty.StringVal("0")
+		}
+
+		k := kc.AsString()
+
+		if vv, exists := valueMap[k]; exists {
+			valueMap[k] = buildObject(traversal, vv, i+1)
+			return cty.ObjectVal(valueMap)
+		}
+
+		valueMap[k] = buildObject(traversal, cty.ObjectVal(make(map[string]cty.Value)), i+1)
+
+		return cty.ObjectVal(valueMap)
+	}
+
+	if v, ok := traverser.(hcl.TraverseAttr); ok {
+		fmt.Println("TRAVERSER NAME", v.Name)
+		if len(traversal)-1 == i {
+			// if the attribute already exists, and we're not setting a list value
+			// then we should return here. It's most likely that we weren't able to
+			// get the full variable calls for the context, so resetting the value could
+			// be harmful.
+			if _, exists := valueMap[v.Name]; exists {
+				return value
+			}
+			valueMap[v.Name] = cty.ObjectVal(make(map[string]cty.Value))
+			return cty.ObjectVal(valueMap)
+		}
+		if vv, exists := valueMap[v.Name]; exists {
+			if isList(vv) {
+				items := make([]cty.Value, vv.LengthInt())
+				it := vv.ElementIterator()
+				for it.Next() {
+					key, sourceItem := it.Element()
+					val := buildObject(traversal, sourceItem, i+1)
+					i, _ := key.AsBigFloat().Int64()
+					items[i] = val
+				}
+				valueMap[v.Name] = cty.TupleVal(items)
+				return cty.ObjectVal(valueMap)
+			}
+
+			valueMap[v.Name] = buildObject(traversal, vv, i+1)
+			return cty.ObjectVal(valueMap)
+		}
+
+		valueMap[v.Name] = buildObject(traversal, cty.ObjectVal(make(map[string]cty.Value)), i+1)
+		return cty.ObjectVal(valueMap)
+	}
+	return buildObject(traversal, value, i+1)
 }
