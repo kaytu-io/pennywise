@@ -81,7 +81,7 @@ func newReference(parts []string) (*Reference, error) {
 	if len(parts) == 0 {
 		return nil, fmt.Errorf("cannot create empty reference")
 	}
-	bType := getBlockType(parts[0])
+	bType := getBlockTypeByRef(parts[0])
 	if bType.name != "Unknown" {
 		ref.blockType = bType
 		if len(parts) > 1 && ref.blockType.name != "resource" {
@@ -119,9 +119,18 @@ func (t Type) ShortName() string {
 	return t.name
 }
 
-func getBlockType(blockTypeStr string) BlockType {
+func getBlockTypeByRef(blockTypeStr string) BlockType {
 	for _, bt := range blockTypes {
 		if bt.refName == blockTypeStr {
+			return bt
+		}
+	}
+	return BlockTypeUnknown
+}
+
+func GetBlockTypeByType(blockTypeStr string) BlockType {
+	for _, bt := range blockTypes {
+		if bt.name == blockTypeStr {
 			return bt
 		}
 	}

@@ -3,68 +3,32 @@ package my_hcl
 import (
 	"fmt"
 	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+	"go.uber.org/zap"
 )
 
 type Attribute struct {
 	Name         string
 	HclAttribute hcl.Attribute
-	Ctx          *Context
+	Context      *hcl.EvalContext
+	CtxVariable  *cty.Value
+
+	logger *zap.Logger
 }
 
-func BuildAttributes(hclAttributes hcl.Attributes) []Attribute {
+func (b *Block) buildAttributes(hclAttributes hcl.Attributes) {
 	var attributes []Attribute
-	ctx := NewContext(&hcl.EvalContext{}, nil)
 	for _, attr := range hclAttributes {
 		attributes = append(attributes, Attribute{
 			Name:         attr.Name,
 			HclAttribute: *attr,
-			Ctx:          ctx,
+			Context:      b.Context,
+			logger:       b.logger,
 		})
 	}
-	return attributes
-}
-
-func (attr *Attribute) readAttributeReference() (*Reference, error) {
-	expression := attr.HclAttribute.Expr
-	switch t := expression.(type) {
-	case *hclsyntax.FunctionCallExpr:
-		fmt.Println(t)
-		fmt.Println("FunctionCallExpr")
-	case *hclsyntax.ConditionalExpr:
-		fmt.Println("ConditionalExpr")
-	case *hclsyntax.ScopeTraversalExpr:
-		var refParts []string
-
-		for _, x := range t.Variables() {
-			for _, p := range x {
-				switch part := p.(type) {
-				case hcl.TraverseRoot:
-					refParts = append(refParts, part.Name)
-				case hcl.TraverseAttr:
-					refParts = append(refParts, part.Name)
-				case hcl.TraverseIndex:
-					refParts[len(refParts)-1] = fmt.Sprintf("%s[%s]", refParts[len(refParts)-1], attr.getIndexValue(part))
-				}
-			}
-		}
-		return newReference(refParts)
-	case *hclsyntax.TemplateWrapExpr:
-		fmt.Println("TemplateWrapExpr")
-	case *hclsyntax.TemplateExpr:
-		fmt.Println("TemplateExpr")
-	case *hclsyntax.TupleConsExpr:
-		fmt.Println("TupleConsExpr")
-	case *hclsyntax.RelativeTraversalExpr:
-		fmt.Println("RelativeTraversalExpr")
-	case *hclsyntax.IndexExpr:
-		fmt.Println("IndexExpr")
-	default:
-		fmt.Println("DEFAULT")
-	}
-	return nil, fmt.Errorf("unknown type")
+	b.Attributes = attributes
+	return
 }
 
 func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
@@ -82,19 +46,13 @@ func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
 	}
 }
 
-func (attr *Attribute) Value(mappedBlocks map[string]interface{}) (any, error) {
-	ctx := hcl.EvalContext{}
-	ctx.Variables = make(map[string]cty.Value)
-	ctyVal, diag := attr.HclAttribute.Expr.Value(&ctx)
+func (attr *Attribute) Value() (any, error) {
+	ctyVal, diag := attr.HclAttribute.Expr.Value(attr.Context)
 	if diag.HasErrors() {
-		if diag.HasErrors() {
-			ref, err := attr.readAttributeReference()
-			if err != nil {
-				return nil, err
-			}
-			return getRefValue(mappedBlocks, *ref)
-		}
+		fmt.Println("ERROR", attr.Name, diag[0].Detail)
+		return nil, nil
 	}
+	attr.CtxVariable = &ctyVal
 	if isList(ctyVal) {
 		return getListValues(ctyVal)
 	}
@@ -121,6 +79,7 @@ func (attr *Attribute) Value(mappedBlocks map[string]interface{}) (any, error) {
 		}
 		return b, nil
 	default:
+		fmt.Println("Unknown attribute", attr.Name, attr.HclAttribute)
 		return nil, nil
 	}
 }
@@ -202,70 +161,4 @@ func getListValues(ctyVal cty.Value) (any, error) {
 	} else {
 		return nil, nil
 	}
-}
-
-func getRefValue(mappedBlocks map[string]interface{}, reference Reference) (any, error) {
-	if len(reference.labels) > 0 {
-		block, err := findRefBlockFromLabels(mappedBlocks, reference.labels)
-		if err != nil {
-			return nil, err
-		}
-		if reference.blockType.hasKey {
-			if reference.key == "id" || reference.key == "name" {
-				return *block, nil
-			}
-			attr := findAttribute(*block, reference.key)
-			if attr == nil {
-				return nil, fmt.Errorf("could not find attribute")
-			} else {
-				value, err := attr.Value(mappedBlocks)
-				if err != nil {
-					return nil, err
-				}
-				return value, nil
-			}
-		} else {
-			if reference.blockType.getValueFunction != nil {
-				attr, err := reference.blockType.getValueFunction(*block)
-				if err != nil {
-					return nil, err
-				}
-				value, err := attr.Value(mappedBlocks)
-				if err != nil {
-					return nil, err
-				}
-				return value, nil
-			}
-			return nil, fmt.Errorf("not handled yet")
-		}
-	} else {
-		_ = mappedBlocks[reference.blockType.name]
-		return nil, fmt.Errorf("not handled yet")
-	}
-}
-
-func findRefBlockFromLabels(mappedBlocks map[string]interface{}, labels []string) (*Block, error) {
-	if len(labels) > 1 {
-		labeledMappedBlocks := mappedBlocks[labels[0]]
-		if _, ok := labeledMappedBlocks.(map[string]interface{}); !ok {
-			return nil, fmt.Errorf("wrong ref labels: %s", labels)
-		}
-		return findRefBlockFromLabels(labeledMappedBlocks.(map[string]interface{}), labels[1:])
-	} else {
-		block := mappedBlocks[labels[0]]
-		if _, ok := block.(Block); !ok {
-			return nil, fmt.Errorf("wrong ref labels: %s", labels)
-		}
-		result := block.(Block)
-		return &result, nil
-	}
-}
-
-func findAttribute(block Block, attrName string) *Attribute { // handle attributes in blocks
-	for _, attr := range block.Attributes {
-		if attr.Name == attrName {
-			return &attr
-		}
-	}
-	return nil
 }
