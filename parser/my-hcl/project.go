@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 )
 
@@ -94,8 +95,9 @@ func (tp *TerraformProject) ParseProjectBlocks() error {
 func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, error) {
 	ctxVariableMap := make(map[string]interface{})
 	var mapStructure map[string]interface{}
-	for i := 0; i < 5; i++ {
-		fmt.Println("==================================")
+	var oldMapStructure map[string]interface{}
+	var retry int
+	for retry < 50 {
 		mapStructure = make(map[string]interface{})
 		for _, b := range tp.Blocks {
 			var blockName string
@@ -129,9 +131,34 @@ func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, e
 			}
 		}
 		tp.Context.Variables = makeCtxVariables(ctxVariableMap)
+		if mapsEqual(oldMapStructure, mapStructure) {
+			break
+		}
+		oldMapStructure = mapStructure
+		retry++
 	}
 
 	return mapStructure, nil
+}
+
+func mapsEqual(map1, map2 map[string]interface{}) bool {
+	if len(map1) != len(map2) {
+		return false
+	}
+
+	for key, value1 := range map1 {
+		if value2, ok := map2[key]; ok {
+			// Check if the values are equal
+			if !reflect.DeepEqual(value1, value2) {
+				return false
+			}
+		} else {
+			// Key not present in the second map
+			return false
+		}
+	}
+
+	return true
 }
 
 func makeCtxVariables(ctxVariableMap map[string]interface{}) map[string]cty.Value {
