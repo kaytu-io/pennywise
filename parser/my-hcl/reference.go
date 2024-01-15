@@ -75,59 +75,6 @@ var blockTypes = []BlockType{
 	BlockTypeTerraform,
 }
 
-func newReference(parts []string) (*Reference, error) {
-	var ref Reference
-
-	if len(parts) == 0 {
-		return nil, fmt.Errorf("cannot create empty reference")
-	}
-	bType := getBlockTypeByRef(parts[0])
-	if bType.name != "Unknown" {
-		ref.blockType = bType
-		if len(parts) > 1 && ref.blockType.name != "resource" {
-			ref.labels = parts[1:]
-		}
-	} else {
-		ref.blockType = BlockTypeResource
-		ref.labels = parts
-	}
-
-	if ref.blockType.hasKey {
-		ref.key = ref.labels[len(ref.labels)-1]
-		ref.labels = ref.labels[:len(ref.labels)-1]
-	}
-
-	ref.labels = append([]string{ref.blockType.name}, ref.labels...)
-
-	return &ref, nil
-}
-
-type Type struct {
-	name                  string
-	refName               string
-	removeTypeInReference bool
-}
-
-func (t Type) Name() string {
-	return t.name
-}
-
-func (t Type) ShortName() string {
-	if t.refName != "" {
-		return t.refName
-	}
-	return t.name
-}
-
-func getBlockTypeByRef(blockTypeStr string) BlockType {
-	for _, bt := range blockTypes {
-		if bt.refName == blockTypeStr {
-			return bt
-		}
-	}
-	return BlockTypeUnknown
-}
-
 func GetBlockTypeByType(blockTypeStr string) BlockType {
 	for _, bt := range blockTypes {
 		if bt.name == blockTypeStr {
