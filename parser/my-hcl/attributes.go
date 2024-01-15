@@ -46,8 +46,11 @@ func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
 	}
 }
 
-func (attr *Attribute) Value() (any, error) {
-	ctyVal, diag := attr.HclAttribute.Expr.Value(attr.Context)
+func (attr *Attribute) Value(ctx *hcl.EvalContext) (any, error) {
+	if ctx == nil {
+		ctx = attr.Context
+	}
+	ctyVal, diag := attr.HclAttribute.Expr.Value(ctx)
 	if diag.HasErrors() {
 		fmt.Println("ERROR", attr.Name, diag[0].Detail)
 		return nil, nil
@@ -56,7 +59,7 @@ func (attr *Attribute) Value() (any, error) {
 	if isList(ctyVal) {
 		return getListValues(ctyVal)
 	}
-	switch ctyVal.Type() {
+	switch t := ctyVal.Type(); t {
 	case cty.String:
 		var s string
 		err := gocty.FromCtyValue(ctyVal, &s)
@@ -78,8 +81,10 @@ func (attr *Attribute) Value() (any, error) {
 			return nil, err
 		}
 		return b, nil
+	case cty.DynamicPseudoType:
+		return nil, nil
 	default:
-		fmt.Println("Unknown attribute", attr.Name, attr.HclAttribute)
+		fmt.Println("Unknown attribute", attr.Name, t)
 		return nil, nil
 	}
 }
