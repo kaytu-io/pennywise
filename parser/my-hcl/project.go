@@ -94,7 +94,7 @@ func (tp *TerraformProject) ParseProjectBlocks() error {
 func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, error) {
 	ctxVariableMap := make(map[string]interface{})
 	var mapStructure map[string]interface{}
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 5; i++ {
 		fmt.Println("==================================")
 		mapStructure = make(map[string]interface{})
 		for _, b := range tp.Blocks {
@@ -124,6 +124,7 @@ func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, e
 						return nil, err
 					}
 					mapStructure[fmt.Sprintf("%s[%s]", blockName, key)] = blockMapStructure
+					ctxVariableMap = tp.makeBlockCtxVariableMap(ctxVariableMap, b, key)
 				}
 			}
 		}
@@ -147,16 +148,16 @@ func makeCtxVariables(ctxVariableMap map[string]interface{}) map[string]cty.Valu
 	return ctxValuesMap
 }
 
-func (tp *TerraformProject) makeBlockCtxVariableMap(ctxVariableMap map[string]interface{}, b Block) map[string]interface{} {
+func (tp *TerraformProject) makeBlockCtxVariableMap(ctxVariableMap map[string]interface{}, b Block, additionalLabels ...string) map[string]interface{} {
 	blockType := GetBlockTypeByType(b.Type)
 	if blockType.name == "resource" {
-		ctxVariableMap = tp.makeCtxVariableMapByLabels(ctxVariableMap, b, b.Labels)
+		ctxVariableMap = tp.makeCtxVariableMapByLabels(ctxVariableMap, b, append(b.Labels, additionalLabels...))
 	} else {
-		if len(b.Labels) > 0 {
+		if len(b.Labels)+len(additionalLabels) > 0 {
 			if _, ok := ctxVariableMap[blockType.refName]; !ok {
 				ctxVariableMap[blockType.refName] = make(map[string]interface{})
 			}
-			ctxVariableMap[blockType.refName] = tp.makeCtxVariableMapByLabels(ctxVariableMap[blockType.refName].(map[string]interface{}), b, b.Labels)
+			ctxVariableMap[blockType.refName] = tp.makeCtxVariableMapByLabels(ctxVariableMap[blockType.refName].(map[string]interface{}), b, append(b.Labels, additionalLabels...))
 		} else {
 			ctxVariableMap[blockType.refName] = b.CtxVariable
 		}
@@ -168,6 +169,8 @@ func (tp *TerraformProject) makeCtxVariableMapByLabels(ctxVariableMap map[string
 	key := labels[0]
 	if len(labels) > 1 {
 		if _, ok := ctxVariableMap[key]; !ok {
+			ctxVariableMap[key] = make(map[string]interface{})
+		} else if _, ok := ctxVariableMap[key].(map[string]interface{}); !ok {
 			ctxVariableMap[key] = make(map[string]interface{})
 		}
 		ctxVariableMap[key] = tp.makeCtxVariableMapByLabels(ctxVariableMap[key].(map[string]interface{}), b, labels[1:])
