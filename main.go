@@ -9,7 +9,7 @@ import (
 func main() {
 	//cmd.Execute()
 	logger, err := zap.NewProduction()
-	tp := my_hcl.NewTerraformProject("./testdata/parser/snapshot", logger)
+	tp := my_hcl.NewTerraformProject("./testdata/parser/storage_queue", logger)
 	err = tp.FindFiles()
 	if err != nil {
 		logger.Error(err.Error())

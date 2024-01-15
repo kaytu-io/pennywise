@@ -24,7 +24,7 @@ type TerraformProject struct {
 func NewTerraformProject(dir string, logger *zap.Logger) *TerraformProject {
 	ctx := &hcl.EvalContext{}
 	ctx.Variables = make(map[string]cty.Value)
-
+	ctx.Functions = ContextFunctions
 	return &TerraformProject{
 		Directory: dir,
 		Context:   ctx,
@@ -109,7 +109,7 @@ func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, e
 				return nil, err
 			}
 			if forEachItems == nil {
-				blockMapStructure, err := b.makeMapStructure(tp.Context)
+				blockMapStructure, err := b.makeMapStructure(blockName, tp.Context)
 				if err != nil {
 					return nil, err
 				}
@@ -119,7 +119,7 @@ func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, e
 				for key, eachItems := range forEachItems {
 					ctx := tp.Context
 					ctx.Variables["each"] = cty.ObjectVal(map[string]cty.Value{"value": eachItems})
-					blockMapStructure, err := b.makeMapStructure(ctx)
+					blockMapStructure, err := b.makeMapStructure(fmt.Sprintf("%s[%s]", blockName, key), ctx)
 					if err != nil {
 						return nil, err
 					}

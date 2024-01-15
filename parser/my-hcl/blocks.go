@@ -133,7 +133,7 @@ func makeBlocks(logger *zap.Logger, context *hcl.EvalContext, blocks *hcl.Blocks
 	return totalBlocks, nil
 }
 
-func (b *Block) makeMapStructure(ctx *hcl.EvalContext) (map[string]interface{}, error) {
+func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) (map[string]interface{}, error) {
 	if ctx == nil {
 		ctx = b.Context
 	}
@@ -147,6 +147,9 @@ func (b *Block) makeMapStructure(ctx *hcl.EvalContext) (map[string]interface{}, 
 		if attr.CtxVariable != nil {
 			ctxMapStructure[attr.Name] = *attr.CtxVariable
 		}
+		if b.Type == "locals" {
+			fmt.Println("locals:", attr.Name, val)
+		}
 		if err != nil {
 			continue
 		}
@@ -159,7 +162,13 @@ func (b *Block) makeMapStructure(ctx *hcl.EvalContext) (map[string]interface{}, 
 			mapStructure[attr.Name] = val.(bool)
 		case Block:
 			attrBlock := val.(Block)
-			blockValues, err := attrBlock.makeMapStructure(ctx)
+			var attrBlockName string
+			if len(attrBlock.Labels) > 0 {
+				attrBlockName = fmt.Sprintf("%s.%s", attrBlock.Type, strings.Join(attrBlock.Labels, "."))
+			} else {
+				attrBlockName = attrBlock.Type
+			}
+			blockValues, err := attrBlock.makeMapStructure(attrBlockName, ctx)
 			if err != nil {
 				//b.logger.Error(fmt.Sprintf("error while getting %s value in block %s : %s", attr.Name, blockName, err.Error()))
 				continue
@@ -182,7 +191,7 @@ func (b *Block) makeMapStructure(ctx *hcl.EvalContext) (map[string]interface{}, 
 		} else {
 			childBlockName = childBlock.Type
 		}
-		mappedChildBlock, err := childBlock.makeMapStructure(ctx)
+		mappedChildBlock, err := childBlock.makeMapStructure(childBlockName, ctx)
 		if err != nil {
 			//b.logger.Error(fmt.Sprintf("error while making %s child block map structure in block %s : %s", childBlockName, blockName, err.Error()))
 			continue
@@ -190,7 +199,7 @@ func (b *Block) makeMapStructure(ctx *hcl.EvalContext) (map[string]interface{}, 
 		ctxMapStructure[childBlock.Type] = childBlock.CtxVariable
 		mapStructure[childBlockName] = mappedChildBlock
 	}
-	ctxMapStructure["id"] = cty.ObjectVal(ctxMapStructure)
+	ctxMapStructure["id"] = cty.StringVal(fmt.Sprintf("!ref:%s", blockName))
 	b.CtxVariable = cty.ObjectVal(ctxMapStructure)
 
 	return mapStructure, nil
