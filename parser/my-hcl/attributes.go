@@ -52,14 +52,12 @@ func (attr *Attribute) Value(ctx *hcl.EvalContext) (any, error) {
 	}
 	ctyVal, diag := attr.HclAttribute.Expr.Value(ctx)
 	if diag.HasErrors() {
-		if attr.Name == "storagev1_options" || attr.Name == "storagev2_options" || attr.Name == "storagev1_permutations" || attr.Name == "storagev2_permutations" {
+		if attr.Name == "" {
 			fmt.Println(attr.Name, "--- ERROR --- ", diag[0].Detail)
 		}
 		return nil, nil
 	}
-	if attr.Name == "storagev1_options" || attr.Name == "storagev2_options" || attr.Name == "storagev1_permutations" || attr.Name == "storagev2_permutations" {
-		fmt.Println(attr.Name, " --- ", ctyVal)
-	}
+
 	attr.CtxVariable = &ctyVal
 	if isList(ctyVal) {
 		return getListValues(ctyVal)
