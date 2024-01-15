@@ -52,7 +52,7 @@ func (attr *Attribute) Value(ctx *hcl.EvalContext) (any, error) {
 	}
 	ctyVal, diag := attr.HclAttribute.Expr.Value(ctx)
 	if diag.HasErrors() {
-		if attr.Name == "" {
+		if attr.Name == "storage_account_name" {
 			fmt.Println(attr.Name, "--- ERROR --- ", diag[0].Detail)
 		}
 		return nil, nil
