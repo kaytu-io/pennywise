@@ -133,14 +133,17 @@ func makeBlocks(logger *zap.Logger, context *hcl.EvalContext, blocks *hcl.Blocks
 	return totalBlocks, nil
 }
 
-func (b *Block) makeMapStructure(mappedBlocks map[string]interface{}) (map[string]interface{}, error) {
+func (b *Block) makeMapStructure(ctx *hcl.EvalContext) (map[string]interface{}, error) {
+	if ctx == nil {
+		ctx = b.Context
+	}
 	mapStructure := make(map[string]interface{})
 	ctxMapStructure := make(map[string]cty.Value)
 	for _, attr := range b.Attributes {
 		if attr.Name == "for_each" {
 			continue
 		}
-		val, err := attr.Value()
+		val, err := attr.Value(ctx)
 		if attr.CtxVariable != nil {
 			ctxMapStructure[attr.Name] = *attr.CtxVariable
 		}
@@ -156,7 +159,7 @@ func (b *Block) makeMapStructure(mappedBlocks map[string]interface{}) (map[strin
 			mapStructure[attr.Name] = val.(bool)
 		case Block:
 			attrBlock := val.(Block)
-			blockValues, err := attrBlock.makeMapStructure(mappedBlocks)
+			blockValues, err := attrBlock.makeMapStructure(ctx)
 			if err != nil {
 				//b.logger.Error(fmt.Sprintf("error while getting %s value in block %s : %s", attr.Name, blockName, err.Error()))
 				continue
@@ -179,7 +182,7 @@ func (b *Block) makeMapStructure(mappedBlocks map[string]interface{}) (map[strin
 		} else {
 			childBlockName = childBlock.Type
 		}
-		mappedChildBlock, err := childBlock.makeMapStructure(mappedBlocks)
+		mappedChildBlock, err := childBlock.makeMapStructure(ctx)
 		if err != nil {
 			//b.logger.Error(fmt.Sprintf("error while making %s child block map structure in block %s : %s", childBlockName, blockName, err.Error()))
 			continue
@@ -187,12 +190,9 @@ func (b *Block) makeMapStructure(mappedBlocks map[string]interface{}) (map[strin
 		ctxMapStructure[childBlock.Type] = childBlock.CtxVariable
 		mapStructure[childBlockName] = mappedChildBlock
 	}
-	ctxMapStructure["id"] = cty.EmptyObjectVal
+	ctxMapStructure["id"] = cty.ObjectVal(ctxMapStructure)
 	b.CtxVariable = cty.ObjectVal(ctxMapStructure)
-	err := b.checkForEach()
-	if err != nil {
-		//b.logger.Error(fmt.Sprintf("error while parsing for each on block %s : %s", blockName, err.Error()))
-	}
+
 	return mapStructure, nil
 }
 
@@ -205,16 +205,15 @@ func (b *Block) findAttribute(name string) *Attribute {
 	return nil
 }
 
-func (b *Block) checkForEach() error {
+func (b *Block) checkForEach() (map[string]cty.Value, error) {
 	forEach := b.findAttribute("for_each")
 	if forEach == nil {
-		return nil
+		return nil, nil
 	}
 
 	ctyVal, diag := forEach.HclAttribute.Expr.Value(b.Context)
 	if diag.HasErrors() {
-		return nil
+		return nil, nil
 	}
-	fmt.Println("foreach ctyVal", ctyVal.AsValueMap())
-	return nil
+	return ctyVal.AsValueMap(), nil
 }

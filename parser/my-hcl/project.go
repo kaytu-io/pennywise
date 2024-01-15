@@ -88,42 +88,15 @@ func (tp *TerraformProject) ParseProjectBlocks() error {
 		totalBlocks = append(totalBlocks, myBlocks...)
 	}
 	tp.Blocks = totalBlocks
-	tp.MappedBlocks = makeMappedBlocks(tp.Blocks)
 	return nil
 }
 
-func makeMappedBlocks(blocks []Block) map[string]interface{} {
-	mappedBlocks := make(map[string]interface{})
-	for _, b := range blocks {
-		if len(b.Labels) == 0 {
-			mappedBlocks[b.Type] = b
-		} else {
-			if mappedBlocks[b.Type] == nil {
-				mappedBlocks[b.Type] = make(map[string]interface{})
-			}
-			mappedBlocks[b.Type] = makeMappedBlockItem(mappedBlocks[b.Type].(map[string]interface{}), b.Labels, b)
-		}
-	}
-	return mappedBlocks
-}
-
-func makeMappedBlockItem(mappedBlocks map[string]interface{}, labels []string, block Block) map[string]interface{} {
-	if len(labels) == 1 {
-		mappedBlocks[labels[0]] = block
-		return mappedBlocks
-	} else {
-		if mappedBlocks[labels[0]] == nil {
-			mappedBlocks[labels[0]] = make(map[string]interface{})
-		}
-		mappedBlocks[labels[0]] = makeMappedBlockItem(mappedBlocks[labels[0]].(map[string]interface{}), labels[1:], block)
-		return mappedBlocks
-	}
-}
-
 func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, error) {
-	mapStructure := make(map[string]interface{})
 	ctxVariableMap := make(map[string]interface{})
+	var mapStructure map[string]interface{}
 	for i := 0; i < 3; i++ {
+		fmt.Println("==================================")
+		mapStructure = make(map[string]interface{})
 		for _, b := range tp.Blocks {
 			var blockName string
 			if len(b.Labels) > 0 {
@@ -131,12 +104,28 @@ func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, e
 			} else {
 				blockName = b.Type
 			}
-			blockMapStructure, err := b.makeMapStructure(tp.MappedBlocks)
+			forEachItems, err := b.checkForEach()
 			if err != nil {
 				return nil, err
 			}
-			mapStructure[blockName] = blockMapStructure
-			ctxVariableMap = tp.makeBlockCtxVariableMap(ctxVariableMap, b)
+			if forEachItems == nil {
+				blockMapStructure, err := b.makeMapStructure(tp.Context)
+				if err != nil {
+					return nil, err
+				}
+				mapStructure[blockName] = blockMapStructure
+				ctxVariableMap = tp.makeBlockCtxVariableMap(ctxVariableMap, b)
+			} else {
+				for key, eachItems := range forEachItems {
+					ctx := tp.Context
+					ctx.Variables["each"] = cty.ObjectVal(map[string]cty.Value{"value": eachItems})
+					blockMapStructure, err := b.makeMapStructure(ctx)
+					if err != nil {
+						return nil, err
+					}
+					mapStructure[fmt.Sprintf("%s[%s]", blockName, key)] = blockMapStructure
+				}
+			}
 		}
 		tp.Context.Variables = makeCtxVariables(ctxVariableMap)
 	}
