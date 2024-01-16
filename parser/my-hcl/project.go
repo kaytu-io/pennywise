@@ -18,6 +18,7 @@ type TerraformProject struct {
 	Blocks       []Block
 	MappedBlocks map[string]interface{}
 	Context      *hcl.EvalContext
+	Diags        Diags
 
 	logger *zap.Logger
 }
@@ -30,7 +31,15 @@ func NewTerraformProject(dir string, logger *zap.Logger) *TerraformProject {
 		Directory: dir,
 		Context:   ctx,
 		logger:    logger,
+		Diags:     Diags{Name: dir, Type: TfProjectDiag},
 	}
+}
+
+func (tp *TerraformProject) resetDiags() {
+	for _, b := range tp.Blocks {
+		b.Diags = Diags{Name: b.Name, Type: BlockDiag}
+	}
+	tp.Diags = Diags{Name: tp.Directory, Type: TfProjectDiag}
 }
 
 func getFiles(path string) ([]*hcl.File, error) {
@@ -98,37 +107,34 @@ func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, e
 	var oldMapStructure map[string]interface{}
 	var retry int
 	for retry < 50 {
+		tp.resetDiags()
 		mapStructure = make(map[string]interface{})
 		for _, b := range tp.Blocks {
-			var blockName string
-			if len(b.Labels) > 0 {
-				blockName = fmt.Sprintf("%s.%s", b.Type, strings.Join(b.Labels, "."))
-			} else {
-				blockName = b.Type
-			}
 			forEachItems, err := b.checkForEach()
 			if err != nil {
-				return nil, err
+				b.Diags.Errors = append(b.Diags.Errors, fmt.Errorf("error while getting for each: %s", err))
 			}
 			if forEachItems == nil {
-				blockMapStructure, err := b.makeMapStructure(blockName, tp.Context)
+				blockMapStructure, err := b.makeMapStructure(b.Name, tp.Context)
 				if err != nil {
 					return nil, err
 				}
-				mapStructure[blockName] = blockMapStructure
-				ctxVariableMap = tp.makeBlockCtxVariableMap(ctxVariableMap, b)
+				mapStructure[b.Name] = blockMapStructure
+				ctxVariableMap = makeBlockCtxVariableMap(ctxVariableMap, b)
 			} else {
 				for key, eachItems := range forEachItems {
 					ctx := tp.Context
 					ctx.Variables["each"] = cty.ObjectVal(map[string]cty.Value{"value": eachItems})
-					blockMapStructure, err := b.makeMapStructure(fmt.Sprintf("%s[%s]", blockName, key), ctx)
+					clonedBlock := b.cloneBlock(key)
+					blockMapStructure, err := b.makeMapStructure(clonedBlock.Name, ctx)
 					if err != nil {
 						return nil, err
 					}
-					mapStructure[fmt.Sprintf("%s[%s]", blockName, key)] = blockMapStructure
-					ctxVariableMap = tp.makeBlockCtxVariableMap(ctxVariableMap, b, key)
+					mapStructure[clonedBlock.Name] = blockMapStructure
+					ctxVariableMap = makeBlockCtxVariableMap(ctxVariableMap, b, key)
 				}
 			}
+			tp.Diags.ChildDiags = append(tp.Diags.ChildDiags, &b.Diags)
 		}
 		tp.Context.Variables = makeCtxVariables(ctxVariableMap)
 		if mapsEqual(oldMapStructure, mapStructure) {
@@ -148,61 +154,13 @@ func mapsEqual(map1, map2 map[string]interface{}) bool {
 
 	for key, value1 := range map1 {
 		if value2, ok := map2[key]; ok {
-			// Check if the values are equal
 			if !reflect.DeepEqual(value1, value2) {
 				return false
 			}
 		} else {
-			// Key not present in the second map
 			return false
 		}
 	}
 
 	return true
-}
-
-func makeCtxVariables(ctxVariableMap map[string]interface{}) map[string]cty.Value {
-	ctxValuesMap := make(map[string]cty.Value)
-	for key, value := range ctxVariableMap {
-		if valuesMap, ok := value.(map[string]interface{}); ok {
-			ctxValuesMap[key] = cty.ObjectVal(makeCtxVariables(valuesMap))
-		} else if ctyValue, ok := value.(cty.Value); ok {
-			ctxValuesMap[key] = ctyValue
-		} else {
-			fmt.Println("unknown value")
-		}
-	}
-	return ctxValuesMap
-}
-
-func (tp *TerraformProject) makeBlockCtxVariableMap(ctxVariableMap map[string]interface{}, b Block, additionalLabels ...string) map[string]interface{} {
-	blockType := GetBlockTypeByType(b.Type)
-	if blockType.name == "resource" {
-		ctxVariableMap = tp.makeCtxVariableMapByLabels(ctxVariableMap, b, append(b.Labels, additionalLabels...))
-	} else {
-		if len(b.Labels)+len(additionalLabels) > 0 {
-			if _, ok := ctxVariableMap[blockType.refName]; !ok {
-				ctxVariableMap[blockType.refName] = make(map[string]interface{})
-			}
-			ctxVariableMap[blockType.refName] = tp.makeCtxVariableMapByLabels(ctxVariableMap[blockType.refName].(map[string]interface{}), b, append(b.Labels, additionalLabels...))
-		} else {
-			ctxVariableMap[blockType.refName] = b.CtxVariable
-		}
-	}
-	return ctxVariableMap
-}
-
-func (tp *TerraformProject) makeCtxVariableMapByLabels(ctxVariableMap map[string]interface{}, b Block, labels []string) map[string]interface{} {
-	key := labels[0]
-	if len(labels) > 1 {
-		if _, ok := ctxVariableMap[key]; !ok {
-			ctxVariableMap[key] = make(map[string]interface{})
-		} else if _, ok := ctxVariableMap[key].(map[string]interface{}); !ok {
-			ctxVariableMap[key] = make(map[string]interface{})
-		}
-		ctxVariableMap[key] = tp.makeCtxVariableMapByLabels(ctxVariableMap[key].(map[string]interface{}), b, labels[1:])
-	} else {
-		ctxVariableMap[key] = b.CtxVariable
-	}
-	return ctxVariableMap
 }

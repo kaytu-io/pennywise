@@ -13,6 +13,7 @@ type Attribute struct {
 	HclAttribute hcl.Attribute
 	Context      *hcl.EvalContext
 	CtxVariable  *cty.Value
+	Diags        Diags
 
 	logger *zap.Logger
 }
@@ -25,6 +26,7 @@ func (b *Block) buildAttributes(hclAttributes hcl.Attributes) {
 			HclAttribute: *attr,
 			Context:      b.Context,
 			logger:       b.logger,
+			Diags:        Diags{Name: attr.Name, Type: AttributeDiag},
 		})
 	}
 	b.Attributes = attributes
@@ -52,10 +54,7 @@ func (attr *Attribute) Value(ctx *hcl.EvalContext) (any, error) {
 	}
 	ctyVal, diag := attr.HclAttribute.Expr.Value(ctx)
 	if diag.HasErrors() {
-		if attr.Name == "storage_account_name" {
-			fmt.Println(attr.Name, "--- ERROR --- ", diag[0].Detail)
-		}
-		return nil, nil
+		return nil, diag
 	}
 
 	attr.CtxVariable = &ctyVal
@@ -87,8 +86,7 @@ func (attr *Attribute) Value(ctx *hcl.EvalContext) (any, error) {
 	case cty.DynamicPseudoType:
 		return nil, nil
 	default:
-		fmt.Println("Unknown attribute", attr.Name, t)
-		return nil, nil
+		return nil, fmt.Errorf("unknown attribute type while parsing")
 	}
 }
 

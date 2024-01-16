@@ -19,4 +19,6 @@ func main() {
 		logger.Error(err.Error())
 	}
 	fmt.Println(tp.MakeProjectMapStructure())
+	fmt.Println("===========================")
+	tp.Diags.Show()
 }
