@@ -9,18 +9,6 @@ import (
 	"strings"
 )
 
-type Block struct {
-	Type        string
-	Labels      []string
-	Body        hcl.Body
-	ChildBlocks []Block
-	Attributes  []Attribute
-	Context     *hcl.EvalContext
-	CtxVariable cty.Value
-
-	logger *zap.Logger
-}
-
 var (
 	terraformSchema = &hcl.BodySchema{
 		Blocks: []hcl.BlockHeaderSchema{
@@ -57,12 +45,66 @@ var (
 		},
 	}
 )
-var (
-	missingAttributeDiagnostic        = "Unsupported attribute"
-	valueDoesNotHaveAnyIndices        = "Invalid index"
-	valueIsNonIterableDiagnostic      = "Iteration over non-iterable value"
-	invalidFunctionArgumentDiagnostic = "Invalid function argument"
-)
+
+type Block struct {
+	Name        string
+	Type        string
+	Labels      []string
+	Body        hcl.Body
+	ChildBlocks []Block
+	Attributes  []Attribute
+	Context     *hcl.EvalContext
+	CtxVariable cty.Value
+	Diags       Diags
+
+	logger *zap.Logger
+}
+
+func makeNewBlock(logger *zap.Logger, ctx *hcl.EvalContext, b any, childHclBlocks *hclsyntax.Blocks, attributes hcl.Attributes) (*Block, error) {
+	childBlocks, err := makeBlocks(logger, ctx, nil, childHclBlocks)
+	if err != nil {
+		return nil, err
+	}
+	var newBlock Block
+	if block, ok := b.(*hcl.Block); ok {
+		newBlock = Block{
+			Type:        block.Type,
+			Labels:      block.Labels,
+			Body:        block.Body,
+			ChildBlocks: childBlocks,
+			Context:     ctx,
+			logger:      logger,
+		}
+	} else if block, ok := b.(*hclsyntax.Block); ok {
+		newBlock = Block{
+			Type:        block.Type,
+			Labels:      block.Labels,
+			Body:        block.Body,
+			ChildBlocks: childBlocks,
+			Context:     ctx,
+			logger:      logger,
+		}
+	} else {
+		return nil, fmt.Errorf("invalid block")
+	}
+
+	var blockName string
+	if len(newBlock.Labels) > 0 {
+		blockName = fmt.Sprintf("%s.%s", newBlock.Type, strings.Join(newBlock.Labels, "."))
+	} else {
+		blockName = newBlock.Type
+	}
+	newBlock.Name = blockName
+	newBlock.Diags = Diags{Name: newBlock.Name, Type: BlockDiag}
+	newBlock.buildAttributes(attributes)
+	return &newBlock, nil
+}
+
+func (b *Block) cloneBlock(key string) Block {
+	newBlock := *b
+	newBlock.Name = fmt.Sprintf("%s[%s]", b.Name, key)
+	return newBlock
+}
 
 func getFileBlocks(logger *zap.Logger, context *hcl.EvalContext, file *hcl.File) ([]Block, error) {
 	contents, _, diags := file.Body.PartialContent(terraformSchema)
@@ -81,52 +123,28 @@ func makeBlocks(logger *zap.Logger, context *hcl.EvalContext, blocks *hcl.Blocks
 	if blocks != nil {
 		for _, b := range *blocks {
 			if body, ok := b.Body.(*hclsyntax.Body); ok {
-				childBlocks, err := makeBlocks(logger, context, nil, &body.Blocks)
-				if err != nil {
-					return nil, err
-				}
 				attributes := make(hcl.Attributes)
 				for _, a := range body.Attributes {
 					attributes[a.Name] = a.AsHCLAttribute()
 				}
-				newBlock := Block{
-					Type:        b.Type,
-					Labels:      b.Labels,
-					Body:        b.Body,
-					ChildBlocks: childBlocks,
-					Context:     context,
-					logger:      logger,
-				}
-				newBlock.buildAttributes(attributes)
+				newBlock, err := makeNewBlock(logger, context, b, &body.Blocks, attributes)
 				if err != nil {
 					return nil, err
 				}
-				totalBlocks = append(totalBlocks, newBlock)
+				totalBlocks = append(totalBlocks, *newBlock)
 			}
 		}
 	} else if childBlocks != nil {
 		for _, b := range *childBlocks {
-			childBlocks, err := makeBlocks(logger, context, nil, &b.Body.Blocks)
-			if err != nil {
-				return nil, err
-			}
 			attributes, diags := b.Body.JustAttributes()
 			if diags.HasErrors() {
 				return nil, diags
 			}
-			newBlock := Block{
-				Type:        b.Type,
-				Labels:      b.Labels,
-				Body:        b.Body,
-				ChildBlocks: childBlocks,
-				Context:     context,
-				logger:      logger,
-			}
-			newBlock.buildAttributes(attributes)
+			newBlock, err := makeNewBlock(logger, context, b, &b.Body.Blocks, attributes)
 			if err != nil {
 				return nil, err
 			}
-			totalBlocks = append(totalBlocks, newBlock)
+			totalBlocks = append(totalBlocks, *newBlock)
 		}
 	}
 
@@ -147,10 +165,9 @@ func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) (map[st
 		if attr.CtxVariable != nil {
 			ctxMapStructure[attr.Name] = *attr.CtxVariable
 		}
-		if b.Type == "locals" {
-			fmt.Println("locals:", attr.Name, val)
-		}
 		if err != nil {
+			attr.Diags.Errors = append(attr.Diags.Errors, err)
+			b.Diags.ChildDiags = append(b.Diags.ChildDiags, &attr.Diags)
 			continue
 		}
 		switch val.(type) {
@@ -170,7 +187,7 @@ func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) (map[st
 			}
 			blockValues, err := attrBlock.makeMapStructure(attrBlockName, ctx)
 			if err != nil {
-				//b.logger.Error(fmt.Sprintf("error while getting %s value in block %s : %s", attr.Name, blockName, err.Error()))
+				attr.Diags.Errors = append(attr.Diags.Errors, err)
 				continue
 			}
 			mapStructure[attr.Name] = blockValues
@@ -181,7 +198,7 @@ func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) (map[st
 		case []int64, []int32, []int:
 			mapStructure[attr.Name] = val.([]int64)
 		default:
-			//b.logger.Debug(fmt.Sprintf("could not find attribute %s type in block %s", attr.Name, blockName))
+			attr.Diags.Errors = append(attr.Diags.Errors, fmt.Errorf("unknown attribute type while parsing"))
 		}
 	}
 	for _, childBlock := range b.ChildBlocks {
@@ -193,7 +210,6 @@ func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) (map[st
 		}
 		mappedChildBlock, err := childBlock.makeMapStructure(childBlockName, ctx)
 		if err != nil {
-			//b.logger.Error(fmt.Sprintf("error while making %s child block map structure in block %s : %s", childBlockName, blockName, err.Error()))
 			continue
 		}
 		ctxMapStructure[childBlock.Type] = childBlock.CtxVariable
@@ -222,7 +238,7 @@ func (b *Block) checkForEach() (map[string]cty.Value, error) {
 
 	ctyVal, diag := forEach.HclAttribute.Expr.Value(b.Context)
 	if diag.HasErrors() {
-		return nil, nil
+		return nil, diag
 	}
 	return ctyVal.AsValueMap(), nil
 }
