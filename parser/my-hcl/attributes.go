@@ -5,7 +5,6 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
-	"go.uber.org/zap"
 )
 
 type Attribute struct {
@@ -14,8 +13,6 @@ type Attribute struct {
 	Context      *hcl.EvalContext
 	CtxVariable  *cty.Value
 	Diags        Diags
-
-	logger *zap.Logger
 }
 
 func (b *Block) buildAttributes(hclAttributes hcl.Attributes) {
@@ -25,7 +22,6 @@ func (b *Block) buildAttributes(hclAttributes hcl.Attributes) {
 			Name:         attr.Name,
 			HclAttribute: *attr,
 			Context:      b.Context,
-			logger:       b.logger,
 			Diags:        Diags{Name: attr.Name, Type: AttributeDiag},
 		})
 	}

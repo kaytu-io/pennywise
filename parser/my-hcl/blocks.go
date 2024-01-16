@@ -5,7 +5,6 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/zclconf/go-cty/cty"
-	"go.uber.org/zap"
 	"strings"
 )
 
@@ -56,12 +55,10 @@ type Block struct {
 	Context     *hcl.EvalContext
 	CtxVariable cty.Value
 	Diags       Diags
-
-	logger *zap.Logger
 }
 
-func makeNewBlock(logger *zap.Logger, ctx *hcl.EvalContext, b any, childHclBlocks *hclsyntax.Blocks, attributes hcl.Attributes) (*Block, error) {
-	childBlocks, err := makeBlocks(logger, ctx, nil, childHclBlocks)
+func makeNewBlock(ctx *hcl.EvalContext, b any, childHclBlocks *hclsyntax.Blocks, attributes hcl.Attributes) (*Block, error) {
+	childBlocks, err := makeBlocks(ctx, nil, childHclBlocks)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +70,6 @@ func makeNewBlock(logger *zap.Logger, ctx *hcl.EvalContext, b any, childHclBlock
 			Body:        block.Body,
 			ChildBlocks: childBlocks,
 			Context:     ctx,
-			logger:      logger,
 		}
 	} else if block, ok := b.(*hclsyntax.Block); ok {
 		newBlock = Block{
@@ -82,7 +78,6 @@ func makeNewBlock(logger *zap.Logger, ctx *hcl.EvalContext, b any, childHclBlock
 			Body:        block.Body,
 			ChildBlocks: childBlocks,
 			Context:     ctx,
-			logger:      logger,
 		}
 	} else {
 		return nil, fmt.Errorf("invalid block")
@@ -106,19 +101,19 @@ func (b *Block) cloneBlock(key string) Block {
 	return newBlock
 }
 
-func getFileBlocks(logger *zap.Logger, context *hcl.EvalContext, file *hcl.File) ([]Block, error) {
+func getFileBlocks(context *hcl.EvalContext, file *hcl.File) ([]Block, error) {
 	contents, _, diags := file.Body.PartialContent(terraformSchema)
 	if diags.HasErrors() {
 		return nil, diags
 	}
-	myBlocks, err := makeBlocks(logger, context, &contents.Blocks, nil)
+	myBlocks, err := makeBlocks(context, &contents.Blocks, nil)
 	if err != nil {
 		return nil, err
 	}
 	return myBlocks, nil
 }
 
-func makeBlocks(logger *zap.Logger, context *hcl.EvalContext, blocks *hcl.Blocks, childBlocks *hclsyntax.Blocks) ([]Block, error) {
+func makeBlocks(context *hcl.EvalContext, blocks *hcl.Blocks, childBlocks *hclsyntax.Blocks) ([]Block, error) {
 	var totalBlocks []Block
 	if blocks != nil {
 		for _, b := range *blocks {
@@ -127,7 +122,7 @@ func makeBlocks(logger *zap.Logger, context *hcl.EvalContext, blocks *hcl.Blocks
 				for _, a := range body.Attributes {
 					attributes[a.Name] = a.AsHCLAttribute()
 				}
-				newBlock, err := makeNewBlock(logger, context, b, &body.Blocks, attributes)
+				newBlock, err := makeNewBlock(context, b, &body.Blocks, attributes)
 				if err != nil {
 					return nil, err
 				}
@@ -140,7 +135,7 @@ func makeBlocks(logger *zap.Logger, context *hcl.EvalContext, blocks *hcl.Blocks
 			if diags.HasErrors() {
 				return nil, diags
 			}
-			newBlock, err := makeNewBlock(logger, context, b, &b.Body.Blocks, attributes)
+			newBlock, err := makeNewBlock(context, b, &b.Body.Blocks, attributes)
 			if err != nil {
 				return nil, err
 			}
@@ -167,7 +162,7 @@ func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) (map[st
 		}
 		if err != nil {
 			attr.Diags.Errors = append(attr.Diags.Errors, err)
-			b.Diags.ChildDiags = append(b.Diags.ChildDiags, &attr.Diags)
+			b.Diags.ChildDiags = append(b.Diags.ChildDiags, attr.Diags)
 			continue
 		}
 		switch val.(type) {

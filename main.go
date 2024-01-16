@@ -20,5 +20,7 @@ func main() {
 	}
 	fmt.Println(tp.MakeProjectMapStructure())
 	fmt.Println("===========================")
-	tp.Diags.Show()
+	if diagsStr, ok := tp.Diags.Show(); ok {
+		fmt.Println(diagsStr)
+	}
 }

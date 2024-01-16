@@ -91,7 +91,7 @@ func (tp *TerraformProject) FindFiles() error {
 func (tp *TerraformProject) ParseProjectBlocks() error {
 	var totalBlocks []Block
 	for _, file := range tp.Files {
-		myBlocks, err := getFileBlocks(tp.logger, tp.Context, file)
+		myBlocks, err := getFileBlocks(tp.Context, file)
 		if err != nil {
 			return err
 		}
@@ -134,7 +134,7 @@ func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, e
 					ctxVariableMap = makeBlockCtxVariableMap(ctxVariableMap, b, key)
 				}
 			}
-			tp.Diags.ChildDiags = append(tp.Diags.ChildDiags, &b.Diags)
+			tp.Diags.ChildDiags = append(tp.Diags.ChildDiags, b.Diags)
 		}
 		tp.Context.Variables = makeCtxVariables(ctxVariableMap)
 		if mapsEqual(oldMapStructure, mapStructure) {
