@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Resource represents a resource in the terraform project
 type Resource struct {
 	Address string                 `mapstructure:"address"`
 	Name    string                 `mapstructure:"name"`
@@ -15,7 +16,8 @@ type Resource struct {
 	Values  map[string]interface{} `mapstructure:"values"`
 }
 
-func parseResourcesFromMapStructure(mapStructure map[string]interface{}) (string, []Resource, error) {
+// extractResourcesFromMapStructure extracts the resources from a terraform project map structure
+func extractResourcesFromMapStructure(mapStructure map[string]interface{}) (string, []Resource, error) {
 	var provider string
 	var resources []Resource
 
@@ -39,6 +41,7 @@ func parseResourcesFromMapStructure(mapStructure map[string]interface{}) (string
 	return provider, resources, nil
 }
 
+// ToResourceDef convert Resource to an acceptable type for pennywise server
 func (r *Resource) ToResourceDef(provider resource.ProviderName, defaultRegion *string) resource.ResourceDef {
 	region := ""
 	if defaultRegion != nil {
@@ -60,6 +63,7 @@ func (r *Resource) ToResourceDef(provider resource.ProviderName, defaultRegion *
 	}
 }
 
+// addUsage add usage data to resource
 func (r *Resource) addUsage(usage usagePackage.Usage) {
 	newValues := r.Values
 

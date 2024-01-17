@@ -18,7 +18,7 @@ func ParseHclResources(path string, usage usagePackage.Usage) (resource.Provider
 		return "", nil, err
 	}
 	mapStructure := tp.makeProjectMapStructure()
-	provider, resources, err := parseResourcesFromMapStructure(mapStructure)
+	provider, resources, err := extractResourcesFromMapStructure(mapStructure)
 	if err != nil {
 		return "", nil, err
 	}

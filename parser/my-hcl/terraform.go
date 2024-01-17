@@ -120,15 +120,14 @@ func (tp *TerraformProject) makeProjectMapStructure() map[string]interface{} {
 			if forEachItems == nil {
 				blockMapStructure := b.makeMapStructure(b.Name, tp.Context)
 				mapStructure[b.Name] = blockMapStructure
-				ctxVariableMap = makeBlockCtxVariableMap(ctxVariableMap, b)
+				ctxVariableMap = updateBlockCtxVariableMap(ctxVariableMap, b)
 			} else {
 				for key, eachItems := range forEachItems {
 					ctx := tp.Context
 					ctx.Variables["each"] = cty.ObjectVal(map[string]cty.Value{"value": eachItems})
-					clonedBlock := b.cloneBlock(key)
-					blockMapStructure := b.makeMapStructure(clonedBlock.Name, ctx)
-					mapStructure[clonedBlock.Name] = blockMapStructure
-					ctxVariableMap = makeBlockCtxVariableMap(ctxVariableMap, b, key)
+					blockMapStructure := b.makeMapStructure(fmt.Sprintf("%s[%s]", b.Name, key), ctx)
+					mapStructure[fmt.Sprintf("%s[%s]", b.Name, key)] = blockMapStructure
+					ctxVariableMap = updateBlockCtxVariableMap(ctxVariableMap, b, key)
 				}
 			}
 			tp.Diags.ChildDiags = append(tp.Diags.ChildDiags, b.Diags)

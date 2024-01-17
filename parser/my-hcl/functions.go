@@ -6,6 +6,7 @@ import (
 	"github.com/zclconf/go-cty/cty/function/stdlib"
 )
 
+// ContextFunctions functions to add to the hcl context for interpreting terraform functions
 var ContextFunctions = map[string]function.Function{
 	"abs":             stdlib.AbsoluteFunc,
 	"can":             tryfunc.CanFunc,

@@ -10,6 +10,8 @@ var (
 	TfProjectDiag DiagType = "tf-project"
 )
 
+// Diags to store diagnostics
+// only remain saved after the last run
 type Diags struct {
 	Name       string
 	Type       DiagType
@@ -17,6 +19,7 @@ type Diags struct {
 	ChildDiags []Diags
 }
 
+// Show shows the diags if any error exists
 func (d Diags) Show() (string, bool) {
 	hasError := false
 	str := fmt.Sprintf("Diags for %s %s :\n", d.Type, d.Name)
