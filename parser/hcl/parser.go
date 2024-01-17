@@ -27,8 +27,6 @@ func ParseHclResources(path string, usage usagePackage.Usage) (schema.ProviderNa
 			res.addUsage(usage)
 		}
 	}
-	fmt.Println(provider, resources)
-	fmt.Println("===========================")
 	if diagsStr, ok := tp.Diags.Show(); ok {
 		fmt.Println(diagsStr)
 	}
