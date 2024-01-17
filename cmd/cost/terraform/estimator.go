@@ -6,6 +6,7 @@ import (
 	"github.com/kaytu-io/pennywise/parser/aws"
 	"github.com/kaytu-io/pennywise/parser/azurerm"
 	"github.com/kaytu-io/pennywise/parser/terraform"
+	"github.com/kaytu-io/pennywise/submission"
 	"github.com/kaytu-io/pennywise/usage"
 	"io"
 	"os"
@@ -40,8 +41,8 @@ func EstimateTerraformPlanJson(plan io.Reader, u usage.Usage) error {
 		resources = append(resources, res)
 	}
 	serverClient := client.NewPennywiseServerClient(ServerClientAddress)
-	state := schema.State{Resources: resources}
-	_, err = serverClient.GetStateCost(state)
+	sub := submission.Submission{Resources: resources}
+	_, err = serverClient.GetStateCost(sub)
 	if err != nil {
 		return err
 	}
