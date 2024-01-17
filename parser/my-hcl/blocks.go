@@ -91,7 +91,7 @@ func makeNewBlock(ctx *hcl.EvalContext, b any, childHclBlocks *hclsyntax.Blocks,
 	}
 	newBlock.Name = blockName
 	newBlock.Diags = Diags{Name: newBlock.Name, Type: BlockDiag}
-	newBlock.buildAttributes(attributes)
+	newBlock.createAttributes(attributes)
 	return &newBlock, nil
 }
 
@@ -146,7 +146,7 @@ func makeBlocks(context *hcl.EvalContext, blocks *hcl.Blocks, childBlocks *hclsy
 	return totalBlocks, nil
 }
 
-func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) (map[string]interface{}, error) {
+func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) map[string]interface{} {
 	if ctx == nil {
 		ctx = b.Context
 	}
@@ -180,11 +180,7 @@ func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) (map[st
 			} else {
 				attrBlockName = attrBlock.Type
 			}
-			blockValues, err := attrBlock.makeMapStructure(attrBlockName, ctx)
-			if err != nil {
-				attr.Diags.Errors = append(attr.Diags.Errors, err)
-				continue
-			}
+			blockValues := attrBlock.makeMapStructure(attrBlockName, ctx)
 			mapStructure[attr.Name] = blockValues
 		case []string:
 			mapStructure[attr.Name] = val.([]string)
@@ -203,17 +199,14 @@ func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) (map[st
 		} else {
 			childBlockName = childBlock.Type
 		}
-		mappedChildBlock, err := childBlock.makeMapStructure(childBlockName, ctx)
-		if err != nil {
-			continue
-		}
+		mappedChildBlock := childBlock.makeMapStructure(childBlockName, ctx)
 		ctxMapStructure[childBlock.Type] = childBlock.CtxVariable
 		mapStructure[childBlockName] = mappedChildBlock
 	}
 	ctxMapStructure["id"] = cty.StringVal(fmt.Sprintf("!ref:%s", blockName))
 	b.CtxVariable = cty.ObjectVal(ctxMapStructure)
 
-	return mapStructure, nil
+	return mapStructure
 }
 
 func (b *Block) findAttribute(name string) *Attribute {

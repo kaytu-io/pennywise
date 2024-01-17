@@ -5,13 +5,13 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/zclconf/go-cty/cty"
-	"go.uber.org/zap"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 )
 
+// TerraformProject represents a terraform project for the parser
 type TerraformProject struct {
 	Directory    string
 	Files        []*hcl.File
@@ -19,22 +19,21 @@ type TerraformProject struct {
 	MappedBlocks map[string]interface{}
 	Context      *hcl.EvalContext
 	Diags        Diags
-
-	logger *zap.Logger
 }
 
-func NewTerraformProject(dir string, logger *zap.Logger) *TerraformProject {
+// newTerraformProject creates a new terraform project object for a directory
+func newTerraformProject(dir string) *TerraformProject {
 	ctx := &hcl.EvalContext{}
 	ctx.Variables = make(map[string]cty.Value)
 	ctx.Functions = ContextFunctions
 	return &TerraformProject{
 		Directory: dir,
 		Context:   ctx,
-		logger:    logger,
 		Diags:     Diags{Name: dir, Type: TfProjectDiag},
 	}
 }
 
+// resetDiags reset all diags (uses in all retries except the last one)
 func (tp *TerraformProject) resetDiags() {
 	for _, b := range tp.Blocks {
 		b.Diags = Diags{Name: b.Name, Type: BlockDiag}
@@ -42,7 +41,8 @@ func (tp *TerraformProject) resetDiags() {
 	tp.Diags = Diags{Name: tp.Directory, Type: TfProjectDiag}
 }
 
-func getFiles(path string) ([]*hcl.File, error) {
+// getTerraformFiles finds all terraform files in a directory recursively
+func getTerraformFiles(path string) ([]*hcl.File, error) {
 	hclParser := hclparse.NewParser()
 	fileInfos, err := os.ReadDir(path)
 	if err != nil {
@@ -51,7 +51,7 @@ func getFiles(path string) ([]*hcl.File, error) {
 	var files []*hcl.File
 	for _, info := range fileInfos {
 		if info.IsDir() {
-			childFiles, err := getFiles(filepath.Join(path, info.Name()))
+			childFiles, err := getTerraformFiles(filepath.Join(path, info.Name()))
 			if err != nil {
 				return nil, err
 			}
@@ -79,8 +79,9 @@ func getFiles(path string) ([]*hcl.File, error) {
 	return files, nil
 }
 
+// FindFiles finds and stores terraform files in a directory
 func (tp *TerraformProject) FindFiles() error {
-	files, err := getFiles(tp.Directory)
+	files, err := getTerraformFiles(tp.Directory)
 	if err != nil {
 		return err
 	}
@@ -88,7 +89,8 @@ func (tp *TerraformProject) FindFiles() error {
 	return nil
 }
 
-func (tp *TerraformProject) ParseProjectBlocks() error {
+// FindProjectBlocks finds and stores blocks in terraform files
+func (tp *TerraformProject) FindProjectBlocks() error {
 	var totalBlocks []Block
 	for _, file := range tp.Files {
 		myBlocks, err := getFileBlocks(tp.Context, file)
@@ -101,7 +103,8 @@ func (tp *TerraformProject) ParseProjectBlocks() error {
 	return nil
 }
 
-func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, error) {
+// makeProjectMapStructure returns a map structure of a terraform project blocks and values
+func (tp *TerraformProject) makeProjectMapStructure() map[string]interface{} {
 	ctxVariableMap := make(map[string]interface{})
 	var mapStructure map[string]interface{}
 	var oldMapStructure map[string]interface{}
@@ -115,10 +118,7 @@ func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, e
 				b.Diags.Errors = append(b.Diags.Errors, fmt.Errorf("error while getting for each: %s", err))
 			}
 			if forEachItems == nil {
-				blockMapStructure, err := b.makeMapStructure(b.Name, tp.Context)
-				if err != nil {
-					return nil, err
-				}
+				blockMapStructure := b.makeMapStructure(b.Name, tp.Context)
 				mapStructure[b.Name] = blockMapStructure
 				ctxVariableMap = makeBlockCtxVariableMap(ctxVariableMap, b)
 			} else {
@@ -126,10 +126,7 @@ func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, e
 					ctx := tp.Context
 					ctx.Variables["each"] = cty.ObjectVal(map[string]cty.Value{"value": eachItems})
 					clonedBlock := b.cloneBlock(key)
-					blockMapStructure, err := b.makeMapStructure(clonedBlock.Name, ctx)
-					if err != nil {
-						return nil, err
-					}
+					blockMapStructure := b.makeMapStructure(clonedBlock.Name, ctx)
 					mapStructure[clonedBlock.Name] = blockMapStructure
 					ctxVariableMap = makeBlockCtxVariableMap(ctxVariableMap, b, key)
 				}
@@ -144,9 +141,10 @@ func (tp *TerraformProject) MakeProjectMapStructure() (map[string]interface{}, e
 		retry++
 	}
 
-	return mapStructure, nil
+	return mapStructure
 }
 
+// mapsEqual checks if two maps are equal
 func mapsEqual(map1, map2 map[string]interface{}) bool {
 	if len(map1) != len(map2) {
 		return false

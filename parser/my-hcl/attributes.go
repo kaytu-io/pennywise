@@ -7,6 +7,7 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 )
 
+// Attribute represents block attributes
 type Attribute struct {
 	Name         string
 	HclAttribute hcl.Attribute
@@ -15,7 +16,8 @@ type Attribute struct {
 	Diags        Diags
 }
 
-func (b *Block) buildAttributes(hclAttributes hcl.Attributes) {
+// createAttributes creates list of attribute object by hcl.Attributes
+func (b *Block) createAttributes(hclAttributes hcl.Attributes) {
 	var attributes []Attribute
 	for _, attr := range hclAttributes {
 		attributes = append(attributes, Attribute{
@@ -29,21 +31,8 @@ func (b *Block) buildAttributes(hclAttributes hcl.Attributes) {
 	return
 }
 
-func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
-	switch part.Key.Type() {
-	case cty.String:
-		return fmt.Sprintf("%q", part.Key.AsString())
-	case cty.Number:
-		var intVal int
-		if err := gocty.FromCtyValue(part.Key, &intVal); err != nil {
-			return "0"
-		}
-		return fmt.Sprintf("%d", intVal)
-	default:
-		return "0"
-	}
-}
-
+// Value returns Attribute value by getting hcl.EvalContext
+// uses the propagated context if ctx is nil
 func (attr *Attribute) Value(ctx *hcl.EvalContext) (any, error) {
 	if ctx == nil {
 		ctx = attr.Context
@@ -86,12 +75,14 @@ func (attr *Attribute) Value(ctx *hcl.EvalContext) (any, error) {
 	}
 }
 
+// isList checks if an attribute value is a kind of list or not
 func isList(v cty.Value) bool {
 	sourceTy := v.Type()
 
 	return sourceTy.IsTupleType() || sourceTy.IsListType() || sourceTy.IsSetType()
 }
 
+// getListValues returns an Attribute value for the list values
 func getListValues(ctyVal cty.Value) (any, error) {
 	it := ctyVal.ElementIterator()
 	if it.Next() {
