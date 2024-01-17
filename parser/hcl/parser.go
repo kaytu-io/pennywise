@@ -1,73 +1,36 @@
 package hcl
 
 import (
-	"encoding/json"
-	"github.com/kaytu-io/infracost/external/config"
-	"github.com/kaytu-io/infracost/external/providers/terraform"
+	"fmt"
 	"github.com/kaytu-io/pennywise-server/resource"
 	usagePackage "github.com/kaytu-io/pennywise/usage"
-	"golang.org/x/net/context"
 )
 
+// ParseHclResources parses a new terraform project and return provider name and resources
 func ParseHclResources(path string, usage usagePackage.Usage) (resource.ProviderName, []Resource, error) {
-	var resources []Resource
-	runCtx, err := config.NewRunContextFromEnv(context.Background())
+	tp := newTerraformProject(path)
+	err := tp.FindFiles()
 	if err != nil {
 		return "", nil, err
 	}
-	ctx := config.ProjectContext{
-		ProjectConfig: &config.Project{
-			Path: path,
-		},
-		RunContext: runCtx,
+	err = tp.FindProjectBlocks()
+	if err != nil {
+		return "", nil, err
 	}
-	h, providerErr := terraform.NewHCLProvider(
-		&ctx,
-		nil,
-	)
-	if providerErr != nil {
-		return "", nil, providerErr
+	mapStructure := tp.makeProjectMapStructure()
+	provider, resources, err := extractResourcesFromMapStructure(mapStructure)
+	if err != nil {
+		return "", nil, err
 	}
-	var provider resource.ProviderName
-	jsons := h.LoadPlanJSONs()
-	for _, j := range jsons {
-		var res Project
-		err := json.Unmarshal(j.JSON, &res)
-		if err != nil {
-			return "", nil, err
-		}
-		for key, _ := range res.Configuration.ProviderConfig {
-			provider = key
-		}
-		for _, mod := range res.PlannedValues {
-			resources = append(resources, mod.Resources...)
+	if usage != nil {
+		for _, res := range resources {
+			res.addUsage(usage)
 		}
 	}
-
-	for i, res := range resources {
-		if makeResource, ok := makeResourceProcesses[res.Type]; ok {
-			resources[i] = makeResource.setRefs(resources, res)
-			resources[i] = makeResource.runFunctions(res)
-		}
-		// Embedded references
-		if makeResource, ok := makeResourceProcesses[res.Type]; ok {
-			resources[i] = makeResource.setRefs(resources, res)
-		}
-		resources[i] = addUsage(res, usage)
+	fmt.Println(provider, resources)
+	fmt.Println("===========================")
+	if diagsStr, ok := tp.Diags.Show(); ok {
+		fmt.Println(diagsStr)
 	}
-
-	return provider, resources, nil
-}
-
-func addUsage(res Resource, usage usagePackage.Usage) Resource {
-	newValues := res.Values
-
-	newValues[usagePackage.Key] = usage.GetUsage(res.Type, res.Address)
-	return Resource{
-		Address: res.Address,
-		Mode:    res.Mode,
-		Name:    res.Name,
-		Type:    res.Type,
-		Values:  newValues,
-	}
+	return resource.ProviderName(provider), resources, nil
 }

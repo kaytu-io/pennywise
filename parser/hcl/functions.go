@@ -1,4 +1,4 @@
-package my_hcl
+package hcl
 
 import (
 	"github.com/hashicorp/hcl/v2/ext/tryfunc"
