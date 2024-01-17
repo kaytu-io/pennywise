@@ -31,8 +31,8 @@ func extractResourcesFromMapStructure(mapStructure map[string]interface{}) (stri
 				return "", nil, fmt.Errorf("resource %s value is not a map", key)
 			}
 			resources = append(resources, Resource{
-				Address: key,
-				Name:    strings.Join(labels[2:], "."),
+				Address: strings.Join(labels[1:], "."),
+				Name:    strings.Split(strings.Join(labels[2:], "."), "[")[0],
 				Type:    labels[1],
 				Values:  values,
 			})
