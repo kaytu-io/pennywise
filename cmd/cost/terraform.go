@@ -8,6 +8,7 @@ import (
 	"github.com/kaytu-io/pennywise/cmd/cost/terraform"
 	"github.com/kaytu-io/pennywise/cmd/flags"
 	"github.com/kaytu-io/pennywise/parser/hcl"
+	"github.com/kaytu-io/pennywise/submission"
 	usagePackage "github.com/kaytu-io/pennywise/usage"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -87,9 +88,16 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
 		return err
 	}
 	var resources []resource.ResourceDef
-	for _, rs := range hclResources {
-		res := rs.ToResource(provider, nil)
-		resources = append(resources, res)
+	for _, res := range hclResources {
+		resources = append(resources, res.ToResourceDef(provider, nil))
+	}
+	sub, err := submission.CreateSubmission(resources)
+	if err != nil {
+		return err
+	}
+	err = sub.StoreAsFile()
+	if err != nil {
+		return err
 	}
 	serverClient := client.NewPennywiseServerClient(ServerClientAddress)
 	state := resource.State{
