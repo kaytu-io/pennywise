@@ -125,8 +125,8 @@ func (tp *TerraformProject) makeProjectMapStructure() map[string]interface{} {
 				for key, eachItems := range forEachItems {
 					ctx := tp.Context
 					ctx.Variables["each"] = cty.ObjectVal(map[string]cty.Value{"value": eachItems})
-					blockMapStructure := b.makeMapStructure(fmt.Sprintf("%s[%s]", b.Name, key), ctx)
-					mapStructure[fmt.Sprintf("%s[%s]", b.Name, key)] = blockMapStructure
+					blockMapStructure := b.makeMapStructure(fmt.Sprintf("%s[\"%s\"]", b.Name, key), ctx)
+					mapStructure[fmt.Sprintf("%s[\"%s\"]", b.Name, key)] = blockMapStructure
 					ctxVariableMap = updateBlockCtxVariableMap(ctxVariableMap, b, key)
 				}
 			}

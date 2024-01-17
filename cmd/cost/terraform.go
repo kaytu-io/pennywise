@@ -8,6 +8,8 @@ import (
 	"github.com/kaytu-io/pennywise/cmd/cost/terraform"
 	"github.com/kaytu-io/pennywise/cmd/flags"
 	"github.com/kaytu-io/pennywise/parser/hcl"
+	my_hcl "github.com/kaytu-io/pennywise/parser/my-hcl"
+	"github.com/kaytu-io/pennywise/submission"
 	usagePackage "github.com/kaytu-io/pennywise/usage"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -59,7 +61,7 @@ var terraformCommand = &cobra.Command{
 			}
 			for _, p := range paths {
 				if !p.IsDir() && strings.HasSuffix(p.Name(), ".tf") {
-					err := estimateTfProject(*projectDirectory, usage)
+					err := estimateTfProject2(*projectDirectory, usage)
 					if err != nil {
 						return err
 					}
@@ -95,11 +97,48 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
 	state := resource.State{
 		Resources: resources,
 	}
+	sub, err := submission.CreateSubmission(resources)
+	if err != nil {
+		return err
+	}
+	err = sub.StoreAsFile()
+	if err != nil {
+		return err
+	}
 	cost, err := serverClient.GetStateCost(state)
 	if err != nil {
 		return err
 	}
 	fmt.Println(cost.CostString())
+	return nil
+}
+
+func estimateTfProject2(projectDir string, usage usagePackage.Usage) error {
+	provider, hclResources, err := my_hcl.ParseHclResources(projectDir, usage)
+	if err != nil {
+		return err
+	}
+	var resources []resource.ResourceDef
+	for _, res := range hclResources {
+		resources = append(resources, res.ToResourceDef(provider, nil))
+	}
+	sub, err := submission.CreateSubmission(resources)
+	if err != nil {
+		return err
+	}
+	err = sub.StoreAsFile()
+	if err != nil {
+		return err
+	}
+	//serverClient := client.NewPennywiseServerClient(ServerClientAddress)
+	//state := resource.State{
+	//	Resources: resources,
+	//}
+	//cost, err := serverClient.GetStateCost(state)
+	//if err != nil {
+	//	return err
+	//}
+	//fmt.Println(cost.CostString())
 	return nil
 }
 
