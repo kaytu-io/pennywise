@@ -45,6 +45,73 @@ var (
 	}
 )
 
+// BlockType represents a block type
+type BlockType struct {
+	name    string
+	refName string
+}
+
+var (
+	BlockTypeResource = BlockType{
+		name:    "resource",
+		refName: "",
+	}
+	BlockTypeVariable = BlockType{
+		name:    "variable",
+		refName: "var",
+	}
+	BlockTypeData = BlockType{
+		name:    "data",
+		refName: "data",
+	}
+	BlockTypeLocal = BlockType{
+		name:    "locals",
+		refName: "local",
+	}
+	BlockTypeProvider = BlockType{
+		name:    "provider",
+		refName: "provider",
+	}
+	BlockTypeOutput = BlockType{
+		name:    "output",
+		refName: "output",
+	}
+	BlockTypeModule = BlockType{
+		name:    "module",
+		refName: "module",
+	}
+	BlockTypeTerraform = BlockType{
+		name:    "terraform",
+		refName: "terraform",
+	}
+	BlockTypeUnknown = BlockType{
+		name: "Unknown",
+	}
+)
+
+// blockTypes available block types
+var blockTypes = []BlockType{
+	BlockTypeResource,
+	BlockTypeVariable,
+	BlockTypeData,
+	BlockTypeLocal,
+	BlockTypeProvider,
+	BlockTypeOutput,
+	BlockTypeModule,
+	BlockTypeTerraform,
+}
+
+// GetBlockTypeByType returns BlockType by name
+func GetBlockTypeByType(blockTypeStr string) BlockType {
+	for _, bt := range blockTypes {
+		if bt.name == blockTypeStr {
+			return bt
+		}
+	}
+	return BlockTypeUnknown
+}
+
+// Block represents a block in a hcl file
 type Block struct {
 	Name        string
 	Type        string
@@ -57,6 +124,7 @@ type Block struct {
 	Diags       Diags
 }
 
+// makeNewBlock creates new Block by hcl syntax block
 func makeNewBlock(ctx *hcl.EvalContext, b any, childHclBlocks *hclsyntax.Blocks, attributes hcl.Attributes) (*Block, error) {
 	childBlocks, err := makeBlocks(ctx, nil, childHclBlocks)
 	if err != nil {
@@ -95,12 +163,7 @@ func makeNewBlock(ctx *hcl.EvalContext, b any, childHclBlocks *hclsyntax.Blocks,
 	return &newBlock, nil
 }
 
-func (b *Block) cloneBlock(key string) Block {
-	newBlock := *b
-	newBlock.Name = fmt.Sprintf("%s[%s]", b.Name, key)
-	return newBlock
-}
-
+// getFileBlocks returns list of Block in a hcl file
 func getFileBlocks(context *hcl.EvalContext, file *hcl.File) ([]Block, error) {
 	contents, _, diags := file.Body.PartialContent(terraformSchema)
 	if diags.HasErrors() {
@@ -113,6 +176,7 @@ func getFileBlocks(context *hcl.EvalContext, file *hcl.File) ([]Block, error) {
 	return myBlocks, nil
 }
 
+// makeBlocks create list of Block by getting list of hcl blocks
 func makeBlocks(context *hcl.EvalContext, blocks *hcl.Blocks, childBlocks *hclsyntax.Blocks) ([]Block, error) {
 	var totalBlocks []Block
 	if blocks != nil {
@@ -146,6 +210,7 @@ func makeBlocks(context *hcl.EvalContext, blocks *hcl.Blocks, childBlocks *hclsy
 	return totalBlocks, nil
 }
 
+// makeMapStructure makes a map structure for a block
 func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) map[string]interface{} {
 	if ctx == nil {
 		ctx = b.Context
@@ -209,6 +274,7 @@ func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) map[str
 	return mapStructure
 }
 
+// findAttribute find an Attribute in a block by name
 func (b *Block) findAttribute(name string) *Attribute {
 	for _, attr := range b.Attributes {
 		if attr.Name == name {
@@ -218,6 +284,7 @@ func (b *Block) findAttribute(name string) *Attribute {
 	return nil
 }
 
+// checkForEach returns for_each values if the expression exists in the Block
 func (b *Block) checkForEach() (map[string]cty.Value, error) {
 	forEach := b.findAttribute("for_each")
 	if forEach == nil {
