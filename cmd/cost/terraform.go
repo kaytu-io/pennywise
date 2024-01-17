@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kaytu-io/pennywise-server/client"
-	"github.com/kaytu-io/pennywise-server/resource"
+	"github.com/kaytu-io/pennywise-server/schema"
 	"github.com/kaytu-io/pennywise/cmd/cost/terraform"
 	"github.com/kaytu-io/pennywise/cmd/flags"
 	"github.com/kaytu-io/pennywise/parser/hcl"
@@ -87,7 +87,7 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
 	if err != nil {
 		return err
 	}
-	var resources []resource.ResourceDef
+	var resources []schema.ResourceDef
 	for _, res := range hclResources {
 		resources = append(resources, res.ToResourceDef(provider, nil))
 	}
@@ -100,10 +100,7 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
 		return err
 	}
 	serverClient := client.NewPennywiseServerClient(ServerClientAddress)
-	state := resource.State{
-		Resources: resources,
-	}
-	cost, err := serverClient.GetStateCost(state)
+	cost, err := serverClient.GetStateCost(sub)
 	if err != nil {
 		return err
 	}

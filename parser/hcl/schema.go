@@ -2,7 +2,7 @@ package hcl
 
 import (
 	"fmt"
-	"github.com/kaytu-io/pennywise-server/resource"
+	"github.com/kaytu-io/pennywise-server/schema"
 	"github.com/kaytu-io/pennywise/parser/azurerm"
 	usagePackage "github.com/kaytu-io/pennywise/usage"
 	"strings"
@@ -42,18 +42,18 @@ func extractResourcesFromMapStructure(mapStructure map[string]interface{}) (stri
 }
 
 // ToResourceDef convert Resource to an acceptable type for pennywise server
-func (r *Resource) ToResourceDef(provider resource.ProviderName, defaultRegion *string) resource.ResourceDef {
+func (r *Resource) ToResourceDef(provider schema.ProviderName, defaultRegion *string) schema.ResourceDef {
 	region := ""
 	if defaultRegion != nil {
 		region = *defaultRegion
 	}
 	for key, value := range r.Values {
-		if provider == resource.AzureProvider && key == "location" {
+		if provider == schema.AzureProvider && key == "location" {
 			region = azurerm.GetRegionCode(value.(string))
 			break
 		}
 	}
-	return resource.ResourceDef{
+	return schema.ResourceDef{
 		Address:      r.Address,
 		Type:         r.Type,
 		Name:         r.Name,

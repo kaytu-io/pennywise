@@ -2,12 +2,12 @@ package hcl
 
 import (
 	"fmt"
-	"github.com/kaytu-io/pennywise-server/resource"
+	"github.com/kaytu-io/pennywise-server/schema"
 	usagePackage "github.com/kaytu-io/pennywise/usage"
 )
 
 // ParseHclResources parses a new terraform project and return provider name and resources
-func ParseHclResources(path string, usage usagePackage.Usage) (resource.ProviderName, []Resource, error) {
+func ParseHclResources(path string, usage usagePackage.Usage) (schema.ProviderName, []Resource, error) {
 	tp := newTerraformProject(path)
 	err := tp.FindFiles()
 	if err != nil {
@@ -32,5 +32,5 @@ func ParseHclResources(path string, usage usagePackage.Usage) (resource.Provider
 	if diagsStr, ok := tp.Diags.Show(); ok {
 		fmt.Println(diagsStr)
 	}
-	return resource.ProviderName(provider), resources, nil
+	return schema.ProviderName(provider), resources, nil
 }

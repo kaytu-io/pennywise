@@ -2,7 +2,7 @@ package terraform
 
 import (
 	"github.com/kaytu-io/pennywise-server/client"
-	"github.com/kaytu-io/pennywise-server/resource"
+	"github.com/kaytu-io/pennywise-server/schema"
 	"github.com/kaytu-io/pennywise/parser/aws"
 	"github.com/kaytu-io/pennywise/parser/azurerm"
 	"github.com/kaytu-io/pennywise/parser/terraform"
@@ -34,13 +34,13 @@ func EstimateTerraformPlanJson(plan io.Reader, u usage.Usage) error {
 	if err != nil {
 		return err
 	}
-	var resources []resource.ResourceDef
+	var resources []schema.ResourceDef
 	for _, rs := range plannedQueries {
 		res := rs.ToResource("")
 		resources = append(resources, res)
 	}
 	serverClient := client.NewPennywiseServerClient(ServerClientAddress)
-	state := resource.State{Resources: resources}
+	state := schema.State{Resources: resources}
 	_, err = serverClient.GetStateCost(state)
 	if err != nil {
 		return err
