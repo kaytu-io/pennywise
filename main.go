@@ -1,26 +1,27 @@
 package main
 
 import (
-	"fmt"
+	"github.com/kaytu-io/pennywise-server/resource"
 	my_hcl "github.com/kaytu-io/pennywise/parser/my-hcl"
-	"go.uber.org/zap"
+	"github.com/kaytu-io/pennywise/submission"
 )
 
 func main() {
 	//cmd.Execute()
-	logger, err := zap.NewProduction()
-	tp := my_hcl.NewTerraformProject("./testdata/parser/storage_queue", logger)
-	err = tp.FindFiles()
+	provider, hclResources, err := my_hcl.ParseHclResources("./testdata/parser/storage_queue", nil)
 	if err != nil {
-		logger.Error(err.Error())
+		panic(err)
 	}
-	err = tp.ParseProjectBlocks()
+	var resources []resource.ResourceDef
+	for _, res := range hclResources {
+		resources = append(resources, res.ToResourceDef(provider, nil))
+	}
+	sub, err := submission.CreateSubmission(resources)
 	if err != nil {
-		logger.Error(err.Error())
+		panic(err)
 	}
-	fmt.Println(tp.MakeProjectMapStructure())
-	fmt.Println("===========================")
-	if diagsStr, ok := tp.Diags.Show(); ok {
-		fmt.Println(diagsStr)
+	err = sub.StoreAsFile()
+	if err != nil {
+		panic(err)
 	}
 }
