@@ -2,7 +2,7 @@ package terraform
 
 import (
 	"encoding/json"
-	"github.com/kaytu-io/pennywise-server/resource"
+	"github.com/kaytu-io/pennywise-server/schema"
 	"strings"
 )
 
@@ -86,8 +86,8 @@ type Resource struct {
 	Values       map[string]interface{} `json:"values"`
 }
 
-func (r *Resource) ToResource(region string) resource.ResourceDef {
-	resourceDef := resource.ResourceDef{
+func (r *Resource) ToResource(region string) schema.ResourceDef {
+	resourceDef := schema.ResourceDef{
 		Address:    r.Address,
 		Type:       r.Type,
 		Name:       r.Name,
@@ -95,9 +95,9 @@ func (r *Resource) ToResource(region string) resource.ResourceDef {
 		Values:     r.Values,
 	}
 	if strings.Contains(r.ProviderName, "azurerm") {
-		resourceDef.ProviderName = resource.AzureProvider
+		resourceDef.ProviderName = schema.AzureProvider
 	} else {
-		resourceDef.ProviderName = resource.AWSProvider
+		resourceDef.ProviderName = schema.AWSProvider
 	}
 	return resourceDef
 }
