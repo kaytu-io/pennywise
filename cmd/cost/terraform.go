@@ -100,7 +100,7 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
 		return err
 	}
 	serverClient := client.NewPennywiseServerClient(ServerClientAddress)
-	cost, err := serverClient.GetStateCost(sub)
+	cost, err := serverClient.GetStateCost(*sub)
 	if err != nil {
 		return err
 	}
