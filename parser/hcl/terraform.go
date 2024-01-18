@@ -51,11 +51,7 @@ func getTerraformFiles(path string) ([]*hcl.File, error) {
 	var files []*hcl.File
 	for _, info := range fileInfos {
 		if info.IsDir() {
-			childFiles, err := getTerraformFiles(filepath.Join(path, info.Name()))
-			if err != nil {
-				return nil, err
-			}
-			files = append(files, childFiles...)
+			continue
 		}
 		if strings.HasSuffix(info.Name(), ".tf") {
 			parseFunc := hclParser.ParseHCLFile

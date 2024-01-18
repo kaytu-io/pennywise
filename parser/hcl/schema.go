@@ -68,6 +68,5 @@ func (r *Resource) addUsage(usage usagePackage.Usage) {
 	newValues := r.Values
 
 	newValues[usagePackage.Key] = usage.GetUsage(r.Type, r.Address)
-	fmt.Println("usage for ", r.Address, " : ", newValues[usagePackage.Key])
 	r.Values = newValues
 }
