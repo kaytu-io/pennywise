@@ -271,7 +271,8 @@ func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) map[str
 		}
 		mapStructure[childBlockName] = append(mapStructure[childBlockName].([]map[string]interface{}), mappedChildBlock)
 	}
-	ctxMapStructure["id"] = cty.StringVal(fmt.Sprintf("!ref:%s", blockName))
+	ctxMapStructure["id"] = cty.StringVal(fmt.Sprintf("%s", blockName))
+	mapStructure["id"] = fmt.Sprintf("%s", blockName)
 	b.CtxVariable = cty.ObjectVal(ctxMapStructure)
 
 	return mapStructure
