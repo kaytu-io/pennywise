@@ -197,7 +197,11 @@ func makeBlocks(context *hcl.EvalContext, blocks *hcl.Blocks, childBlocks *hclsy
 		for _, b := range *childBlocks {
 			attributes, diags := b.Body.JustAttributes()
 			if diags.HasErrors() {
-				return nil, diags
+				for _, err := range diags {
+					if err.Detail != "Blocks are not allowed here." {
+						return nil, diags
+					}
+				}
 			}
 			newBlock, err := makeNewBlock(context, b, &b.Body.Blocks, attributes)
 			if err != nil {
