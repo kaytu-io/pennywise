@@ -18,6 +18,12 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: stable
+      - name: Tag version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          release_branches: main
+          tag_prefix: v
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
