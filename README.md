@@ -1,12 +1,13 @@
-# Pennywise
-Pennywise is an open-source program designed for calculating cloud resources' costs. It currently supports AWS and Azure. The project consists of a server, and a CLI program.
+<h1 align="center"> Pennywise </h1>
 
 ## Overview
+Pennywise is an open-source program designed for calculating cloud resources' costs. It currently supports AWS and Azure. The project consists of a server, and a CLI program.
+
 ### Server
 The server component is intended for deployment on a server with MySQL database configuration. The server stores pricing data from AWS and Azure in a MySQL database. During startup, a migrator is run to set up the required tables and schema.
 
 ### CLI Program
-The CLI program parses data from Terraform in three possible formats: a Terraform file, a Terraform plan file, or a Terraform plan JSON file. The cost request is then sent to the Pennywise server, and the result, comprising the cost (in the specified currency), is received.
+The CLI program parses data from Terraform in three possible formats: a Terraform file, a Terraform plan file, or a Terraform plan JSON file. The cost request is then sent to the Pennywise server, and the result, comprising the cost, is received.
 
 ## Getting Started
 Follow these steps to get started with Pennywise:
