@@ -3,6 +3,7 @@ package cost
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/kaytu-io/pennywise-server/client"
 	"github.com/kaytu-io/pennywise-server/schema"
 	"github.com/kaytu-io/pennywise/cmd/cost/terraform"
 	"github.com/kaytu-io/pennywise/cmd/flags"
@@ -98,12 +99,12 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
 	if err != nil {
 		return err
 	}
-	//serverClient := client.NewPennywiseServerClient(ServerClientAddress)
-	//cost, err := serverClient.GetStateCost(*sub)
-	//if err != nil {
-	//	return err
-	//}
-	//fmt.Println(cost.CostString())
+	serverClient := client.NewPennywiseServerClient(ServerClientAddress)
+	cost, err := serverClient.GetStateCost(*sub)
+	if err != nil {
+		return err
+	}
+	fmt.Println(cost.CostString())
 	return nil
 }
 
