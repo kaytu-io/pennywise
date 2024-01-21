@@ -234,31 +234,9 @@ func (b *Block) makeMapStructure(blockName string, ctx *hcl.EvalContext) map[str
 			b.Diags.ChildDiags = append(b.Diags.ChildDiags, attr.Diags)
 			continue
 		}
-		switch val.(type) {
-		case int64, int32, int:
-			mapStructure[attr.Name] = val.(int64)
-		case string:
-			mapStructure[attr.Name] = val.(string)
-		case bool:
-			mapStructure[attr.Name] = val.(bool)
-		case Block:
-			attrBlock := val.(Block)
-			var attrBlockName string
-			if len(attrBlock.Labels) > 0 {
-				attrBlockName = fmt.Sprintf("%s.%s", attrBlock.Type, strings.Join(attrBlock.Labels, "."))
-			} else {
-				attrBlockName = attrBlock.Type
-			}
-			blockValues := attrBlock.makeMapStructure(attrBlockName, ctx)
-			mapStructure[attr.Name] = blockValues
-		case []string:
-			mapStructure[attr.Name] = val.([]string)
-		case []bool:
-			mapStructure[attr.Name] = val.([]bool)
-		case []int64, []int32, []int:
-			mapStructure[attr.Name] = val.([]int64)
-		default:
-			attr.Diags.Errors = append(attr.Diags.Errors, fmt.Errorf("unknown attribute type while parsing"))
+		mapStructure, err = parseCtyValue(ctx, mapStructure, attr.Name, val)
+		if err != nil {
+			attr.Diags.Errors = append(attr.Diags.Errors, err)
 		}
 	}
 	for _, childBlock := range b.ChildBlocks {
