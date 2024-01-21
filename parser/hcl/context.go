@@ -66,16 +66,7 @@ func updateCtxVariableMapByLabels(ctxVariableMap map[string]interface{}, variabl
 		}
 		ctxVariableMap[key] = updateCtxVariableMapByLabels(ctxVariableMap[key].(map[string]interface{}), variable, labels[1:])
 	} else {
-		if _, ok := ctxVariableMap[key]; ok {
-			if _, ok := ctxVariableMap[key].(map[string]interface{}); ok {
-				valueMap := variable.AsValueMap()
-				for k, v := range valueMap {
-					ctxVariableMap[key] = updateCtxVariableMapByLabels(ctxVariableMap[key].(map[string]interface{}), v, []string{k})
-				}
-			}
-		} else {
-			ctxVariableMap[key] = variable
-		}
+		ctxVariableMap[key] = variable
 	}
 	return ctxVariableMap
 }
