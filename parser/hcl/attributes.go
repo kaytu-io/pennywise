@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+	"strings"
 )
 
 // Attribute represents block attributes
@@ -43,6 +44,10 @@ func (attr *Attribute) Value(ctx *hcl.EvalContext) (any, error) {
 	}
 
 	attr.CtxVariable = &ctyVal
+	return getCtyValue(ctyVal)
+}
+
+func getCtyValue(ctyVal cty.Value) (any, error) {
 	if isList(ctyVal) {
 		return getListValues(ctyVal)
 	}
@@ -71,7 +76,18 @@ func (attr *Attribute) Value(ctx *hcl.EvalContext) (any, error) {
 	case cty.DynamicPseudoType:
 		return nil, nil
 	default:
-		return nil, fmt.Errorf("unknown attribute type while parsing")
+		if checkMapCtyValue(ctyVal) {
+			valueMap := make(map[string]any)
+			for k, v := range ctyVal.AsValueMap() {
+				value, err := getCtyValue(v)
+				if err != nil {
+					return nil, fmt.Errorf("unknown attribute type while getting value")
+				}
+				valueMap[k] = value
+			}
+			return valueMap, nil
+		}
+		return nil, fmt.Errorf("unknown attribute type while getting value")
 	}
 }
 
@@ -154,4 +170,60 @@ func getListValues(ctyVal cty.Value) (any, error) {
 	} else {
 		return nil, nil
 	}
+}
+
+func checkMapCtyValue(value cty.Value) (b bool) {
+	b = true
+	defer func() {
+		if r := recover(); r != nil {
+			b = false
+		}
+	}()
+
+	if !value.CanIterateElements() {
+		b = false
+	}
+	_ = value.AsValueMap()
+
+	return
+}
+
+func parseCtyValue(ctx *hcl.EvalContext, mapStructure map[string]interface{}, name string, val any) (map[string]interface{}, error) {
+	switch val.(type) {
+	case int64, int32, int:
+		mapStructure[name] = val.(int64)
+	case string:
+		mapStructure[name] = val.(string)
+	case bool:
+		mapStructure[name] = val.(bool)
+	case Block:
+		attrBlock := val.(Block)
+		var attrBlockName string
+		if len(attrBlock.Labels) > 0 {
+			attrBlockName = fmt.Sprintf("%s.%s", attrBlock.Type, strings.Join(attrBlock.Labels, "."))
+		} else {
+			attrBlockName = attrBlock.Type
+		}
+		blockValues := attrBlock.makeMapStructure(attrBlockName, ctx)
+		mapStructure[name] = blockValues
+	case []string:
+		mapStructure[name] = val.([]string)
+	case []bool:
+		mapStructure[name] = val.([]bool)
+	case []int64, []int32, []int:
+		mapStructure[name] = val.([]int64)
+	case map[string]any:
+		valueMap := make(map[string]any)
+		var err error
+		for k, v := range val.(map[string]any) {
+			valueMap, err = parseCtyValue(ctx, valueMap, k, v)
+			if err != nil {
+				return mapStructure, err
+			}
+		}
+		mapStructure[name] = valueMap
+	default:
+		return mapStructure, fmt.Errorf("unknown attribute type while parsing")
+	}
+	return mapStructure, nil
 }
