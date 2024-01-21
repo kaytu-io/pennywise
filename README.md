@@ -12,53 +12,7 @@ The CLI program parses data from Terraform in three possible formats: a Terrafor
 Follow these steps to get started with Pennywise:
 
 ### Server Deployment
-Clone the Pennywise repository:
-
-```shell
-git clone https://github.com/kaytu-io/pennywise.git
-```
-
-```shell
-cd pennywise/server
-```
-
-Set up the server configuration by creating a folder outside the cli and server folders in Pennywise as config and set config.yaml or config.json inside it or set it another way by exporting environmental variables :
-
-MYSQL_HOST, MYSQL_PORT, MYSQL_DB, MYSQL_USERNAME, MYSQL_PASSWORD, HTTP_ADDRESS
-
-Or by configuring the config.json file:
-````json
-{
-  "mysql": {
-    "host": "host",
-    "port":"port",
-    "db": "database_name",
-    "username": "username",
-    "password": "password"
-  },
-  "http": {
-    "address": ":address"
-  }
-}
-````
-Or by configuring the config.yml file:
-````yaml
-mysql:
-  host: host
-  port: port
-  db: database_name
-  username: username
-  password: password
-http:
-  address: :address
-````
-
-Start the Pennywise server:
-
-```shell
-go run .
-```
-
+[pennywise-server github page](https://github.com/kaytu-io/pennywise-server)
 ### CLI Program
 Clone the Pennywise repository (if not done already).
 
