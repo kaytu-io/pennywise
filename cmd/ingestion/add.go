@@ -5,6 +5,7 @@ import (
 	"github.com/kaytu-io/pennywise-server/client"
 	"github.com/kaytu-io/pennywise/cmd/flags"
 	"github.com/spf13/cobra"
+	"time"
 )
 
 var add = &cobra.Command{
@@ -16,6 +17,7 @@ var add = &cobra.Command{
 		provider := flags.ReadStringFlag(cmd, "provider")
 		service := flags.ReadStringFlag(cmd, "service")
 		region := flags.ReadStringFlag(cmd, "region")
+		wait := flags.ReadBooleanFlag(cmd, "wait")
 
 		serverClient := client.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
 		job, err := serverClient.AddIngestion(provider, service, region)
@@ -23,7 +25,22 @@ var add = &cobra.Command{
 			return err
 		}
 
-		fmt.Println(*job)
+		fmt.Println(fmt.Sprintf("Job %d is created to ingest service %s in region %s fro %s provider", job.ID, job.Service, job.Location, job.Provider))
+		if wait {
+			fmt.Println("Waiting...")
+			var maxWaiting int
+			for maxWaiting < 3600/10 {
+				job, err = serverClient.GetIngestionJob(fmt.Sprintf("%d", job.ID))
+				if err != nil {
+					return err
+				}
+				if job.Status == "SUCCEEDED" || job.Status == "FAILED" {
+					fmt.Println("Job is finished:", job.Status)
+					return nil
+				}
+				time.Sleep(time.Second * 10)
+			}
+		}
 		return nil
 	},
 }
