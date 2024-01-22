@@ -20,6 +20,7 @@ func init() {
 	add.Flags().String("service", "", "service")
 	add.MarkFlagRequired("service")
 	add.Flags().String("region", "", "region")
+	add.Flags().Bool("wait", false, "wait")
 
 	IngestCmd.AddCommand(list)
 	list.Flags().String("provider", "", "cloud provider (aws | azure)")
