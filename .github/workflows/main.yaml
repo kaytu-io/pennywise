@@ -40,6 +40,11 @@ jobs:
     needs:
       - tag
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
