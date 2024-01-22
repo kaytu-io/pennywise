@@ -1,6 +1,7 @@
 package ingestion
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/kaytu-io/pennywise/cmd/flags"
 	"github.com/kaytu-io/pennywise/pkg/server"
@@ -20,7 +21,12 @@ var get = &cobra.Command{
 			return err
 		}
 
-		fmt.Println(*job)
+		jobJSON, err := json.MarshalIndent(*job, "", "    ")
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(string(jobJSON))
 		return nil
 	},
 }
