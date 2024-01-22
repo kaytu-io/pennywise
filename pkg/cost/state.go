@@ -68,8 +68,8 @@ func (s *State) CostString() (string, error) {
 	return costString, nil
 }
 
-// ensureResource creates Resource at the given address if it doesn't already exist.
-func (s *State) ensureResource(address, typ string, provider schema.ProviderName, skipped bool) {
+// EnsureResource creates Resource at the given address if it doesn't already exist.
+func (s *State) EnsureResource(address, typ string, provider schema.ProviderName, skipped bool) {
 	if _, ok := s.Resources[address]; !ok {
 		res := Resource{
 			Provider: provider,
@@ -85,8 +85,8 @@ func (s *State) ensureResource(address, typ string, provider schema.ProviderName
 	}
 }
 
-// addComponent adds the Component with given label to the Resource at given address.
-func (s *State) addComponent(resAddress, compLabel string, component Component) {
+// AddComponent adds the Component with given label to the Resource at given address.
+func (s *State) AddComponent(resAddress, compLabel string, component Component) {
 	if _, ok := s.Resources[resAddress].Components[compLabel]; !ok {
 		s.Resources[resAddress].Components[compLabel] = []Component{}
 	}
