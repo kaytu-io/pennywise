@@ -2,9 +2,9 @@ package hcl
 
 import (
 	"fmt"
-	"github.com/kaytu-io/pennywise-server/schema"
-	"github.com/kaytu-io/pennywise/parser/azurerm"
-	usagePackage "github.com/kaytu-io/pennywise/usage"
+	"github.com/kaytu-io/pennywise/pkg/parser/azurerm"
+	"github.com/kaytu-io/pennywise/pkg/schema"
+	usagePackage "github.com/kaytu-io/pennywise/pkg/usage"
 	"strings"
 )
 

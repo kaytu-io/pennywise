@@ -1,8 +1,8 @@
 package aws
 
 import (
-	"github.com/kaytu-io/pennywise/parser/aws/region"
-	"github.com/kaytu-io/pennywise/parser/terraform"
+	"github.com/kaytu-io/pennywise/pkg/parser/aws/region"
+	"github.com/kaytu-io/pennywise/pkg/parser/terraform"
 )
 
 const (

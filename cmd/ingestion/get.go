@@ -2,8 +2,8 @@ package ingestion
 
 import (
 	"fmt"
-	"github.com/kaytu-io/pennywise-server/client"
 	"github.com/kaytu-io/pennywise/cmd/flags"
+	"github.com/kaytu-io/pennywise/pkg/server"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +14,7 @@ var get = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id := flags.ReadStringFlag(cmd, "id")
 
-		serverClient := client.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+		serverClient := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
 		job, err := serverClient.GetIngestionJob(id)
 		if err != nil {
 			return err

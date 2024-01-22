@@ -1,14 +1,14 @@
 package terraform
 
 import (
-	"github.com/kaytu-io/pennywise-server/client"
-	"github.com/kaytu-io/pennywise-server/cost"
-	"github.com/kaytu-io/pennywise-server/schema"
-	"github.com/kaytu-io/pennywise/parser/aws"
-	"github.com/kaytu-io/pennywise/parser/azurerm"
-	"github.com/kaytu-io/pennywise/parser/terraform"
-	"github.com/kaytu-io/pennywise/submission"
-	"github.com/kaytu-io/pennywise/usage"
+	"github.com/kaytu-io/pennywise/pkg/cost"
+	"github.com/kaytu-io/pennywise/pkg/parser/aws"
+	"github.com/kaytu-io/pennywise/pkg/parser/azurerm"
+	terraform2 "github.com/kaytu-io/pennywise/pkg/parser/terraform"
+	"github.com/kaytu-io/pennywise/pkg/schema"
+	"github.com/kaytu-io/pennywise/pkg/server"
+	"github.com/kaytu-io/pennywise/pkg/submission"
+	"github.com/kaytu-io/pennywise/pkg/usage"
 	"io"
 	"os"
 )
@@ -21,12 +21,12 @@ var (
 // calculates the costs of the resources and show them.
 // It uses the Backend to retrieve the pricing data.
 func EstimateTerraformPlanJson(plan io.Reader, u usage.Usage) (*cost.State, error) {
-	providerInitializers := []terraform.ProviderInitializer{
+	providerInitializers := []terraform2.ProviderInitializer{
 		aws.TerraformProviderInitializer,
 		azurerm.TerraformProviderInitializer,
 	}
 
-	tfplan := terraform.NewPlan(providerInitializers...)
+	tfplan := terraform2.NewPlan(providerInitializers...)
 	if err := tfplan.Read(plan); err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func EstimateTerraformPlanJson(plan io.Reader, u usage.Usage) (*cost.State, erro
 		res := rs.ToResource("")
 		resources = append(resources, res)
 	}
-	serverClient := client.NewPennywiseServerClient(ServerClientAddress)
+	serverClient := server.NewPennywiseServerClient(ServerClientAddress)
 	sub := submission.Submission{Resources: resources}
 	stateCost, err := serverClient.GetStateCost(sub)
 	if err != nil {

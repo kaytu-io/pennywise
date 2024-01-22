@@ -3,7 +3,7 @@ package submission
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/kaytu-io/pennywise-server/schema"
+	"github.com/kaytu-io/pennywise/pkg/schema"
 	"github.com/sony/sonyflake"
 	"os"
 	"path/filepath"

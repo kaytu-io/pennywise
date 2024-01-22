@@ -2,8 +2,8 @@ package hcl
 
 import (
 	"fmt"
-	"github.com/kaytu-io/pennywise-server/schema"
-	usagePackage "github.com/kaytu-io/pennywise/usage"
+	"github.com/kaytu-io/pennywise/pkg/schema"
+	usagePackage "github.com/kaytu-io/pennywise/pkg/usage"
 )
 
 // ParseHclResources parses a new terraform project and return provider name and resources
