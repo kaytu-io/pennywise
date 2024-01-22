@@ -12,7 +12,6 @@ import (
 	usagePackage "github.com/kaytu-io/pennywise/usage"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -104,20 +103,27 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(cost.CostString())
+	costString, err := cost.CostString()
+	if err != nil {
+		return err
+	}
+	fmt.Println(costString)
 	return nil
 }
 
 func estimateTfPlanJson(jsonPath string, usage usagePackage.Usage) error {
 	file, err := os.Open(jsonPath)
 	if err != nil {
-		fmt.Println(err)
-		log.Fatal(err)
+		return err
 	}
-	err = terraform.EstimateTerraformPlanJson(file, usage)
+	stateCost, err := terraform.EstimateTerraformPlanJson(file, usage)
 	if err != nil {
-		fmt.Println(err)
-		log.Fatal(err)
+		return err
 	}
+	costString, err := stateCost.CostString()
+	if err != nil {
+		return err
+	}
+	fmt.Println(costString)
 	return nil
 }
