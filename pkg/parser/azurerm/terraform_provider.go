@@ -1,6 +1,8 @@
 package azurerm
 
-import "github.com/kaytu-io/pennywise/parser/terraform"
+import (
+	"github.com/kaytu-io/pennywise/pkg/parser/terraform"
+)
 
 // RegistryName is the fully qualified name under which this provider is stored in the registry.
 const RegistryName = "registry.terraform.io/hashicorp/azurerm"

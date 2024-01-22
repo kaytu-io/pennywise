@@ -2,8 +2,9 @@ package ingestion
 
 import (
 	"fmt"
-	"github.com/kaytu-io/pennywise-server/client"
 	"github.com/kaytu-io/pennywise/cmd/flags"
+	"github.com/kaytu-io/pennywise/pkg/schema"
+	"github.com/kaytu-io/pennywise/pkg/server"
 	"github.com/spf13/cobra"
 	"time"
 )
@@ -19,7 +20,7 @@ var add = &cobra.Command{
 		region := flags.ReadStringFlag(cmd, "region")
 		wait := flags.ReadBooleanFlag(cmd, "wait")
 
-		serverClient := client.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+		serverClient := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
 		job, err := serverClient.AddIngestion(provider, service, region)
 		if err != nil {
 			return err
@@ -34,7 +35,7 @@ var add = &cobra.Command{
 				if err != nil {
 					return err
 				}
-				if job.Status == "SUCCEEDED" || job.Status == "FAILED" {
+				if job.Status == schema.IngestionJobSucceeded || job.Status == schema.IngestionJobFailed {
 					fmt.Println("Job is finished:", job.Status)
 					return nil
 				}

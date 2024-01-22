@@ -2,8 +2,8 @@ package ingestion
 
 import (
 	"fmt"
-	"github.com/kaytu-io/pennywise-server/client"
 	"github.com/kaytu-io/pennywise/cmd/flags"
+	"github.com/kaytu-io/pennywise/pkg/server"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ var list = &cobra.Command{
 		region := flags.ReadStringFlag(cmd, "region")
 		status := flags.ReadStringFlag(cmd, "status")
 
-		serverClient := client.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+		serverClient := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
 		jobs, err := serverClient.ListIngestionJobs(provider, service, region, status)
 		if err != nil {
 			return err

@@ -3,13 +3,13 @@ package cost
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/kaytu-io/pennywise-server/client"
-	"github.com/kaytu-io/pennywise-server/schema"
 	"github.com/kaytu-io/pennywise/cmd/cost/terraform"
 	"github.com/kaytu-io/pennywise/cmd/flags"
-	"github.com/kaytu-io/pennywise/parser/hcl"
-	"github.com/kaytu-io/pennywise/submission"
-	usagePackage "github.com/kaytu-io/pennywise/usage"
+	"github.com/kaytu-io/pennywise/pkg/parser/hcl"
+	"github.com/kaytu-io/pennywise/pkg/schema"
+	"github.com/kaytu-io/pennywise/pkg/server"
+	"github.com/kaytu-io/pennywise/pkg/submission"
+	usagePackage "github.com/kaytu-io/pennywise/pkg/usage"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -98,7 +98,7 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
 	if err != nil {
 		return err
 	}
-	serverClient := client.NewPennywiseServerClient(ServerClientAddress)
+	serverClient := server.NewPennywiseServerClient(ServerClientAddress)
 	cost, err := serverClient.GetStateCost(*sub)
 	if err != nil {
 		return err
