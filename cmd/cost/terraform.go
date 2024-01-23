@@ -14,7 +14,6 @@ import (
 	"gopkg.in/yaml.v2"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 var (
@@ -51,22 +50,6 @@ var terraformCommand = &cobra.Command{
 		} else {
 			usage = usagePackage.Usage{}
 		}
-		projectDirectory := flags.ReadStringOptionalFlag(cmd, "project")
-		if projectDirectory != nil {
-			paths, err := os.ReadDir(*projectDirectory)
-			if err != nil {
-				return err
-			}
-			for _, p := range paths {
-				if !p.IsDir() && strings.HasSuffix(p.Name(), ".tf") {
-					err := estimateTfProject(*projectDirectory, usage)
-					if err != nil {
-						return err
-					}
-					return nil
-				}
-			}
-		}
 
 		jsonPath := flags.ReadStringOptionalFlag(cmd, "json-path")
 		if jsonPath != nil {
@@ -76,7 +59,7 @@ var terraformCommand = &cobra.Command{
 			}
 			return nil
 		}
-		fmt.Println("Please provide a terraform project or a terraform plan json file")
+		fmt.Println("Please provide a terraform plan json file")
 		return nil
 	},
 }
@@ -116,7 +99,23 @@ func estimateTfPlanJson(jsonPath string, usage usagePackage.Usage) error {
 	if err != nil {
 		return err
 	}
-	stateCost, err := terraform.EstimateTerraformPlanJson(file, usage)
+	resources, err := terraform.ParseTerraformPlanJson(file, usage)
+	if err != nil {
+		return err
+	}
+	serverClient := server.NewPennywiseServerClient(ServerClientAddress)
+	sub, err := submission.CreateSubmission(resources)
+	if err != nil {
+		return err
+	}
+	err = sub.StoreAsFile()
+	if err != nil {
+		return err
+	}
+	stateCost, err := serverClient.GetStateCost(*sub)
+	if err != nil {
+		return err
+	}
 	if err != nil {
 		return err
 	}
