@@ -10,29 +10,28 @@ The server component is intended for deployment on a server with MySQL database 
 The CLI program parses data from Terraform in three possible formats: a Terraform file, a Terraform plan file, or a Terraform plan JSON file. The cost request is then sent to the Pennywise server, and the result, comprising the cost, is received.
 
 ## Getting Started
-Follow these steps to get started with Pennywise:
 
-### Server Deployment
-[pennywise-server github page](https://github.com/kaytu-io/pennywise-server)
-### CLI Program
-Clone the Pennywise repository (if not done already).
-
-Navigate to the CLI program directory:
-
-```shell
-cd pennywise/cli
-```
 Run the ingester for the services and regions you need (you can store service data for all regions if you don't define the region).
 
 ```shell
-go run . ingest --provider (azure|aws) --service service-name --region region
+go run . ingestion add --provider (azure|aws) --service service-name --region region
 ```
 
-Then run the cost estimator for your terraform project.
+This will add an ingestion job to run on the server, you can wait until it finishes by using wait tag or get the job status 
+using get or list commands.
+
+Then run the following terraform commands to build the terraform plan json file:
 
 ```shell
-go run . cost terraform --project path-to-project --usage path-to-usage-file
+terraform init
+terraform plan -out tfplan.binary
+terraform show -json tfplan.binary | jq > tfplan.json
 ```
+And then estimate the project cost by passing the terraform plan json file to cost terraform command:
+```shell
+go run . cost terraform --json-path path-to-json --usage path-to-usage-file
+```
+
 You can also specify the usage file path by usage tag.
 The usage file is responsible for getting usage details from user.
 currently The usage file is supported in two types : (json , yaml)
