@@ -8,8 +8,8 @@ import (
 
 // ProviderConfigExpression is a single configuration variable of a ProviderConfig.
 type ProviderConfigExpression struct {
-	ConstantValue string   `json:"constant_value",mapstructure:"constant_value"`
-	References    []string `json:"references",mapstructure:"references"`
+	ConstantValue interface{} `json:"constant_value",mapstructure:"constant_value"`
+	References    []string    `json:"references",mapstructure:"references"`
 }
 
 // ProviderConfig is configuration of a provider with the given Name.
