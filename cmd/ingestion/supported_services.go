@@ -3,6 +3,7 @@ package ingestion
 import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/cmd/flags"
+	"github.com/kaytu-io/pennywise/pkg/server"
 	"github.com/spf13/cobra"
 )
 
@@ -13,17 +14,35 @@ var supportedService = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		provider := flags.ReadStringFlag(cmd, "provider")
 		if provider == "aws" {
-			fmt.Printf("Available services in AWS: \nAmazonEC2\nAmazonEFS\nAmazonEKS\nAmazonFSx\nAmazonRDS\nAmazonElastiCache\nAmazonCloudWatch\nAWSELB\n")
+
+			serverClient := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+			listNewServices, err := serverClient.ListServices(provider)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("Available services in AWS: ")
+			for _, v := range listNewServices {
+				fmt.Println(v)
+			}
+
 			return nil
 		} else if provider == "azure" {
-			fmt.Printf("Available services in Azure: \nKey Vault\nVirtual Machines\nStorage\nContainer Registry\nAzure DNS\nLoad Balancer\n" +
-				"Application Gateway\nNAT Gateway\nVPN Gateway\nContent Delivery Network\nVirtual Network\nAzure Cosmos DB\n" +
-				"Azure Database for MariaDB\nAzure Database for MySQL\nAzure Database for PostgreSQL\nSQL Database\nSQL Managed Instance\n" +
-				"Azure Kubernetes Service\nFunctions\nAzure App Service\nAPI Management\n")
+
+			serverClient := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+			listNewServices, err := serverClient.ListServices(provider)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("Available services in Azure: ")
+			for _, v := range listNewServices {
+				fmt.Println(v)
+			}
+
 			return nil
 		} else {
-			fmt.Errorf("please enter right provider")
-			return nil
+			return fmt.Errorf("please enter right provider")
 		}
 	},
 }
