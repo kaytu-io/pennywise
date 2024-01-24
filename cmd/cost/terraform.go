@@ -16,10 +16,6 @@ import (
 	"path/filepath"
 )
 
-var (
-	ServerClientAddress = os.Getenv("SERVER_CLIENT_URL")
-)
-
 var terraformCommand = &cobra.Command{
 	Use:   "terraform",
 	Short: `Shows the costs by parsing terraform resources.`,
@@ -51,9 +47,14 @@ var terraformCommand = &cobra.Command{
 			usage = usagePackage.Usage{}
 		}
 
+		ServerClientAddress := flags.ReadStringFlag(cmd, "server-url")
+		if os.Getenv("SERVER_CLIENT_URL") != "" {
+			ServerClientAddress = os.Getenv("SERVER_CLIENT_URL")
+		}
+
 		jsonPath := flags.ReadStringOptionalFlag(cmd, "json-path")
 		if jsonPath != nil {
-			err := estimateTfPlanJson(*jsonPath, usage)
+			err := estimateTfPlanJson(*jsonPath, usage, ServerClientAddress)
 			if err != nil {
 				return err
 			}
@@ -64,7 +65,7 @@ var terraformCommand = &cobra.Command{
 	},
 }
 
-func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
+func estimateTfProject(projectDir string, usage usagePackage.Usage, ServerClientAddress string) error {
 	provider, hclResources, err := hcl.ParseHclResources(projectDir, usage)
 	if err != nil {
 		return err
@@ -94,7 +95,7 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage) error {
 	return nil
 }
 
-func estimateTfPlanJson(jsonPath string, usage usagePackage.Usage) error {
+func estimateTfPlanJson(jsonPath string, usage usagePackage.Usage, ServerClientAddress string) error {
 	file, err := os.Open(jsonPath)
 	if err != nil {
 		return err
