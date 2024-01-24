@@ -45,9 +45,3 @@ var add = &cobra.Command{
 		return nil
 	},
 }
-
-func init() {
-	add.AddCommand(supportedService)
-	supportedService.Flags().String("provider", "", "cloud provider (aws | azure)")
-	supportedService.MarkFlagRequired("provider")
-}
