@@ -69,6 +69,9 @@ func (s *serverClient) AddIngestion(provider, service, region string) (*schema.I
 		if 400 <= statusCode && statusCode < 500 {
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
+		if strings.Contains(err.Error(), "connect: connection refused") {
+			return nil, fmt.Errorf("Please ensure that your server is running or that you have entered the --server-url flag currectly ")
+		}
 		return nil, err
 	}
 	return &job, nil
