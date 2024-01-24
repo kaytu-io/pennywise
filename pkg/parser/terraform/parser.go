@@ -149,6 +149,7 @@ func (p *Plan) extractReferences(resourcesMap map[string][]Resource) []Resource 
 					continue
 				}
 			}
+			res.Values["id"] = fmt.Sprintf("%s.id", res.Address)
 		}
 	}
 	var resources []Resource
@@ -407,7 +408,7 @@ func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]int
 			values[name] = v.Value
 			continue
 		}
-		values[name] = fmt.Sprintf("*ref*.%s", refs[0])
+		values[name] = fmt.Sprintf("%s", refs[0])
 	}
 	return values, nil
 }
