@@ -23,6 +23,7 @@ type ServerClient interface {
 	AddIngestion(provider, service, region string) (*schema.IngestionJob, error)
 	ListIngestionJobs(provider, service, region, status string) ([]schema.IngestionJob, error)
 	GetIngestionJob(id string) (*schema.IngestionJob, error)
+	ListServices(provider string) ([]string, error)
 }
 
 type serverClient struct {
@@ -33,6 +34,20 @@ func NewPennywiseServerClient(baseURL string) ServerClient {
 	return &serverClient{baseURL: baseURL}
 }
 
+func (s *serverClient) ListServices(provider string) ([]string, error) {
+	url := fmt.Sprintf("%s/api/v1/ingestion/new_services?provider=%s", s.baseURL, provider)
+	url = strings.ReplaceAll(url, " ", "%20")
+
+	var listNewServices []string
+	if statusCode, err := doRequest(http.MethodGet, url, nil, &listNewServices); err != nil {
+		if 400 <= statusCode && statusCode < 500 {
+			return nil, echo.NewHTTPError(statusCode, err.Error())
+		}
+		return nil, err
+	}
+	return listNewServices, nil
+}
+
 func (s *serverClient) ListIngestionJobs(provider, service, region, status string) ([]schema.IngestionJob, error) {
 	url := fmt.Sprintf("%s/api/v1/ingestion/jobs?status=%s&provider=%s&service=%s&region=%s", s.baseURL, status, provider, service, region)
 	url = strings.ReplaceAll(url, " ", "%20")
@@ -41,6 +56,9 @@ func (s *serverClient) ListIngestionJobs(provider, service, region, status strin
 	if statusCode, err := doRequest(http.MethodGet, url, nil, &jobs); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return nil, echo.NewHTTPError(statusCode, err.Error())
+		}
+		if strings.Contains(err.Error(), "connect: connection refused") {
+			return nil, fmt.Errorf("Please ensure that your server is running or that you have entered the --server-url flag currectly ")
 		}
 		return nil, err
 	}
@@ -55,6 +73,9 @@ func (s *serverClient) GetIngestionJob(id string) (*schema.IngestionJob, error) 
 		if 400 <= statusCode && statusCode < 500 {
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
+		if strings.Contains(err.Error(), "connect: connection refused") {
+			return nil, fmt.Errorf("Please ensure that your server is running or that you have entered the --server-url flag currectly ")
+		}
 		return nil, err
 	}
 	return &job, nil
@@ -67,6 +88,9 @@ func (s *serverClient) AddIngestion(provider, service, region string) (*schema.I
 	var job schema.IngestionJob
 	if statusCode, err := doRequest(http.MethodPut, url, nil, &job); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
+			if strings.Contains(err.Error(), "please enter the correct service name") {
+				return nil, fmt.Errorf("please enter the correct service name")
+			}
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
 		if strings.Contains(err.Error(), "connect: connection refused") {
@@ -88,6 +112,9 @@ func (s *serverClient) GetStateCost(req submission.Submission) (*cost.State, err
 	if statusCode, err := doRequest(http.MethodGet, url, payload, &cost); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return nil, echo.NewHTTPError(statusCode, err.Error())
+		}
+		if strings.Contains(err.Error(), "connect: connection refused") {
+			return nil, fmt.Errorf("Please ensure that your server is running or that you have entered the --server-url flag currectly ")
 		}
 		return nil, err
 	}
