@@ -8,7 +8,8 @@ import (
 
 var supportedService = &cobra.Command{
 	Use:   "supported-services",
-	Short: `Shows the list of services`,
+	Short: `Returns a list of the available services`,
+	Long:  `Returns the services that are available for the add ingestion command`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		provider := flags.ReadStringFlag(cmd, "provider")
 		if provider == "aws" {
