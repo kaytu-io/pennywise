@@ -7,7 +7,7 @@ import (
 )
 
 var supportedService = &cobra.Command{
-	Use:   "supported-services",
+	Use:   "supported_services",
 	Short: `Returns a list of the available services`,
 	Long:  `Returns the services that are available for the add ingestion command`,
 	RunE: func(cmd *cobra.Command, args []string) error {
