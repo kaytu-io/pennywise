@@ -1,3 +1,0 @@
-azurerm_kubernetes_cluster_node_pool.usage_basic_A2:
-  nodes: 2
-  monthly_hrs: 450
