@@ -1,2 +1,0 @@
-azurerm_managed_disk.custom_size_ssd:
-  monthly_disk_operations: 20000
