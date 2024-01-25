@@ -7,6 +7,7 @@ import (
 	"github.com/kaytu-io/pennywise/pkg/schema"
 	"github.com/kaytu-io/pennywise/pkg/server"
 	"github.com/spf13/cobra"
+	"strings"
 	"time"
 )
 
@@ -21,6 +22,9 @@ var get = &cobra.Command{
 		serverClient := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
 		job, err := serverClient.GetIngestionJob(id)
 		if err != nil {
+			if strings.Contains(err.Error(), "job ID not found") {
+				return fmt.Errorf("job ID not found")
+			}
 			return err
 		}
 		if wait && !(job.Status == schema.IngestionJobSucceeded || job.Status == schema.IngestionJobFailed) {
@@ -42,6 +46,7 @@ var get = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
 		fmt.Println(string(jobJSON))
 		return nil
 	},
