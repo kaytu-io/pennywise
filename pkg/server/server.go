@@ -58,7 +58,7 @@ func (s *serverClient) ListIngestionJobs(provider, service, region, status strin
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
 		if strings.Contains(err.Error(), "connect: connection refused") {
-			return nil, fmt.Errorf("Please ensure that your server is running or that you have entered the --server-url flag currectly ")
+			return nil, fmt.Errorf("Can't connectt to the server. Please ensure that your server is running or that you have entered the --server-url flag currectly ")
 		}
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (s *serverClient) GetIngestionJob(id string) (*schema.IngestionJob, error) 
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
 		if strings.Contains(err.Error(), "connect: connection refused") {
-			return nil, fmt.Errorf("Please ensure that your server is running or that you have entered the --server-url flag currectly ")
+			return nil, fmt.Errorf("Can't connectt to the server. Please ensure that your server is running or that you have entered the --server-url flag currectly ")
 		}
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (s *serverClient) AddIngestion(provider, service, region string) (*schema.I
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
 		if strings.Contains(err.Error(), "connect: connection refused") {
-			return nil, fmt.Errorf("Please ensure that your server is running or that you have entered the --server-url flag currectly ")
+			return nil, fmt.Errorf("Can't connectt to the server. Please ensure that your server is running or that you have entered the --server-url flag currectly ")
 		}
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (s *serverClient) GetStateCost(req submission.Submission) (*cost.State, err
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
 		if strings.Contains(err.Error(), "connect: connection refused") {
-			return nil, fmt.Errorf("Please ensure that your server is running or that you have entered the --server-url flag currectly ")
+			return nil, fmt.Errorf("Can't connectt to the server. Please ensure that your server is running or that you have entered the --server-url flag currectly ")
 		}
 		return nil, err
 	}
