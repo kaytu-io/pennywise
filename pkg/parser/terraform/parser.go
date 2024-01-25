@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/pkg/usage"
 	"io"
+	"reflect"
 	"strings"
 )
 
@@ -110,7 +111,22 @@ func (p *Plan) extractResources(values Values, providers map[string]Provider) ([
 
 	resourcesMap := p.extractModuleResources(&values.RootModule, resourceProviders)
 
-	return p.extractReferences(resourcesMap), nil
+	var retry int
+	var oldResourcesMap map[string][]Resource
+	for retry < 50 {
+		resourcesMap = p.extractReferences(resourcesMap)
+		if mapsEqual(oldResourcesMap, resourcesMap) {
+			break
+		}
+		oldResourcesMap = resourcesMap
+		retry++
+	}
+
+	var resources []Resource
+	for _, rss := range resourcesMap {
+		resources = append(resources, rss...)
+	}
+	return resources, nil
 }
 
 type providerWithResourceValues struct {
@@ -118,9 +134,10 @@ type providerWithResourceValues struct {
 	Values   map[string]interface{}
 }
 
-func (p *Plan) extractReferences(resourcesMap map[string][]Resource) []Resource {
+func (p *Plan) extractReferences(resourcesMap map[string][]Resource) map[string][]Resource {
 	for _, resources := range resourcesMap {
 		for i, res := range resources {
+			res.Values["id"] = fmt.Sprintf("%s.id", res.Address)
 			for key, val := range res.Values {
 				if value, ok := val.(string); ok {
 					ref := strings.Split(value, ".")
@@ -128,8 +145,6 @@ func (p *Plan) extractReferences(resourcesMap map[string][]Resource) []Resource 
 						if _, ok := resourcesMap[strings.Join(ref[1:len(ref)-1], ".")]; ok {
 							if refValue, ok := resourcesMap[strings.Join(ref[1:len(ref)-1], ".")][0].Values[ref[len(ref)-1]]; ok {
 								res.Values[key] = refValue
-							} else {
-								res.Values[key] = resourcesMap[strings.Join(ref[1:len(ref)-1], ".")][0]
 							}
 						} else {
 							res.Values[key] = nil
@@ -138,8 +153,6 @@ func (p *Plan) extractReferences(resourcesMap map[string][]Resource) []Resource 
 						if _, ok := resourcesMap[strings.Join(ref[1:len(ref)-1], ".")]; ok && len(resourcesMap[strings.Join(ref[1:len(ref)-1], ".")]) > i {
 							if refValue, ok := resourcesMap[strings.Join(ref[1:len(ref)-1], ".")][i].Values[ref[len(ref)-1]]; ok {
 								res.Values[key] = refValue
-							} else {
-								res.Values[key] = resourcesMap[strings.Join(ref[1:len(ref)-1], ".")][i]
 							}
 						} else {
 							res.Values[key] = nil
@@ -149,14 +162,9 @@ func (p *Plan) extractReferences(resourcesMap map[string][]Resource) []Resource 
 					continue
 				}
 			}
-			res.Values["id"] = fmt.Sprintf("%s.id", res.Address)
 		}
 	}
-	var resources []Resource
-	for _, rss := range resourcesMap {
-		resources = append(resources, rss...)
-	}
-	return resources
+	return resourcesMap
 }
 
 // extractModuleConfiguration iterates over all the modules included in the plan's configuration block and
@@ -216,9 +224,15 @@ func (p *Plan) extractModuleResources(module *Module, resourceProviders map[stri
 	for _, tfres := range module.Resources {
 		pwrv, ok := resourceProviders[fmt.Sprintf("%s.%s", tfres.Type, tfres.Name)]
 		if !ok {
-			continue
+			pwrv, ok = resourceProviders[tfres.Address]
+			if !ok {
+				continue
+			}
 		}
 		for k, v := range pwrv.Values {
+			if k == "source_virtual_machine_id" {
+				fmt.Println("HERE", k, v)
+			}
 			if v == nil {
 				continue
 			}
@@ -278,9 +292,9 @@ func (p *Plan) extractModuleResources(module *Module, resourceProviders map[stri
 			resources[name] = []Resource{rs}
 		}
 	}
-
 	for _, child := range module.ChildModules {
-		for name, rs := range p.extractModuleResources(child, resourceProviders) {
+		childResources := p.extractModuleResources(child, resourceProviders)
+		for name, rs := range childResources {
 			if _, ok := resources[name]; ok {
 				resources[name] = append(resources[name], rs...)
 			} else {
@@ -387,18 +401,6 @@ func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]int
 			continue
 		}
 
-		// The references can be 'var', 'local' and any other resource referenced, so if it's not either of the first
-		// ones is a resource reference so we use it as value
-		//if ref[0] != "var" {
-		//	// The case for 2 is when aws_launch_configuration.as_conf.name which is 3 but we only want the aws_launch_configuration.as_conf
-		//	// so as the e.References hold all of the precedents of the separation we take the 1 as the 0 is the full with the '.name' at the end
-		//	if len(ref) > 2 {
-		//		values[name] = fmt.Sprintf("%s.%s", prefix, refs[1])
-		//	} else {
-		//		values[name] = fmt.Sprintf("%s.%s", prefix, refs[0])
-		//	}
-		//	continue
-		//}
 		if ref[0] == "var" {
 			varName := ref[1]
 			v, ok := variables[varName]
@@ -411,4 +413,36 @@ func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]int
 		values[name] = fmt.Sprintf("%s", refs[0])
 	}
 	return values, nil
+}
+
+// mapsEqual checks if two maps are equal
+func mapsEqual(resourcesMap1, resourcesMap2 map[string][]Resource) bool {
+	if len(resourcesMap1) != len(resourcesMap2) {
+		return false
+	}
+
+	for key, value1 := range resourcesMap1 {
+		if value2, ok := resourcesMap2[key]; ok {
+			if len(value1) != len(value2) {
+				return false
+			}
+			for i, _ := range value1 {
+				map1 := value1[i].Values
+				map2 := value2[i].Values
+				for k, v1 := range map1 {
+					if v2, ok := map2[k]; ok {
+						if !reflect.DeepEqual(v1, v2) {
+							return false
+						}
+					} else {
+						return false
+					}
+				}
+			}
+		} else {
+			return false
+		}
+	}
+
+	return true
 }
