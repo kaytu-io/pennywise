@@ -230,9 +230,6 @@ func (p *Plan) extractModuleResources(module *Module, resourceProviders map[stri
 			}
 		}
 		for k, v := range pwrv.Values {
-			if k == "source_virtual_machine_id" {
-				fmt.Println("HERE", k, v)
-			}
 			if v == nil {
 				continue
 			}
