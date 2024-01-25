@@ -11,10 +11,16 @@ The CLI program parses data from Terraform in three possible formats: a Terrafor
 
 ## Getting Started
 
+### Install pennywise client
+
+```shell
+wget -qO - https://raw.githubusercontent.com/kaytu-io/pennywise/main/scripts/install.sh | bash
+```
+### Usage
 Run the ingester for the services and regions you need (you can store service data for all regions if you don't define the region).
 
 ```shell
-go run . ingestion add --provider (azure|aws) --service service-name --region region
+pennywise ingestion add --provider (azure|aws) --service service-name --region region
 ```
 
 This will add an ingestion job to run on the server, you can wait until it finishes by using wait tag or get the job status 
@@ -29,7 +35,7 @@ terraform show -json tfplan.binary | jq > tfplan.json
 ```
 And then estimate the project cost by passing the terraform plan json file to cost terraform command:
 ```shell
-go run . cost terraform --json-path path-to-json --usage path-to-usage-file
+pennywise cost terraform --json-path path-to-json --usage path-to-usage-file
 ```
 
 You can also specify the usage file path by usage tag.
