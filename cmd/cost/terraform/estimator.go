@@ -28,6 +28,14 @@ func ParseTerraformPlanJson(plan io.Reader, u usage.Usage) ([]schema.ResourceDef
 		return nil, err
 	}
 	tfplan.SetUsage(u)
+	var defaultRegion string
+	for _, config := range tfplan.Configuration.ProviderConfig {
+		for key, value := range config.Expressions {
+			if _, ok := value.ConstantValue.(string); ok && key == "region" {
+				defaultRegion = value.ConstantValue.(string)
+			}
+		}
+	}
 
 	plannedQueries, err := tfplan.ExtractPlannedQueries()
 	if err != nil {
@@ -35,7 +43,7 @@ func ParseTerraformPlanJson(plan io.Reader, u usage.Usage) ([]schema.ResourceDef
 	}
 	var resources []schema.ResourceDef
 	for _, rs := range plannedQueries {
-		res := rs.ToResource("")
+		res := rs.ToResource(defaultRegion)
 		resources = append(resources, res)
 	}
 	return resources, nil
