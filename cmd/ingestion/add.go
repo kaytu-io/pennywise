@@ -28,7 +28,7 @@ var add = &cobra.Command{
 			return err
 		}
 
-		fmt.Println(fmt.Sprintf("Job %d is created to ingest service %s in region %s fro %s provider", job.ID, job.Service, job.Location, job.Provider))
+		fmt.Println(fmt.Sprintf("Job %d is created to ingest service %s in %s region for %s provider", job.ID, job.Service, job.Location, job.Provider))
 		if wait {
 			fmt.Println("Waiting...")
 			var maxWaiting int

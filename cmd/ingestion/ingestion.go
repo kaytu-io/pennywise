@@ -35,4 +35,5 @@ func init() {
 	IngestCmd.AddCommand(get)
 	get.Flags().String("id", "", "id")
 	get.MarkFlagRequired("id")
+	get.Flags().Bool("wait", false, "wait")
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/kaytu-io/pennywise/cmd/cost"
 	"github.com/kaytu-io/pennywise/cmd/ingestion"
+	"github.com/kaytu-io/pennywise/cmd/predef"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -22,6 +23,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(ingestion.IngestCmd)
 	rootCmd.AddCommand(cost.CostCmd)
+	rootCmd.AddCommand(predef.VersionCmd)
 	rootCmd.PersistentFlags().String("server-url", "http://localhost:8080", "define the server http address")
 }
 
