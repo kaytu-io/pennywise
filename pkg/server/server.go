@@ -71,6 +71,9 @@ func (s *serverClient) GetIngestionJob(id string) (*schema.IngestionJob, error) 
 	var job schema.IngestionJob
 	if statusCode, err := doRequest(http.MethodGet, url, nil, &job); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
+			if strings.Contains(err.Error(), "this ID does not exist") {
+				return nil, fmt.Errorf("this ID does not exist")
+			}
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
 		if strings.Contains(err.Error(), "connect: connection refused") {
@@ -88,8 +91,8 @@ func (s *serverClient) AddIngestion(provider, service, region string) (*schema.I
 	var job schema.IngestionJob
 	if statusCode, err := doRequest(http.MethodPut, url, nil, &job); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
-			if strings.Contains(err.Error(), "please enter the correct service name") {
-				return nil, fmt.Errorf("please enter the correct service name")
+			if strings.Contains(err.Error(), "this service is not supported") {
+				return nil, fmt.Errorf("this services is not supported")
 			}
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
