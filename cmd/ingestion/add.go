@@ -19,7 +19,9 @@ var add = &cobra.Command{
 		service := flags.ReadStringFlag(cmd, "service")
 		region := flags.ReadStringFlag(cmd, "region")
 		wait := flags.ReadBooleanFlag(cmd, "wait")
-
+		if provider != "azure" && provider != "aws" {
+			return fmt.Errorf("this provider is not supported")
+		}
 		serverClient := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
 		job, err := serverClient.AddIngestion(provider, service, region)
 		if err != nil {

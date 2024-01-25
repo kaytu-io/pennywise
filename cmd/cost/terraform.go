@@ -53,14 +53,10 @@ var terraformCommand = &cobra.Command{
 		}
 
 		jsonPath := flags.ReadStringOptionalFlag(cmd, "json-path")
-		if jsonPath != nil {
-			err := estimateTfPlanJson(*jsonPath, usage, ServerClientAddress)
-			if err != nil {
-				return err
-			}
-			return nil
+		err := estimateTfPlanJson(*jsonPath, usage, ServerClientAddress)
+		if err != nil {
+			return err
 		}
-		fmt.Println("Please provide a terraform plan json file")
 		return nil
 	},
 }
