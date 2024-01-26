@@ -6,6 +6,8 @@ import (
 	"github.com/kaytu-io/pennywise/pkg/usage"
 	"io"
 	"reflect"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -384,6 +386,20 @@ func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]int
 			return nil, fmt.Errorf("refernce %q has invalid format", refs[0])
 		}
 		if ref[0] == "each" {
+			if ref[1] == "key" {
+				values[name] = fmt.Sprintf("*each*.%s.key", forEach["references"].([]interface{})[0])
+				continue
+			} else if ref[1] == "value" && len(ref) == 2 {
+				values[name] = fmt.Sprintf("*each*.%s", forEach["references"].([]interface{})[0])
+				continue
+			} else if strings.Contains(ref[1], "value") && len(ref) == 2 {
+				regex := regexp.MustCompile(`^value\["([^"]+)"\]$`)
+				match := regex.FindStringSubmatch(ref[1])
+				if match != nil {
+					values[name] = fmt.Sprintf("*each*.%s[%s]", forEach["references"].([]interface{})[0], match[1])
+					continue
+				}
+			}
 			values[name] = fmt.Sprintf("*each*.%s.%s", forEach["references"].([]interface{})[0], ref[2])
 			continue
 		}
@@ -400,6 +416,48 @@ func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]int
 
 		if ref[0] == "var" {
 			varName := ref[1]
+
+			arrayRegex := regexp.MustCompile(`^([^[]+)(?:\[(\d+)\])?$`)
+			arrayMatch := arrayRegex.FindStringSubmatch(varName)
+			if arrayMatch != nil {
+				if arrayMatch[2] != "" {
+					v, ok := variables[arrayMatch[1]]
+					if !ok || v.Value == "" {
+						return nil, fmt.Errorf("required variable %q is not defined", varName)
+					}
+					if value, ok := v.Value.([]interface{}); ok {
+						index, err := strconv.Atoi(arrayMatch[2])
+						if err != nil {
+							values[name] = nil
+						} else {
+							values[name] = value[index]
+						}
+					} else {
+						values[name] = v.Value
+					}
+					continue
+				}
+			}
+
+			mapRegex := regexp.MustCompile(`^([^[]+)\[\"([^\"]+)\"\]$`)
+			mapMatch := mapRegex.FindStringSubmatch(varName)
+			if mapMatch != nil {
+				v, ok := variables[mapMatch[1]]
+				if !ok || v.Value == "" {
+					return nil, fmt.Errorf("required variable %q is not defined", varName)
+				}
+				if valueMap, ok := v.Value.(map[string]interface{}); ok {
+					if value, ok := valueMap[mapMatch[2]]; ok {
+						values[name] = value
+					} else {
+						values[name] = nil
+					}
+				} else {
+					values[name] = v.Value
+				}
+				continue
+			}
+
 			v, ok := variables[varName]
 			if !ok || v.Value == "" {
 				return nil, fmt.Errorf("required variable %q is not defined", varName)
