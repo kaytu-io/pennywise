@@ -224,12 +224,25 @@ func (p *Plan) extractModuleResources(module *Module, resourceProviders map[stri
 	rss := make(map[string]Resource)
 	resources := make(map[string][]Resource)
 	for _, tfres := range module.Resources {
-		pwrv, ok := resourceProviders[fmt.Sprintf("%s.%s", tfres.Type, tfres.Name)]
-		if !ok {
-			pwrv, ok = resourceProviders[tfres.Address]
-			if !ok {
-				continue
+		arrayRegex := regexp.MustCompile(`^([^[]+)(?:\[(\d+)\])?$`)
+		arrayMatch := arrayRegex.FindStringSubmatch(tfres.Address)
+		var pwrv providerWithResourceValues
+		if arrayMatch != nil {
+			if arrayMatch[2] != "" {
+				pwrvTemp, ok := resourceProviders[arrayMatch[1]]
+				if ok {
+					pwrv = pwrvTemp
+				}
 			}
+		}
+		pwrvTemp, ok := resourceProviders[fmt.Sprintf("%s.%s", tfres.Type, tfres.Name)]
+		if !ok {
+			pwrvTemp, ok = resourceProviders[tfres.Address]
+			if ok {
+				pwrv = pwrvTemp
+			}
+		} else {
+			pwrv = pwrvTemp
 		}
 		for k, v := range pwrv.Values {
 			if v == nil {
@@ -238,6 +251,9 @@ func (p *Plan) extractModuleResources(module *Module, resourceProviders map[stri
 
 			vv, ok := tfres.Values[k]
 			if !ok {
+				if len(tfres.Values) == 0 {
+					tfres.Values = make(map[string]interface{})
+				}
 				tfres.Values[k] = v
 				continue
 			}
