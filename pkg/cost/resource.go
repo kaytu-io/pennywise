@@ -8,10 +8,11 @@ import (
 // Resource represents costs of a single cloud resource. Each Resource includes a Component map, keyed
 // by the label.
 type Resource struct {
-	Provider   schema.ProviderName
-	Type       string
-	Components map[string][]Component
-	Skipped    bool
+	Provider    schema.ProviderName
+	Type        string
+	Components  map[string][]Component
+	Skipped     bool
+	IsSupported bool
 }
 
 // Cost returns the sum of costs of every Component of this Resource.
@@ -37,6 +38,9 @@ func (re Resource) CostString() (string, error) {
 	cost, err := re.Cost()
 	if err != nil {
 		return "", err
+	}
+	if !re.IsSupported {
+		return fmt.Sprintf("---- Resource type %s not supported", re.Type), nil
 	}
 	costString := fmt.Sprintf("---- Total Resource Cost: %v", cost.Decimal.Round(3))
 	for _, comps := range re.Components {
