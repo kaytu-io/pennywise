@@ -69,12 +69,13 @@ func (s *State) CostString() (string, error) {
 }
 
 // EnsureResource creates Resource at the given address if it doesn't already exist.
-func (s *State) EnsureResource(address, typ string, provider schema.ProviderName, skipped bool) {
+func (s *State) EnsureResource(address, typ string, provider schema.ProviderName, skipped, isSupported bool) {
 	if _, ok := s.Resources[address]; !ok {
 		res := Resource{
-			Provider: provider,
-			Type:     typ,
-			Skipped:  skipped,
+			Provider:    provider,
+			Type:        typ,
+			Skipped:     skipped,
+			IsSupported: isSupported,
 		}
 
 		if !skipped {
