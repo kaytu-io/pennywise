@@ -1,7 +1,7 @@
 ## Description
 <!-- Provide a brief description of your changes -->
 
-## What type of PR is this?
+## What type of PR(Pull Request) is this?
 - [ ] 🐛 Bug Fix
 - [ ] 🍕 New Feature
 - [ ] 🔥 Performance Improvement
