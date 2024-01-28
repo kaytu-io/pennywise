@@ -113,9 +113,6 @@ func estimateTfPlanJson(jsonPath string, usage usagePackage.Usage, ServerClientA
 	if err != nil {
 		return err
 	}
-	if err != nil {
-		return err
-	}
 	costString, err := stateCost.CostString()
 	if err != nil {
 		return err
