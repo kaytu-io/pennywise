@@ -39,9 +39,7 @@ func (re Resource) CostString() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if !re.IsSupported {
-		return fmt.Sprintf("---- Resource type %s not supported", re.Type), nil
-	}
+
 	costString := fmt.Sprintf("---- Total Resource Cost: %v", cost.Decimal.Round(3))
 	for _, comps := range re.Components {
 		for _, c := range comps {
