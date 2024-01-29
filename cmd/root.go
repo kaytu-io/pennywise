@@ -24,7 +24,7 @@ func init() {
 	rootCmd.AddCommand(ingestion.IngestCmd)
 	rootCmd.AddCommand(cost.CostCmd)
 	rootCmd.AddCommand(predef.VersionCmd)
-	rootCmd.PersistentFlags().String("server-url", "http://localhost:8080", "define the server http address")
+	rootCmd.PersistentFlags().String("server-url", "https://pennywise.kaytu.dev", "define the server http address")
 }
 
 func Execute() {
