@@ -51,20 +51,36 @@ func (s *State) GetCostComponents() []Component {
 // CostString returns a string to show the breakdown of the costs for a state
 // containing the resources and their components costs and total cost for the resources and the state
 func (s *State) CostString() (string, error) {
+	var unsupportedServices []string
 	cost, err := s.Cost()
 	if err != nil {
 		return "", err
 	}
 	costString := fmt.Sprintf("- Total Cost (per month): %v", cost.Decimal.Round(3))
 	for name, rs := range s.Resources {
+		if !rs.IsSupported {
+			unsupportedServices = append(unsupportedServices, rs.Type)
+			continue
+		}
+
 		rsCostString, err := rs.CostString()
 		if err != nil {
 			return "", err
 		}
 		costString = fmt.Sprintf("%s\n--- Costs for %s :", costString, name)
 		costString = fmt.Sprintf("%s\n%s", costString, rsCostString)
-
 	}
+
+	if len(unsupportedServices) == 3 {
+		costString = fmt.Sprintf("%s\n---- Resource types %s, %s and %s not supported", costString, unsupportedServices[0], unsupportedServices[1], unsupportedServices[2])
+	} else if len(unsupportedServices) == 2 {
+		costString = fmt.Sprintf("%s\n---- Resource types %s and %s not supported", costString, unsupportedServices[0], unsupportedServices[1])
+	} else if len(unsupportedServices) == 1 {
+		costString = fmt.Sprintf("%s\n---- Resource type %s not supported", costString, unsupportedServices[0])
+	} else {
+		costString = fmt.Sprintf("%s\n---- Resource types %s, %s, %s and %d other Resource types not supported", costString, unsupportedServices[0], unsupportedServices[1], unsupportedServices[2], len(unsupportedServices)-3)
+	}
+
 	return costString, nil
 }
 
