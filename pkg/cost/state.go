@@ -77,7 +77,7 @@ func (s *State) CostString() (string, error) {
 		costString = fmt.Sprintf("%s\n---- Resource types %s and %s not supported", costString, unsupportedServices[0], unsupportedServices[1])
 	} else if len(unsupportedServices) == 1 {
 		costString = fmt.Sprintf("%s\n---- Resource type %s not supported", costString, unsupportedServices[0])
-	} else {
+	} else if len(unsupportedServices) > 3 {
 		costString = fmt.Sprintf("%s\n---- Resource types %s, %s, %s and %d other Resource types not supported", costString, unsupportedServices[0], unsupportedServices[1], unsupportedServices[2], len(unsupportedServices)-3)
 	}
 
