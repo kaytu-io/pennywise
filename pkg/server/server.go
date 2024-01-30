@@ -136,7 +136,6 @@ func (s *serverClient) doRequest(method, url string, payload []byte, v interface
 	}
 	req.Header.Set(echo.HeaderContentType, "application/json")
 	req.Header.Set(echo.HeaderAuthorization, "Bearer "+s.config.AccessToken)
-	req.Header.Set("workspace-name", s.config.DefaultWorkspace)
 	t := http.DefaultTransport.(*http.Transport)
 	client := http.Client{
 		Timeout:   3 * time.Minute,
