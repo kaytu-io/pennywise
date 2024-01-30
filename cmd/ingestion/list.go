@@ -18,7 +18,10 @@ var list = &cobra.Command{
 		region := flags.ReadStringFlag(cmd, "region")
 		status := flags.ReadStringFlag(cmd, "status")
 
-		serverClient := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+		serverClient, err := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+		if err != nil {
+			return err
+		}
 		jobs, err := serverClient.ListIngestionJobs(provider, service, region, status)
 		if err != nil {
 			return err
