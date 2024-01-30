@@ -2,6 +2,7 @@ package cost
 
 import (
 	"fmt"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/kaytu-io/pennywise/pkg/schema"
 )
 
@@ -32,21 +33,22 @@ func (re Resource) Cost() (Cost, error) {
 	return total, nil
 }
 
-// CostString returns a string to show the breakdown of the costs for a resource
+// CostRows returns rows for resource components
 // containing the components costs and total cost for the resource
-func (re Resource) CostString() (string, error) {
-	cost, err := re.Cost()
-	if err != nil {
-		return "", err
-	}
+func (re Resource) CostRows() ([]table.Row, error) {
+	var rows []table.Row
 
-	costString := fmt.Sprintf("---- Total Resource Cost: %v", cost.Decimal.Round(3))
 	for _, comps := range re.Components {
 		for _, c := range comps {
-			costString = fmt.Sprintf("%s\n-------- %s : %s", costString, c.Name, c.CostString())
+			if c.Cost().Decimal.Round(3).IntPart() == 0 {
+				continue
+			}
+			var row table.Row
+			row = append(row, faint.Sprint("└─ ")+c.Name, c.Rate.Decimal, c.HourlyQuantity, c.MonthlyQuantity, c.Unit, c.Cost().Decimal.Round(2))
+			rows = append(rows, row)
 		}
 	}
-	return costString, nil
+	return rows, nil
 }
 
 // ResourceDiff is the difference in costs between prior and planned Resource. It contains a ComponentDiff
