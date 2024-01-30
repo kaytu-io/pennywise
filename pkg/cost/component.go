@@ -1,7 +1,6 @@
 package cost
 
 import (
-	"fmt"
 	"github.com/shopspring/decimal"
 )
 
@@ -19,7 +18,7 @@ type Component struct {
 	Error error
 }
 
-// GetRounded returns component with rounded values to show in the CostString
+// GetRounded returns component with rounded values to show
 func (c Component) GetRounded() Component {
 	return Component{
 		Name:            c.Name,
@@ -43,27 +42,6 @@ func (c Component) Cost() Cost {
 	} else {
 		return Zero
 	}
-}
-
-func (c Component) CostString() string {
-	var str string
-	str = fmt.Sprintf("%v", c.Cost().Decimal.Round(3))
-	if !c.MonthlyQuantity.IsZero() {
-		str = fmt.Sprintf("%s (%v monthly cost", str, c.Rate.Decimal.Round(3))
-		if c.Unit != "" {
-			str = fmt.Sprintf("%s per %s", str, c.Unit)
-		}
-		str = fmt.Sprintf("%s, qty: %s)", str, c.MonthlyQuantity.Round(3))
-	} else if !c.HourlyQuantity.IsZero() {
-		str = fmt.Sprintf("%s (%v hourly cost", str, c.Rate.Decimal.Round(3))
-		if c.Unit != "" {
-			str = fmt.Sprintf("%s per %s", str, c.Unit)
-		}
-		str = fmt.Sprintf("%s, qty: %s)", str, c.HourlyQuantity.Mul(HoursPerMonth).Round(3))
-	} else {
-		return fmt.Sprintf("No cost")
-	}
-	return str
 }
 
 // ComponentDiff is a difference between the Prior and Planned Component.
