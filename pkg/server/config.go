@@ -14,14 +14,14 @@ type Config struct {
 	DefaultWorkspace string `json:"default_workspace"`
 }
 
-var ExpiredSession = fmt.Errorf("your session has expired, please login again using `kaytu login`")
+var ExpiredSession = fmt.Errorf("your session has expired, please login again using `pennywise login`")
 
 func getConfig() (*Config, error) {
 	home := os.Getenv("HOME")
 	data, err := os.ReadFile(home + "/.kaytu/pennywise-config.json")
 	if err != nil {
 		if strings.Contains(err.Error(), "no such file or directory") {
-			return nil, fmt.Errorf("credentials not found! please login using `kaytu login`")
+			return nil, fmt.Errorf("credentials not found! please login using `pennywise login`")
 		}
 		return nil, fmt.Errorf("[CredentialsFile] : %v", err)
 	}
