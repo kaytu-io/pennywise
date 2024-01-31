@@ -17,16 +17,7 @@ The CLI program parses data from Terraform in three possible formats: a Terrafor
 wget -qO - https://raw.githubusercontent.com/kaytu-io/pennywise/main/scripts/install.sh | bash
 ```
 ### Usage
-Run the ingester for the services and regions you need (you can store service data for all regions if you don't define the region).
-
-```shell
-pennywise ingestion add --provider (azure|aws) --service service-name --region region
-```
-
-This will add an ingestion job to run on the server, you can wait until it finishes by using wait tag or get the job status 
-using get or list commands.
-
-Then run the following terraform commands to build the terraform plan json file:
+Run the following terraform commands to build the terraform plan json file:
 
 ```shell
 terraform init

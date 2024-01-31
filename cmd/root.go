@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"github.com/kaytu-io/pennywise/cmd/cost"
-	"github.com/kaytu-io/pennywise/cmd/ingestion"
 	"github.com/kaytu-io/pennywise/cmd/predef"
 	"github.com/spf13/cobra"
 	"os"
@@ -21,7 +20,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(ingestion.IngestCmd)
+	//rootCmd.AddCommand(ingestion.IngestCmd)
 	rootCmd.AddCommand(cost.CostCmd)
 	rootCmd.AddCommand(predef.VersionCmd)
 	rootCmd.AddCommand(predef.LoginCmd)
