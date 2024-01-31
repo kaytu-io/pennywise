@@ -43,7 +43,7 @@ func (m FreeResourcesModel) View() string {
 
 func getFreeResourcesModel(resModel ResourcesModel) (tea.Model, error) {
 	columns := []table.Column{
-		{Title: "Name", Width: 180},
+		{Title: "Name", Width: resModel.longestName + 17},
 	}
 
 	var rows []table.Row
