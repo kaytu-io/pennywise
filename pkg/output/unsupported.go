@@ -6,18 +6,17 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/kaytu-io/pennywise/pkg/cost"
 )
 
-type ComponentsModel struct {
+type UnsupportedModel struct {
 	viewport       viewport.Model
 	table          table.Model
 	resourcesModel ResourcesModel
 }
 
-func (m ComponentsModel) Init() tea.Cmd { return nil }
+func (m UnsupportedModel) Init() tea.Cmd { return nil }
 
-func (m ComponentsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m UnsupportedModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -38,34 +37,22 @@ func (m ComponentsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m ComponentsModel) View() string {
+func (m UnsupportedModel) View() string {
 	return m.viewport.View() + "\n" + baseStyle.Render(m.table.View()) + "\n"
 }
 
-func getComponentsModel(resourceName, resourceCost string, components map[string][]cost.Component, resModel ResourcesModel) (tea.Model, error) {
+func getUnsupportedModel(resModel ResourcesModel) (tea.Model, error) {
 	columns := []table.Column{
-		{Title: "Name", Width: 50},
-		{Title: "Unit Price", Width: 30},
-		{Title: "Hourly Qty", Width: 26},
-		{Title: "Monthly Qty", Width: 26},
-		{Title: "Unit", Width: 25},
-		{Title: "Monthly Cost", Width: 15},
+		{Title: "Resource Type", Width: 165},
+		{Title: "Resources Count", Width: 15},
 	}
 
 	var rows []table.Row
 
-	for _, comps := range components {
-		for _, c := range comps {
-			if c.Cost().Decimal.Round(3).IntPart() == 0 {
-				continue
-			}
-			var row table.Row
-			row = append(row, c.Name, c.Rate.Decimal.String(), c.HourlyQuantity.String(), c.MonthlyQuantity.String(), c.Unit, c.Cost().Decimal.Round(2).String())
-			rows = append(rows, row)
-		}
+	for name, resources := range resModel.unsupportedResources {
+		rows = append(rows, []string{name, fmt.Sprintf("%d", len(resources))})
 	}
 	rows = sortRows(rows)
-	rows = makeNumbersAccounting(rows)
 
 	t := table.New(
 		table.WithColumns(columns),
@@ -85,8 +72,9 @@ func getComponentsModel(resourceName, resourceCost string, components map[string
 		Background(lipgloss.Color("57")).
 		Bold(false)
 	t.SetStyles(s)
-	vp := viewport.New(len(fmt.Sprintf("%s, Resource Total Cost: %s", resourceName, resourceCost)), 1)
-	vp.SetContent(fmt.Sprintf("%s, Resource Total Cost: %s", resourceName, resourceCost))
-	m := ComponentsModel{vp, t, resModel}
+
+	vp := viewport.New(30, 1)
+	vp.SetContent(fmt.Sprintf("Unsupported Resource Types"))
+	m := UnsupportedModel{vp, t, resModel}
 	return m, nil
 }

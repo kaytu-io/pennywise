@@ -1,10 +1,13 @@
 package output
 
 import (
+	"fmt"
 	"github.com/charmbracelet/bubbles/table"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/kaytu-io/pennywise/pkg/cost"
+	"github.com/leekchan/accounting"
 )
 
 var baseStyle = lipgloss.NewStyle().
@@ -12,8 +15,11 @@ var baseStyle = lipgloss.NewStyle().
 	BorderForeground(lipgloss.Color("240"))
 
 type ResourcesModel struct {
-	table     table.Model
-	resources map[string]cost.Resource
+	viewport             viewport.Model
+	table                table.Model
+	resources            map[string]cost.Resource
+	freeResources        []string
+	unsupportedResources map[string][]string
 }
 
 func (m ResourcesModel) Init() tea.Cmd { return nil }
@@ -31,9 +37,24 @@ func (m ResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "q", "ctrl+c":
 			return m, tea.Quit
-		case "enter":
-			resource := m.resources[m.table.SelectedRow()[0]]
-			compsModel, err := getComponentsModel(resource.Components, m)
+		case "right", "enter":
+
+			resourceName := m.table.SelectedRow()[0]
+			if resourceName == "Free Resources" {
+				freeResourcesModel, err := getFreeResourcesModel(m)
+				if err != nil {
+					panic(err)
+				}
+				return freeResourcesModel, cmd
+			} else if resourceName == "Unsupported" {
+				unsupportedModel, err := getUnsupportedModel(m)
+				if err != nil {
+					panic(err)
+				}
+				return unsupportedModel, cmd
+			}
+			resource := m.resources[resourceName]
+			compsModel, err := getComponentsModel(resourceName, m.table.SelectedRow()[1], resource.Components, m)
 			if err != nil {
 				panic(err)
 			}
@@ -45,25 +66,41 @@ func (m ResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ResourcesModel) View() string {
-	return baseStyle.Render(m.table.View()) + "\n"
+	return m.viewport.View() + "\n" + baseStyle.Render(m.table.View()) + "\n"
 }
 
-func getResourcesModel(resources map[string]cost.Resource) (tea.Model, error) {
+func getResourcesModel(totalCost float64, resources map[string]cost.Resource) (tea.Model, error) {
 	columns := []table.Column{
 		{Title: "Name", Width: 165},
 		{Title: "Monthly Cost", Width: 15},
 	}
 
 	var rows []table.Row
+	var freeResources []string
+	unsupportedServices := make(map[string][]string)
 
 	for name, resource := range resources {
+		if !resource.IsSupported && resource.Type != "" {
+			if _, ok := unsupportedServices[resource.Type]; !ok {
+				unsupportedServices[resource.Type] = []string{}
+			}
+			unsupportedServices[resource.Type] = append(unsupportedServices[resource.Type], name)
+			continue
+		}
 		cost, err := resource.Cost()
 		if err != nil {
 			return nil, err
 		}
+		if cost.Decimal.InexactFloat64() == 0 {
+			freeResources = append(freeResources, name)
+			continue
+		}
 		rows = append(rows, []string{name, cost.Decimal.String()})
 	}
-
+	rows = append(rows, []string{"Free Resources", "0"})
+	rows = append(rows, []string{"Unsupported", "0"})
+	rows = sortRows(rows)
+	rows = makeNumbersAccounting(rows)
 	t := table.New(
 		table.WithColumns(columns),
 		table.WithRows(rows),
@@ -83,6 +120,9 @@ func getResourcesModel(resources map[string]cost.Resource) (tea.Model, error) {
 		Bold(false)
 	t.SetStyles(s)
 
-	m := ResourcesModel{t, resources}
+	ac := accounting.Accounting{Symbol: "$", Precision: 2}
+	vp := viewport.New(30, 1)
+	vp.SetContent(fmt.Sprintf("Total cost: %s", ac.FormatMoney(totalCost)))
+	m := ResourcesModel{vp, t, resources, freeResources, unsupportedServices}
 	return m, nil
 }
