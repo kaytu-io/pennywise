@@ -3,7 +3,6 @@ package output
 import (
 	"fmt"
 	"github.com/charmbracelet/bubbles/table"
-	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/kaytu-io/pennywise/pkg/cost"
@@ -16,7 +15,7 @@ var baseStyle = lipgloss.NewStyle().
 	BorderForeground(lipgloss.Color("240"))
 
 type ResourcesModel struct {
-	viewport             viewport.Model
+	label                string
 	table                table.Model
 	resources            map[string]cost.Resource
 	freeResources        []string
@@ -31,12 +30,6 @@ func (m ResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc":
-			if m.table.Focused() {
-				m.table.Blur()
-			} else {
-				m.table.Focus()
-			}
 		case "q", "ctrl+c":
 			return m, tea.Quit
 		case "right", "enter":
@@ -68,7 +61,9 @@ func (m ResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ResourcesModel) View() string {
-	return m.viewport.View() + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output := "Navigate to details by pressing →  Quit by pressing Q or [CTRL+C]\n\n"
+	output += m.label + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	return output
 }
 
 func getResourcesModel(totalCost float64, resources map[string]cost.Resource, longestName int) (tea.Model, error) {
@@ -134,8 +129,7 @@ func getResourcesModel(totalCost float64, resources map[string]cost.Resource, lo
 	t.SetStyles(s)
 
 	ac := accounting.Accounting{Symbol: "$", Precision: 2}
-	vp := viewport.New(30, 1)
-	vp.SetContent(fmt.Sprintf("Total cost: %s", ac.FormatMoney(totalCost)))
-	m := ResourcesModel{vp, t, resources, freeResources, unsupportedServices, longestName}
+
+	m := ResourcesModel{fmt.Sprintf("Total cost: %s", ac.FormatMoney(totalCost)), t, resources, freeResources, unsupportedServices, longestName}
 	return m, nil
 }

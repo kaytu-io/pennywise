@@ -21,15 +21,9 @@ func (m ComponentsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc":
-			if m.table.Focused() {
-				m.table.Blur()
-			} else {
-				m.table.Focus()
-			}
-		case "ctrl+c":
+		case "ctrl+c", "q":
 			return m, tea.Quit
-		case "left", "q":
+		case "left":
 			return m.resourcesModel, cmd
 		}
 	}
@@ -38,7 +32,9 @@ func (m ComponentsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ComponentsModel) View() string {
-	return m.label + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output := "Navigate to resources by pressing ←  Quit by pressing Q or [CTRL+C]\n\n"
+	output += m.label + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	return output
 }
 
 func getComponentsModel(resourceName, resourceCost string, components map[string][]cost.Component, resModel ResourcesModel) (tea.Model, error) {
