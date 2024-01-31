@@ -53,8 +53,10 @@ var terraformCommand = &cobra.Command{
 			ServerClientAddress = os.Getenv("SERVER_CLIENT_URL")
 		}
 
+		classic := flags.ReadBooleanFlag(cmd, "classic")
+
 		jsonPath := flags.ReadStringOptionalFlag(cmd, "json-path")
-		err := estimateTfPlanJson(*jsonPath, usage, ServerClientAddress)
+		err := estimateTfPlanJson(classic, *jsonPath, usage, ServerClientAddress)
 		if err != nil {
 			return err
 		}
@@ -62,7 +64,7 @@ var terraformCommand = &cobra.Command{
 	},
 }
 
-func estimateTfProject(projectDir string, usage usagePackage.Usage, ServerClientAddress string) error {
+func estimateTfProject(classic bool, projectDir string, usage usagePackage.Usage, ServerClientAddress string) error {
 	provider, hclResources, err := hcl.ParseHclResources(projectDir, usage)
 	if err != nil {
 		return err
@@ -87,15 +89,25 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage, ServerClient
 	if err != nil {
 		return err
 	}
-	//costString, err := cost.CostString()
-	err = output.ShowStateCosts(state)
+	if classic {
+		costString, err := state.CostString()
+		if err != nil {
+			return err
+		}
+		fmt.Println(costString)
+	} else {
+		err = output.ShowStateCosts(state)
+		if err != nil {
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func estimateTfPlanJson(jsonPath string, usage usagePackage.Usage, ServerClientAddress string) error {
+func estimateTfPlanJson(classic bool, jsonPath string, usage usagePackage.Usage, ServerClientAddress string) error {
 	file, err := os.Open(jsonPath)
 	if err != nil {
 		return err
@@ -120,7 +132,17 @@ func estimateTfPlanJson(jsonPath string, usage usagePackage.Usage, ServerClientA
 	if err != nil {
 		return err
 	}
-	//costString, err := cost.CostString()
-	err = output.ShowStateCosts(state)
+	if classic {
+		costString, err := state.CostString()
+		if err != nil {
+			return err
+		}
+		fmt.Println(costString)
+	} else {
+		err = output.ShowStateCosts(state)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }

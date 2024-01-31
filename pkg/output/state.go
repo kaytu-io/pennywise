@@ -8,7 +8,11 @@ import (
 )
 
 func ShowStateCosts(s *cost.State) error {
-	model, err := getResourcesModel(s.Resources)
+	totalCost, err := s.Cost()
+	if err != nil {
+		return err
+	}
+	model, err := getResourcesModel(totalCost.Decimal.InexactFloat64(), s.Resources)
 	if err != nil {
 		return err
 	}

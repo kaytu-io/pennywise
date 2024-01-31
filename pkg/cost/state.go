@@ -156,7 +156,7 @@ func (s *State) CostString() (string, error) {
 		}
 	}
 
-	//costString = t.Render()
+	costString = t.Render()
 	costString += "\n──────────────────────────────────\n"
 	costString += fmt.Sprintf("%s:    %v", bold.Sprint("Total Cost (per month)"), cost.Decimal.Round(2))
 	if len(unsupportedServices) == 3 {
