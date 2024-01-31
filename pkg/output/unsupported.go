@@ -3,13 +3,11 @@ package output
 import (
 	"fmt"
 	"github.com/charmbracelet/bubbles/table"
-	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
 type UnsupportedModel struct {
-	viewport       viewport.Model
 	table          table.Model
 	resourcesModel ResourcesModel
 }
@@ -21,15 +19,9 @@ func (m UnsupportedModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc":
-			if m.table.Focused() {
-				m.table.Blur()
-			} else {
-				m.table.Focus()
-			}
-		case "ctrl+c":
+		case "ctrl+c", "q":
 			return m, tea.Quit
-		case "left", "q":
+		case "left":
 			return m.resourcesModel, cmd
 		}
 	}
@@ -38,7 +30,9 @@ func (m UnsupportedModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m UnsupportedModel) View() string {
-	return m.viewport.View() + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output := "Navigate to resources by pressing ←  Quit by pressing Q or [CTRL+C]\n\n"
+	output += "Unsupported Resource Types" + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	return output
 }
 
 func getUnsupportedModel(resModel ResourcesModel) (tea.Model, error) {
@@ -73,8 +67,6 @@ func getUnsupportedModel(resModel ResourcesModel) (tea.Model, error) {
 		Bold(false)
 	t.SetStyles(s)
 
-	vp := viewport.New(30, 1)
-	vp.SetContent(fmt.Sprintf("Unsupported Resource Types"))
-	m := UnsupportedModel{vp, t, resModel}
+	m := UnsupportedModel{t, resModel}
 	return m, nil
 }
