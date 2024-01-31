@@ -1,15 +1,12 @@
 package output
 
 import (
-	"fmt"
 	"github.com/charmbracelet/bubbles/table"
-	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
 type FreeResourcesModel struct {
-	viewport       viewport.Model
 	table          table.Model
 	resourcesModel ResourcesModel
 }
@@ -21,15 +18,9 @@ func (m FreeResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc":
-			if m.table.Focused() {
-				m.table.Blur()
-			} else {
-				m.table.Focus()
-			}
-		case "ctrl+c":
+		case "ctrl+c", "q":
 			return m, tea.Quit
-		case "left", "q":
+		case "left":
 			return m.resourcesModel, cmd
 		}
 	}
@@ -38,12 +29,14 @@ func (m FreeResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m FreeResourcesModel) View() string {
-	return m.viewport.View() + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output := "Navigate to resources by pressing ←  Quit by pressing Q or [CTRL+C]\n\n"
+	output += bold.Sprint("Free Resources") + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	return output
 }
 
 func getFreeResourcesModel(resModel ResourcesModel) (tea.Model, error) {
 	columns := []table.Column{
-		{Title: "Name", Width: 180},
+		{Title: "Name", Width: resModel.longestName + 17},
 	}
 
 	var rows []table.Row
@@ -71,8 +64,6 @@ func getFreeResourcesModel(resModel ResourcesModel) (tea.Model, error) {
 		Bold(false)
 	t.SetStyles(s)
 
-	vp := viewport.New(30, 1)
-	vp.SetContent(fmt.Sprintf("Free Resources"))
-	m := FreeResourcesModel{vp, t, resModel}
+	m := FreeResourcesModel{t, resModel}
 	return m, nil
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/kaytu-io/pennywise/pkg/schema"
+	"sort"
 )
 
 // State represents a collection of all the Resource costs (either prior or planned.) It is not tied to any specific
@@ -134,8 +135,9 @@ func (s *State) CostString() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	resources := getSortedResources(s.Resources)
 
-	for name, rs := range s.Resources {
+	for _, rs := range resources {
 		if !rs.IsSupported {
 			unsupportedServices = append(unsupportedServices, rs.Type)
 			continue
@@ -145,7 +147,7 @@ func (s *State) CostString() (string, error) {
 			return "", err
 		}
 		var row table.Row
-		row = append(row, bold.Sprint(name), "", "", "", "", cost.Decimal.Round(2))
+		row = append(row, bold.Sprint(rs.Address), "", "", "", "", cost.Decimal.Round(2))
 		costRows, err := rs.CostRows()
 		if err != nil {
 			return "", err
@@ -176,6 +178,7 @@ func (s *State) CostString() (string, error) {
 func (s *State) EnsureResource(address, typ string, provider schema.ProviderName, skipped, isSupported bool) {
 	if _, ok := s.Resources[address]; !ok {
 		res := Resource{
+			Address:     address,
 			Provider:    provider,
 			Type:        typ,
 			Skipped:     skipped,
@@ -196,4 +199,18 @@ func (s *State) AddComponent(resAddress, compLabel string, component Component) 
 		s.Resources[resAddress].Components[compLabel] = []Component{}
 	}
 	s.Resources[resAddress].Components[compLabel] = append(s.Resources[resAddress].Components[compLabel], component)
+}
+
+func getSortedResources(resourcesMap map[string]Resource) []Resource {
+	var resources []Resource
+	for name, res := range resourcesMap {
+		res.Address = name
+		resources = append(resources, res)
+	}
+	sort.Slice(resources, func(i, j int) bool {
+		numI, _ := resources[i].Cost()
+		numJ, _ := resources[j].Cost()
+		return numI.InexactFloat64() > numJ.InexactFloat64()
+	})
+	return resources
 }

@@ -3,14 +3,13 @@ package output
 import (
 	"fmt"
 	"github.com/charmbracelet/bubbles/table"
-	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/kaytu-io/pennywise/pkg/cost"
 )
 
 type ComponentsModel struct {
-	viewport       viewport.Model
+	label          string
 	table          table.Model
 	resourcesModel ResourcesModel
 }
@@ -22,15 +21,9 @@ func (m ComponentsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc":
-			if m.table.Focused() {
-				m.table.Blur()
-			} else {
-				m.table.Focus()
-			}
-		case "ctrl+c":
+		case "ctrl+c", "q":
 			return m, tea.Quit
-		case "left", "q":
+		case "left":
 			return m.resourcesModel, cmd
 		}
 	}
@@ -39,16 +32,18 @@ func (m ComponentsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ComponentsModel) View() string {
-	return m.viewport.View() + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output := "Navigate to resources by pressing ←  Quit by pressing Q or [CTRL+C]\n\n"
+	output += bold.Sprint(m.label) + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	return output
 }
 
 func getComponentsModel(resourceName, resourceCost string, components map[string][]cost.Component, resModel ResourcesModel) (tea.Model, error) {
 	columns := []table.Column{
-		{Title: "Name", Width: 50},
-		{Title: "Unit Price", Width: 30},
-		{Title: "Hourly Qty", Width: 26},
-		{Title: "Monthly Qty", Width: 26},
-		{Title: "Unit", Width: 25},
+		{Title: "Name", Width: resModel.longestName - 63},
+		{Title: "Unit Price", Width: 15},
+		{Title: "Hourly Qty", Width: 15},
+		{Title: "Monthly Qty", Width: 15},
+		{Title: "Unit", Width: 10},
 		{Title: "Monthly Cost", Width: 15},
 	}
 
@@ -85,8 +80,6 @@ func getComponentsModel(resourceName, resourceCost string, components map[string
 		Background(lipgloss.Color("57")).
 		Bold(false)
 	t.SetStyles(s)
-	vp := viewport.New(len(fmt.Sprintf("%s, Resource Total Cost: %s", resourceName, resourceCost)), 1)
-	vp.SetContent(fmt.Sprintf("%s, Resource Total Cost: %s", resourceName, resourceCost))
-	m := ComponentsModel{vp, t, resModel}
+	m := ComponentsModel{fmt.Sprintf("%s, Resource Total Cost: %s", resourceName, resourceCost), t, resModel}
 	return m, nil
 }
