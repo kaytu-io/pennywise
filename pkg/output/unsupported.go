@@ -31,7 +31,7 @@ func (m UnsupportedModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m UnsupportedModel) View() string {
 	output := "Navigate to resources by pressing ←  Quit by pressing Q or [CTRL+C]\n\n"
-	output += "Unsupported Resource Types" + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output += bold.Sprint("Unsupported Resource Types") + "\n" + baseStyle.Render(m.table.View()) + "\n"
 	return output
 }
 
