@@ -15,7 +15,10 @@ var supportedService = &cobra.Command{
 		provider := flags.ReadStringFlag(cmd, "provider")
 		if provider == "aws" {
 
-			serverClient := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+			serverClient, err := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+			if err != nil {
+				return err
+			}
 			listNewServices, err := serverClient.ListServices(provider)
 			if err != nil {
 				return err
@@ -29,7 +32,10 @@ var supportedService = &cobra.Command{
 			return nil
 		} else if provider == "azure" {
 
-			serverClient := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+			serverClient, err := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+			if err != nil {
+				return err
+			}
 			listNewServices, err := serverClient.ListServices(provider)
 			if err != nil {
 				return err

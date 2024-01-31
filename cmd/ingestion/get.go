@@ -19,7 +19,10 @@ var get = &cobra.Command{
 		id := flags.ReadStringFlag(cmd, "id")
 		wait := flags.ReadBooleanFlag(cmd, "wait")
 
-		serverClient := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+		serverClient, err := server.NewPennywiseServerClient(flags.ReadStringFlag(cmd, "server-url"))
+		if err != nil {
+			return err
+		}
 		job, err := serverClient.GetIngestionJob(id)
 		if err != nil {
 			if strings.Contains(err.Error(), "job ID not found") {
