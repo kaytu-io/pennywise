@@ -135,7 +135,7 @@ func (s *serverClient) doRequest(method, url string, payload []byte, v interface
 		return statusCode, fmt.Errorf("new request: %w", err)
 	}
 	req.Header.Set(echo.HeaderContentType, "application/json")
-	req.Header.Set(echo.HeaderAuthorization, "Bearer "+s.config.AccessToken)
+	req.Header.Set(strings.ToLower(echo.HeaderAuthorization), "Bearer "+s.config.AccessToken)
 	t := http.DefaultTransport.(*http.Transport)
 	client := http.Client{
 		Timeout:   3 * time.Minute,
