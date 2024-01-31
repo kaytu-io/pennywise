@@ -155,6 +155,7 @@ func (s *State) CostString() (string, error) {
 			t.AppendRow(r)
 		}
 	}
+
 	costString = t.Render()
 	costString += "\n──────────────────────────────────\n"
 	costString += fmt.Sprintf("%s:    %v", bold.Sprint("Total Cost (per month)"), cost.Decimal.Round(2))
