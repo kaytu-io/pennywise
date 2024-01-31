@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"github.com/kaytu-io/pennywise/cmd/cost"
-	"github.com/kaytu-io/pennywise/cmd/ingestion"
 	"github.com/kaytu-io/pennywise/cmd/predef"
 	"github.com/spf13/cobra"
 	"os"
@@ -21,10 +20,12 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(ingestion.IngestCmd)
+	//rootCmd.AddCommand(ingestion.IngestCmd)
 	rootCmd.AddCommand(cost.CostCmd)
 	rootCmd.AddCommand(predef.VersionCmd)
-	rootCmd.PersistentFlags().String("server-url", "https://pennywise.kaytu.dev", "define the server http address")
+	rootCmd.AddCommand(predef.LoginCmd)
+	rootCmd.AddCommand(predef.LogoutCmd)
+	rootCmd.PersistentFlags().String("server-url", "https://pennywise.kaytu.dev/kaytu", "define the server http address")
 }
 
 func Execute() {

@@ -28,10 +28,15 @@ type ServerClient interface {
 
 type serverClient struct {
 	baseURL string
+	config  *Config
 }
 
-func NewPennywiseServerClient(baseURL string) ServerClient {
-	return &serverClient{baseURL: baseURL}
+func NewPennywiseServerClient(baseURL string) (ServerClient, error) {
+	config, err := getConfig()
+	if err != nil {
+		return nil, err
+	}
+	return &serverClient{baseURL: baseURL, config: config}, nil
 }
 
 func (s *serverClient) ListServices(provider string) ([]string, error) {
@@ -39,7 +44,7 @@ func (s *serverClient) ListServices(provider string) ([]string, error) {
 	url = strings.ReplaceAll(url, " ", "%20")
 
 	var listNewServices []string
-	if statusCode, err := doRequest(http.MethodGet, url, nil, &listNewServices); err != nil {
+	if statusCode, err := s.doRequest(http.MethodGet, url, nil, &listNewServices); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
@@ -53,7 +58,7 @@ func (s *serverClient) ListIngestionJobs(provider, service, region, status strin
 	url = strings.ReplaceAll(url, " ", "%20")
 
 	var jobs []schema.IngestionJob
-	if statusCode, err := doRequest(http.MethodGet, url, nil, &jobs); err != nil {
+	if statusCode, err := s.doRequest(http.MethodGet, url, nil, &jobs); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
@@ -69,7 +74,7 @@ func (s *serverClient) GetIngestionJob(id string) (*schema.IngestionJob, error) 
 	url := fmt.Sprintf("%s/api/v1/ingestion/jobs/%s", s.baseURL, id)
 
 	var job schema.IngestionJob
-	if statusCode, err := doRequest(http.MethodGet, url, nil, &job); err != nil {
+	if statusCode, err := s.doRequest(http.MethodGet, url, nil, &job); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			if strings.Contains(err.Error(), "this ID does not exist") {
 				return nil, fmt.Errorf("this ID does not exist")
@@ -89,7 +94,7 @@ func (s *serverClient) AddIngestion(provider, service, region string) (*schema.I
 	url = strings.ReplaceAll(url, " ", "%20")
 
 	var job schema.IngestionJob
-	if statusCode, err := doRequest(http.MethodPut, url, nil, &job); err != nil {
+	if statusCode, err := s.doRequest(http.MethodPut, url, nil, &job); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			if strings.Contains(err.Error(), "this service is not supported") {
 				return nil, fmt.Errorf("this services is not supported")
@@ -112,7 +117,7 @@ func (s *serverClient) GetStateCost(req submission.Submission) (*cost.State, err
 		return nil, err
 	}
 	var cost cost.State
-	if statusCode, err := doRequest(http.MethodGet, url, payload, &cost); err != nil {
+	if statusCode, err := s.doRequest(http.MethodGet, url, payload, &cost); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return nil, echo.NewHTTPError(statusCode, err.Error())
 		}
@@ -124,12 +129,13 @@ func (s *serverClient) GetStateCost(req submission.Submission) (*cost.State, err
 	return &cost, nil
 }
 
-func doRequest(method, url string, payload []byte, v interface{}) (statusCode int, err error) {
+func (s *serverClient) doRequest(method, url string, payload []byte, v interface{}) (statusCode int, err error) {
 	req, err := http.NewRequest(method, url, bytes.NewReader(payload))
 	if err != nil {
 		return statusCode, fmt.Errorf("new request: %w", err)
 	}
 	req.Header.Set(echo.HeaderContentType, "application/json")
+	req.Header.Set(strings.ToLower(echo.HeaderAuthorization), "Bearer "+s.config.AccessToken)
 	t := http.DefaultTransport.(*http.Transport)
 	client := http.Client{
 		Timeout:   3 * time.Minute,

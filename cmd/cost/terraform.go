@@ -78,7 +78,10 @@ func estimateTfProject(projectDir string, usage usagePackage.Usage, ServerClient
 	if err != nil {
 		return err
 	}
-	serverClient := server.NewPennywiseServerClient(ServerClientAddress)
+	serverClient, err := server.NewPennywiseServerClient(ServerClientAddress)
+	if err != nil {
+		return err
+	}
 	cost, err := serverClient.GetStateCost(*sub)
 	if err != nil {
 		return err
@@ -100,7 +103,10 @@ func estimateTfPlanJson(jsonPath string, usage usagePackage.Usage, ServerClientA
 	if err != nil {
 		return err
 	}
-	serverClient := server.NewPennywiseServerClient(ServerClientAddress)
+	serverClient, err := server.NewPennywiseServerClient(ServerClientAddress)
+	if err != nil {
+		return err
+	}
 	sub, err := submission.CreateSubmission(resources)
 	if err != nil {
 		return err
