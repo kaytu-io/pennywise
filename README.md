@@ -17,6 +17,11 @@ The CLI program parses data from Terraform in three possible formats: a Terrafor
 wget -qO - https://raw.githubusercontent.com/kaytu-io/pennywise/main/scripts/install.sh | bash
 ```
 ### Usage
+Login to your kaytu account:
+```shell
+pennywise login
+```
+
 Run the following terraform commands to build the terraform plan json file:
 
 ```shell
