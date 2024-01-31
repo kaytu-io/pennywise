@@ -62,7 +62,7 @@ func (m ResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m ResourcesModel) View() string {
 	output := "Navigate to details by pressing →  Quit by pressing Q or [CTRL+C]\n\n"
-	output += m.label + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output += bold.Sprint(m.label) + "\n" + baseStyle.Render(m.table.View()) + "\n"
 	return output
 }
 

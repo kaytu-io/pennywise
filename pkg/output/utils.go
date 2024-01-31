@@ -2,10 +2,13 @@ package output
 
 import (
 	"github.com/charmbracelet/bubbles/table"
+	"github.com/fatih/color"
 	"github.com/leekchan/accounting"
 	"sort"
 	"strconv"
 )
+
+var bold = color.New(color.Bold)
 
 func sortRows(rows []table.Row) []table.Row {
 	sort.Slice(rows, func(i, j int) bool {

@@ -33,7 +33,7 @@ func (m ComponentsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m ComponentsModel) View() string {
 	output := "Navigate to resources by pressing ←  Quit by pressing Q or [CTRL+C]\n\n"
-	output += m.label + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output += bold.Sprint(m.label) + "\n" + baseStyle.Render(m.table.View()) + "\n"
 	return output
 }
 

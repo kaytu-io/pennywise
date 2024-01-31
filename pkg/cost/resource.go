@@ -9,6 +9,7 @@ import (
 // Resource represents costs of a single cloud resource. Each Resource includes a Component map, keyed
 // by the label.
 type Resource struct {
+	Address     string
 	Provider    schema.ProviderName
 	Type        string
 	Components  map[string][]Component
