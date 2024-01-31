@@ -12,7 +12,14 @@ func ShowStateCosts(s *cost.State) error {
 	if err != nil {
 		return err
 	}
-	model, err := getResourcesModel(totalCost.Decimal.InexactFloat64(), s.Resources)
+	var longestName int
+	for name, _ := range s.Resources {
+		if len(name) > longestName {
+			longestName = len(name)
+		}
+	}
+
+	model, err := getResourcesModel(totalCost.Decimal.InexactFloat64(), s.Resources, longestName)
 	if err != nil {
 		return err
 	}

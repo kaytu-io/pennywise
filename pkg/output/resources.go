@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/kaytu-io/pennywise/pkg/cost"
 	"github.com/leekchan/accounting"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 var baseStyle = lipgloss.NewStyle().
@@ -20,6 +21,7 @@ type ResourcesModel struct {
 	resources            map[string]cost.Resource
 	freeResources        []string
 	unsupportedResources map[string][]string
+	longestName          int
 }
 
 func (m ResourcesModel) Init() tea.Cmd { return nil }
@@ -69,9 +71,16 @@ func (m ResourcesModel) View() string {
 	return m.viewport.View() + "\n" + baseStyle.Render(m.table.View()) + "\n"
 }
 
-func getResourcesModel(totalCost float64, resources map[string]cost.Resource) (tea.Model, error) {
+func getResourcesModel(totalCost float64, resources map[string]cost.Resource, longestName int) (tea.Model, error) {
+	w, _, err := terminal.GetSize(0)
+	if err != nil {
+		return nil, err
+	}
+	if (longestName + 20) > w {
+		return getSmallTerminalModelModel(totalCost, resources, w-23)
+	}
 	columns := []table.Column{
-		{Title: "Name", Width: 165},
+		{Title: "Name", Width: longestName},
 		{Title: "Monthly Cost", Width: 15},
 	}
 
@@ -97,8 +106,12 @@ func getResourcesModel(totalCost float64, resources map[string]cost.Resource) (t
 		}
 		rows = append(rows, []string{name, cost.Decimal.String()})
 	}
-	rows = append(rows, []string{"Free Resources", "0"})
-	rows = append(rows, []string{"Unsupported", "0"})
+	if len(freeResources) > 0 {
+		rows = append(rows, []string{"Free Resources", "0"})
+	}
+	if len(unsupportedServices) > 0 {
+		rows = append(rows, []string{"Unsupported", "0"})
+	}
 	rows = sortRows(rows)
 	rows = makeNumbersAccounting(rows)
 	t := table.New(
@@ -123,6 +136,6 @@ func getResourcesModel(totalCost float64, resources map[string]cost.Resource) (t
 	ac := accounting.Accounting{Symbol: "$", Precision: 2}
 	vp := viewport.New(30, 1)
 	vp.SetContent(fmt.Sprintf("Total cost: %s", ac.FormatMoney(totalCost)))
-	m := ResourcesModel{vp, t, resources, freeResources, unsupportedServices}
+	m := ResourcesModel{vp, t, resources, freeResources, unsupportedServices, longestName}
 	return m, nil
 }

@@ -43,7 +43,7 @@ func (m UnsupportedModel) View() string {
 
 func getUnsupportedModel(resModel ResourcesModel) (tea.Model, error) {
 	columns := []table.Column{
-		{Title: "Resource Type", Width: 165},
+		{Title: "Resource Type", Width: resModel.longestName},
 		{Title: "Resources Count", Width: 15},
 	}
 
