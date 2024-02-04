@@ -51,11 +51,8 @@ func getComponentsModel(resourceName, resourceCost string, components map[string
 
 	for _, comps := range components {
 		for _, c := range comps {
-			if c.Cost().Decimal.Round(3).IntPart() == 0 {
-				continue
-			}
 			var row table.Row
-			row = append(row, c.Name, c.Rate.Decimal.String(), c.HourlyQuantity.String(), c.MonthlyQuantity.String(), c.Unit, c.Cost().Decimal.Round(2).String())
+			row = append(row, c.Name, c.Rate.Decimal.String(), c.HourlyQuantity.String(), c.MonthlyQuantity.String(), c.Unit, c.Cost().Decimal.String())
 			rows = append(rows, row)
 		}
 	}

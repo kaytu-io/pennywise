@@ -41,11 +41,8 @@ func (re Resource) CostRows() ([]table.Row, error) {
 
 	for _, comps := range re.Components {
 		for _, c := range comps {
-			if c.Cost().Decimal.Round(3).IntPart() == 0 {
-				continue
-			}
 			var row table.Row
-			row = append(row, faint.Sprint("└─ ")+c.Name, c.Rate.Decimal, c.HourlyQuantity, c.MonthlyQuantity, c.Unit, c.Cost().Decimal.Round(2))
+			row = append(row, faint.Sprint("└─ ")+c.Name, c.Rate.Decimal, c.HourlyQuantity, c.MonthlyQuantity, c.Unit, c.Cost().Decimal)
 			rows = append(rows, row)
 		}
 	}
