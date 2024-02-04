@@ -6,6 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/kaytu-io/pennywise/pkg/cost"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 type ComponentsModel struct {
@@ -38,8 +39,23 @@ func (m ComponentsModel) View() string {
 }
 
 func getComponentsModel(resourceName, resourceCost string, components map[string][]cost.Component, resModel ResourcesModel) (tea.Model, error) {
+	var longestName int
+	for _, comps := range components {
+		for _, c := range comps {
+			if len(c.Name) > longestName {
+				longestName = len(c.Name)
+			}
+		}
+	}
+	w, _, err := terminal.GetSize(0)
+	if err != nil {
+		return nil, err
+	}
+	if (longestName + 70) > w {
+		longestName = w - 70
+	}
 	columns := []table.Column{
-		{Title: "Name", Width: resModel.longestName - 63},
+		{Title: "Name", Width: longestName},
 		{Title: "Unit Price", Width: 15},
 		{Title: "Hourly Qty", Width: 15},
 		{Title: "Monthly Qty", Width: 15},
