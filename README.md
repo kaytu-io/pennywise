@@ -65,4 +65,4 @@ azurerm_virtual_machine.windows_withMonthlyHours:
   monthly_hrs: 100
 ````
 
-To get a more detailed documents on CLI options and commands, please refer to [docs](./docs)
+To get a more detailed documents on CLI options and commands, please refer to [docs](./docs/pennywise.md)
