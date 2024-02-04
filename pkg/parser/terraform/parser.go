@@ -416,7 +416,9 @@ func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]int
 					continue
 				}
 			}
-			values[name] = fmt.Sprintf("*each*.%s.%s", forEach["references"].([]interface{})[0], ref[2])
+			if forEach["references"] != nil {
+				values[name] = fmt.Sprintf("*each*.%s.%s", forEach["references"].([]interface{})[0], ref[2])
+			}
 			continue
 		}
 		// "local" variables are not set on the plan
