@@ -1,15 +1,15 @@
-## pennywise version
+## pennywise logout
 
 
 
 ```
-pennywise version [flags]
+pennywise logout [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help   help for version
+  -h, --help   help for logout
 ```
 
 ### Options inherited from parent commands
