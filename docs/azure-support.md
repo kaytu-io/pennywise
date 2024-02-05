@@ -14,6 +14,12 @@
 ##### Application Gateway
 - azurerm_application_gateway
 
+##### Automation
+- azurerm_automation_account
+- azurerm_automation_dsc_configuration
+- azurerm_automation_dsc_nodeconfiguration
+- azurerm_automation_job_schedule
+
 ##### CDN
 - azurerm_cdn_endpoint
 
@@ -114,6 +120,7 @@
 
 #### VPN Gateway
 - azurerm_virtual_network_gateway
+- azurerm_virtual_network_gateway_connection
 
 
 ### Free resource types
