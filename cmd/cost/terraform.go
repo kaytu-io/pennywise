@@ -138,6 +138,7 @@ func estimateTfPlanJson(classic bool, jsonPath string, usage usagePackage.Usage,
 			return err
 		}
 		fmt.Println(costString)
+		fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
 	} else {
 		err = output.ShowStateCosts(state)
 		if err != nil {
