@@ -8,7 +8,7 @@
 </p>
 
 ## Overview
-Pennywise is an open-source program designed for calculating cloud resources' costs. It currently supports AWS and Azure.
+Pennywise is an open-source program designed for calculating cloud resources' costs. It currently supports [AWS](docs/aws-support.md) and [Azure](docs/azure-support.md).
 
 The program parses data from Terraform using a Terraform plan JSON file and shows the costs for the project.
 
