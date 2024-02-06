@@ -34,7 +34,7 @@ pennywise login
 ``` 
 this command will give you a link to open in your browser to help you sign-up and login into your kaytu account.
 
-### Usage
+### Get costs
 Run the following terraform commands to build the terraform plan json file:
 
 ```shell

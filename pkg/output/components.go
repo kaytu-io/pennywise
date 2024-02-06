@@ -33,8 +33,9 @@ func (m ComponentsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ComponentsModel) View() string {
-	output := "Navigate to resources by pressing ←  Quit by pressing Q or [CTRL+C]\n\n"
+	output := "Navigate to resources by pressing ← Quit by pressing Q or [CTRL+C]\n\n"
 	output += bold.Sprint(m.label) + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output += "To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md"
 	return output
 }
 
@@ -57,9 +58,9 @@ func getComponentsModel(resourceName, resourceCost string, components map[string
 	columns := []table.Column{
 		{Title: "Name", Width: longestName},
 		{Title: "Unit Price", Width: 15},
-		{Title: "Hourly Qty", Width: 15},
-		{Title: "Monthly Qty", Width: 15},
-		{Title: "Unit", Width: 10},
+		{Title: "Hourly Qty", Width: 12},
+		{Title: "Monthly Qty", Width: 12},
+		{Title: "Unit", Width: 14},
 		{Title: "Monthly Cost", Width: 15},
 	}
 

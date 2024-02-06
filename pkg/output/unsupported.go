@@ -30,8 +30,9 @@ func (m UnsupportedModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m UnsupportedModel) View() string {
-	output := "Navigate to resources by pressing ←  Quit by pressing Q or [CTRL+C]\n\n"
+	output := "Navigate to resources by pressing ← Quit by pressing Q or [CTRL+C]\n\n"
 	output += bold.Sprint("Unsupported Resource Types") + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output += "To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md"
 	return output
 }
 

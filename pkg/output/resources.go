@@ -61,8 +61,9 @@ func (m ResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ResourcesModel) View() string {
-	output := "Navigate to details by pressing →  Quit by pressing Q or [CTRL+C]\n\n"
+	output := "Navigate to details by pressing → or [ENTER] Quit by pressing Q or [CTRL+C]\n\n"
 	output += bold.Sprint(m.label) + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output += "To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md"
 	return output
 }
 
@@ -76,7 +77,7 @@ func getResourcesModel(totalCost float64, resources map[string]cost.Resource, lo
 	}
 	columns := []table.Column{
 		{Title: "Name", Width: longestName},
-		{Title: "Monthly Cost", Width: 15},
+		{Title: "Monthly Cost", Width: 12},
 	}
 
 	var rows []table.Row
@@ -109,6 +110,10 @@ func getResourcesModel(totalCost float64, resources map[string]cost.Resource, lo
 	}
 	rows = sortRows(rows)
 	rows = makeNumbersAccounting(rows)
+	columns = append(columns, table.Column{Title: "", Width: 1})
+	for i, _ := range rows {
+		rows[i] = append(rows[i], "→")
+	}
 	t := table.New(
 		table.WithColumns(columns),
 		table.WithRows(rows),

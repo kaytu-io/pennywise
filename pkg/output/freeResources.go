@@ -29,8 +29,9 @@ func (m FreeResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m FreeResourcesModel) View() string {
-	output := "Navigate to resources by pressing ←  Quit by pressing Q or [CTRL+C]\n\n"
+	output := "Navigate to resources by pressing ← Quit by pressing Q or [CTRL+C]\n\n"
 	output += bold.Sprint("Free Resources") + "\n" + baseStyle.Render(m.table.View()) + "\n"
+	output += "To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md"
 	return output
 }
 
