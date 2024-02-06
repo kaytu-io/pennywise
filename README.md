@@ -1,32 +1,36 @@
 <h1 align="center"> Pennywise </h1>
 
-[![Build Status](https://travis-ci.org/kaytu-io/pennywise.svg?branch=master)](https://travis-ci.org/kaytu-io/pennywise)
 [![GitHub release](https://img.shields.io/github/release/kaytu-io/pennywise.svg)](https://github.com/kaytu-io/pennywise/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Overview
-Pennywise is an open-source program designed for calculating cloud resources' costs. It currently supports AWS and Azure. The project consists of a server, and a CLI program.
+Pennywise is an open-source program designed for calculating cloud resources' costs. It currently supports AWS and Azure.
 
-The CLI program parses data from Terraform in three possible formats: a Terraform file, a Terraform plan file, or a Terraform plan JSON file. The cost request is then sent to the Pennywise server, and the result, comprising the cost, is received.
+The program parses data from Terraform using a Terraform plan JSON file and shows the costs for the project.
 
 ## Getting Started
 
-### Install pennywise client
+### Install
 
-Download the binary from [releases](https://github.com/kaytu-io/pennywise/releases).\
-If you are using Linux you can run this command to install the CLI: 
-```shell
-wget -qO - https://raw.githubusercontent.com/kaytu-io/pennywise/main/scripts/install.sh | bash
-```
 
-### Usage
+- Linux/macOS
+    ```shell
+    wget -qO - https://raw.githubusercontent.com/kaytu-io/pennywise/main/scripts/install.sh | sh
+    ```
+- Windows\
+    Download and install manually from [releases](https://github.com/kaytu-io/pennywise/releases) 
 
+### Sign-up for an account
+Sign up for free on [kaytu](http://app.kaytu.io/)
+
+### Login
 Login to your kaytu account using:
 ```shell
 pennywise login
 ``` 
 this command will give you a link to open in your browser to help you sign-up and login into your kaytu account.
 
+### Usage
 Run the following terraform commands to build the terraform plan json file:
 
 ```shell
