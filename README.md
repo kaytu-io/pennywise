@@ -1,7 +1,11 @@
 <h1 align="center"> Pennywise </h1>
 
-[![GitHub release](https://img.shields.io/github/release/kaytu-io/pennywise.svg)](https://github.com/kaytu-io/pennywise/releases)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+<p align="center">
+    <img alt="GitHub repo size" src="https://img.shields.io/badge/License-Apache%202.0-blue?logo=github&style=for-the-badge&logo">
+    <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/kaytu-io/pennywise?logo=github&style=for-the-badge">
+    <img alt="GitHub tag (with filter)" src="https://img.shields.io/github/v/tag/kaytu-io/pennywise?style=for-the-badge&logo=git">
+    <img alt="GitHub go.mod Go version (subdirectory of monorepo)" src="https://img.shields.io/github/go-mod/go-version/kaytu-io/pennywise?style=for-the-badge&logo=go">
+</p>
 
 ## Overview
 Pennywise is an open-source program designed for calculating cloud resources' costs. It currently supports AWS and Azure.
