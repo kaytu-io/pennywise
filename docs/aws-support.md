@@ -38,12 +38,6 @@
 ##### Lambda
 - aws_lambda_function
 
-##### Launch Configuration
-- aws_launch_configuration
-
-##### Launch Template
-- aws_launch_template
-
 ##### Load Balancer
 - aws_lb
 - aws_alb

@@ -356,6 +356,9 @@ func (p *Plan) evaluateProviderConfigExpressions(config ProviderConfig) (map[str
 func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]interface{}, config map[string]interface{}, variables map[string]Variable) (map[string]interface{}, error) {
 	values := make(map[string]interface{})
 	for name, ex := range config {
+		if name == "launch_template_id" {
+			fmt.Println("HEEREE", values[name])
+		}
 		m, ok := ex.(map[string]interface{})
 		if !ok {
 			a, ok := ex.([]interface{})
@@ -377,26 +380,38 @@ func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]int
 					return nil, fmt.Errorf("failed to evaluateResourceExpressions on array: %w", err)
 				}
 				values[name] = append(values[name].([]interface{}), av)
+				if name == "launch_template_id" {
+					fmt.Println("HEEREE2", av)
+				}
 			}
 		}
 		refs, ok := m["references"].([]interface{})
 		if !ok {
 			refs = make([]interface{}, 0, 0)
 		}
-
+		if name == "launch_template_id" {
+			fmt.Println("HEEREE3", m)
+		}
 		if len(m) > 0 && m["constant_value"] == nil && len(refs) == 0 {
 			// Right now the only key identified empty has been `timeout`
 			continue
+		}
+		if name == "launch_template_id" {
+			fmt.Println("HEEREE4", values[name])
 		}
 		if m["constant_value"] != nil {
 			values[name] = m["constant_value"]
 			continue
 		}
-
+		if name == "launch_template_id" {
+			fmt.Println("HEEREE5", values[name])
+		}
 		if len(refs) < 1 {
 			continue
 		}
-
+		if name == "launch_template_id" {
+			fmt.Println("HEEREE6", refs)
+		}
 		ref := strings.Split(refs[0].(string), ".")
 		if len(ref) < 2 {
 			return nil, fmt.Errorf("refernce %q has invalid format", refs[0])
@@ -421,20 +436,29 @@ func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]int
 			}
 			continue
 		}
+		if name == "launch_template_id" {
+			fmt.Println("HEEREE7", refs)
+		}
 		// "local" variables are not set on the plan
 		// so we ignore them
 		if ref[0] == "local" {
 			continue
 		}
-
+		if name == "launch_template_id" {
+			fmt.Println("HEEREE8", refs, values[name])
+		}
 		// For now we do not want external module references or data references
 		if ref[0] == "module" || ref[0] == "data" {
 			continue
 		}
-
+		if name == "launch_template_id" {
+			fmt.Println("HEEREE9", refs)
+		}
 		if ref[0] == "var" {
 			varName := ref[1]
-
+			if name == "launch_template_id" {
+				fmt.Println("HEEREE10", refs, values[name])
+			}
 			arrayRegex := regexp.MustCompile(`^([^[]+)(?:\[(\d+)\])?$`)
 			arrayMatch := arrayRegex.FindStringSubmatch(varName)
 			if arrayMatch != nil {
@@ -456,7 +480,9 @@ func (p *Plan) evaluateResourceExpressions(prefix string, forEach map[string]int
 					continue
 				}
 			}
-
+			if name == "launch_template_id" {
+				fmt.Println("HEEREE11", refs, values[name])
+			}
 			mapRegex := regexp.MustCompile(`^([^[]+)\[\"([^\"]+)\"\]$`)
 			mapMatch := mapRegex.FindStringSubmatch(varName)
 			if mapMatch != nil {
