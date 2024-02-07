@@ -36,7 +36,7 @@ this command will give you a link to open in your browser to help you sign-up an
 
 ### 3. Generate Terraform Plan
 
-Navigate to your Terraform folder and generate the Terraform plan.
+Navigate to your Terraform folder and generate the Terraform plan (you need terraform and jq installed to do this)
 
 ```shell
 # You can try out our sample if you wish: git clone https://github.com/kaytu-io/sample-terraform.git
