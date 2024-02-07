@@ -17,7 +17,7 @@ Pennywise estimates the cost of cloud infrastructure before the actual deploymen
 
 **Linux/MacOS**
 ```shell
-wget -qO - https://raw.githubusercontent.com/kaytu-io/pennywise/main/scripts/install.sh | sh
+wget -qO - https://kaytu.s3.amazonaws.com/pennywise/install.sh | sh
 ```
 
 **Windows**
