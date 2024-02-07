@@ -1,33 +1,140 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e
 
-sudo -v
+DEFAULT_BIN_DIR="/usr/local/bin"
+BIN_DIR=${1:-"${DEFAULT_BIN_DIR}"}
+GITHUB_REPO="kaytu-io/pennywise"
+TMP_DIR=$(mktemp -d -t pennywise-install.XXXXXXXXXX)
 
-# Detect architecture
-arch=$(uname -m | tr '[:upper:]' '[:lower:]' | sed -e s/x86_64/amd64/)
-if [ "$arch" = "aarch64" ]; then
-  arch="arm64"
-fi
+# Helper functions for logs
+info() {
+    echo '[INFO] ' "$@"
+}
 
-# Detect operating system
-OS=$(uname -s)
+warn() {
+    echo '[WARN] ' "$@" >&2
+}
 
-# Determine the release based on OS and architecture
-case "$OS" in
-  Linux)
-    DOWNLOAD_URL=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/kaytu-io/pennywise/releases/latest | jq -r --arg ARCH "$arch" '.assets[] | select(.browser_download_url | contains("linux") and contains($ARCH)) | .browser_download_url')
-    ;;
-  Darwin)
-    DOWNLOAD_URL=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/kaytu-io/pennywise/releases/latest | jq -r --arg ARCH "$arch" '.assets[] | select(.browser_download_url | contains("mac") and contains($ARCH)) | .browser_download_url')
-    ;;
-  *)
-    echo "Unsupported operating system: $OS"
+fatal() {
+    echo '[ERROR] ' "$@" >&2
     exit 1
-    ;;
-esac
+}
 
-# Download and install
-curl -L "$DOWNLOAD_URL" -o ./pennywise
-chmod +x ./pennywise
-sudo mv ./pennywise /usr/local/bin/
+# Set os, fatal if operating system not supported
+setup_verify_os() {
+    OS=$(uname -s)
+    case ${OS} in
+        Darwin)
+            OS=mac
+            ;;
+        Linux)
+            OS=linux
+            ;;
+        *)
+            fatal "Unsupported operating system ${OS}"
+    esac
+}
 
-echo "Pennywise installed successfully version $(pennywise version)"
+# Set arch, fatal if architecture not supported
+setup_verify_arch() {
+    ARCH=$(uname -m)
+
+    case ${ARCH} in
+        arm64|aarch64|armv8l)
+            ARCH=arm64
+            ;;
+        amd64)
+            ARCH=amd64
+            ;;
+        x86_64)
+            ARCH=amd64
+            ;;
+        *)
+            fatal "Unsupported architecture ${ARCH}"
+    esac
+}
+
+# Verify existence of downloader executable
+verify_downloader() {
+    # Return failure if it doesn't exist or is no executable
+    [ -x "$(which "$1")" ] || return 1
+
+    # Set verified executable as our downloader program and return success
+    DOWNLOADER=$1
+    return 0
+}
+
+
+# Find version from Github metadata
+get_release_version() {
+    if [ -n "${FLUX_VERSION}" ]; then
+      SUFFIX_URL="tags/v${FLUX_VERSION}"
+    else
+      SUFFIX_URL="latest"
+    fi
+
+    METADATA_URL="https://api.github.com/repos/${GITHUB_REPO}/releases/${SUFFIX_URL}"
+    TMP_METADATA="${TMP_DIR}/pennywise.json"
+    info "Downloading metadata ${METADATA_URL}"
+    download "${TMP_METADATA}" "${METADATA_URL}"
+    VERSION=$(grep '"tag_name":' "${TMP_METADATA}" | sed -E 's/.*"([^"]+)".*/\1/' | cut -c 2-)
+    if [ -n "${VERSION}" ]; then
+        info "Using ${VERSION} as release"
+    else
+        fatal "Unable to determine release version"
+    fi
+}
+
+# Download from file from URL
+download() {
+    [ $# -eq 2 ] || fatal 'download needs exactly 2 arguments'
+
+    case $DOWNLOADER in
+        curl)
+            curl -o "$1" -sfL "$2"
+            ;;
+        wget)
+            wget --auth-no-challenge -qO "$1" "$2"
+            ;;
+        *)
+            fatal "Incorrect executable '${DOWNLOADER}'"
+            ;;
+    esac
+
+    # Abort if download command failed
+    [ $? -eq 0 ] || fatal 'Download failed'
+}
+
+
+# Download binary from Github URL
+download_binary() {
+    BIN_URL="https://github.com/${GITHUB_REPO}/releases/download/v${VERSION}/pennywise-${OS}-${ARCH}"
+    info "Downloading binary ${BIN_URL}"
+    TMP_BIN="${TMP_DIR}/pennywise"
+
+    download "${TMP_BIN}" "${BIN_URL}"
+}
+
+
+# Setup permissions and move binary
+setup_binary() {
+    chmod +x "${TMP_BIN}"
+    info "Installing pennywise to ${BIN_DIR}/pennywise"
+
+    local CMD_MOVE="mv -f \"${TMP_DIR}/pennywise\" \"${BIN_DIR}\""
+    if [ -w "${BIN_DIR}" ]; then
+        eval "${CMD_MOVE}"
+    else
+        eval "sudo ${CMD_MOVE}"
+    fi
+}
+
+# Run the install process
+{
+    setup_verify_os
+    setup_verify_arch
+    verify_downloader curl || verify_downloader wget || fatal 'Can not find curl or wget for downloading files'
+    get_release_version
+    download_binary
+    setup_binary
+}
