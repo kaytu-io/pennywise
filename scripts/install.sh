@@ -25,7 +25,7 @@ setup_verify_os() {
     OS=$(uname -s)
     case ${OS} in
         Darwin)
-            OS=mac
+            OS=macos
             ;;
         Linux)
             OS=linux
