@@ -13,7 +13,7 @@ Pennywise estimates the cost of cloud infrastructure before the actual deploymen
 ![Cost Gif](.github/assets/cost_gif.gif)
 ## Getting Started
 
-### Install
+### 1. Install CLI
 
 
 - Linux/macOS
@@ -23,34 +23,37 @@ Pennywise estimates the cost of cloud infrastructure before the actual deploymen
 - Windows\
     Download and install manually from [releases](https://github.com/kaytu-io/pennywise/releases) 
 
-### Sign-up for an account
-Sign up for free on [kaytu](http://app.kaytu.io/)
-
-### Login
-Login to your kaytu account using:
+### 2. Sign-up / Login
+Sign-up & Login for free by running using:
 ```shell
 pennywise login
 ``` 
 this command will give you a link to open in your browser to help you sign-up and login into your kaytu account.
 
-### Get costs
-Run the following terraform commands to build the terraform plan json file:
+### 3. Generate Terraform Plan
+
+Navigate to your Terraform folder and generate the Terraform plan.
 
 ```shell
+# to get samples run `git clone https://github.com/kaytu-io/pennywise.git`
+# and go to pennywise/sample
+
 terraform init
 terraform plan -out tfplan.binary
 terraform show -json tfplan.binary | jq > tfplan.json
 ```
-And then estimate the project cost by passing the terraform plan json file to cost terraform command:
+
+### 4. Get costs
+
+Run the following in the directory containing your terraform plan:
+
 ```shell
-pennywise cost terraform --json-path path-to-json --usage path-to-usage-file
+pennywise cost terraform --json-path tfplan.json
 ```
 
-You can also specify the usage file path by usage tag.
-The usage file is responsible for getting usage details from user.
+You can also specify the usage file which provides additional information for cost estimation.
 The usage file is supported in two types: `json` and `yaml`
 
-The json file is as follows:
 ````json
 {
   "azurerm_virtual_machine.windows": {
@@ -65,17 +68,14 @@ The json file is as follows:
   }
 }
 ````
-The yaml file is as follows:
-````yaml
-azurerm_virtual_machine.windows:
-  monthly_os_disk_operations: 1000000
-  monthly_data_disk_operations: 2000000
-azurerm_virtual_machine.linux_withMonthlyHours:
-  monthly_hrs: 100
-azurerm_virtual_machine.windows_withMonthlyHours:
-  monthly_hrs: 100
-````
-Also, here's the documents for supported usage parameters of each resource type:\
+
+Use the usage file to optimize the cost estimation:
+
+```shell
+pennywise cost terraform --json-path tfplan.json --usage usage.json
+```
+
+Supported usage parameters of each resource type are available here:\
 [aws-usage](./docs/aws-usage-parameters.md)\
 [azure-usage](./docs/azure-usage-parameters.md)
 
