@@ -1,0 +1,2 @@
+azurerm_linux_virtual_machine_scale_set.tfexample:
+  monthly_hrs: 300

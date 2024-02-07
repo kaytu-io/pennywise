@@ -33,6 +33,18 @@
 - reserved_instance_term
 - reserved_instance_payment_option
 
+### aws_instance
+- operating_system
+- reserved_instance_type
+- reserved_instance_term
+- reserved_instance_payment_option
+- monthly_cpu_credit_hrs
+- vcpu_count
+- monthly_hrs
+
+#### aws_lb, aws_alb, aws_elb
+- monthly_data_processed_gb
+
 #### aws_lambda_function
 - request_duration_ms
 - monthly_requests

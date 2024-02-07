@@ -1,0 +1,988 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.7.1",
+  "variables": {
+    "server_port": {
+      "value": "8080"
+    }
+  },
+  "planned_values": {
+    "outputs": {
+      "elb_dns_name": {
+        "sensitive": false
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_autoscaling_group.example",
+          "mode": "managed",
+          "type": "aws_autoscaling_group",
+          "name": "example",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 1,
+          "values": {
+            "availability_zones": [
+              "us-west-1a",
+              "us-west-1b"
+            ],
+            "capacity_rebalance": null,
+            "context": null,
+            "default_instance_warmup": null,
+            "desired_capacity_type": null,
+            "enabled_metrics": null,
+            "force_delete": false,
+            "force_delete_warm_pool": false,
+            "health_check_grace_period": 300,
+            "health_check_type": "ELB",
+            "ignore_failed_scaling_activities": false,
+            "initial_lifecycle_hook": [],
+            "instance_maintenance_policy": [],
+            "instance_refresh": [],
+            "load_balancers": [
+              "terraform-asg-example"
+            ],
+            "max_instance_lifetime": null,
+            "max_size": 10,
+            "metrics_granularity": "1Minute",
+            "min_elb_capacity": null,
+            "min_size": 2,
+            "placement_group": null,
+            "protect_from_scale_in": false,
+            "suspended_processes": null,
+            "tag": [
+              {
+                "key": "Name",
+                "propagate_at_launch": true,
+                "value": "terraform-asg-example"
+              }
+            ],
+            "termination_policies": null,
+            "timeouts": null,
+            "wait_for_capacity_timeout": "10m",
+            "wait_for_elb_capacity": null,
+            "warm_pool": []
+          },
+          "sensitive_values": {
+            "availability_zones": [
+              false,
+              false
+            ],
+            "initial_lifecycle_hook": [],
+            "instance_maintenance_policy": [],
+            "instance_refresh": [],
+            "launch_template": [],
+            "load_balancers": [
+              false
+            ],
+            "mixed_instances_policy": [],
+            "tag": [
+              {}
+            ],
+            "target_group_arns": [],
+            "traffic_source": [],
+            "vpc_zone_identifier": [],
+            "warm_pool": []
+          }
+        },
+        {
+          "address": "aws_elb.example",
+          "mode": "managed",
+          "type": "aws_elb",
+          "name": "example",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "access_logs": [],
+            "availability_zones": [
+              "us-west-1a",
+              "us-west-1b"
+            ],
+            "connection_draining": false,
+            "connection_draining_timeout": 300,
+            "cross_zone_load_balancing": true,
+            "desync_mitigation_mode": "defensive",
+            "health_check": [
+              {
+                "healthy_threshold": 2,
+                "interval": 30,
+                "target": "HTTP:8080/",
+                "timeout": 3,
+                "unhealthy_threshold": 2
+              }
+            ],
+            "idle_timeout": 60,
+            "listener": [
+              {
+                "instance_port": 8080,
+                "instance_protocol": "http",
+                "lb_port": 80,
+                "lb_protocol": "http",
+                "ssl_certificate_id": ""
+              }
+            ],
+            "name": "terraform-asg-example",
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_values": {
+            "access_logs": [],
+            "availability_zones": [
+              false,
+              false
+            ],
+            "health_check": [
+              {}
+            ],
+            "instances": [],
+            "listener": [
+              {}
+            ],
+            "security_groups": [],
+            "subnets": [],
+            "tags_all": {}
+          }
+        },
+        {
+          "address": "aws_launch_configuration.example",
+          "mode": "managed",
+          "type": "aws_launch_configuration",
+          "name": "example",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "enable_monitoring": true,
+            "ephemeral_block_device": [],
+            "iam_instance_profile": null,
+            "image_id": "ami-785db401",
+            "instance_type": "t2.micro",
+            "placement_tenancy": null,
+            "spot_price": null,
+            "user_data": "4430fd6498339061effa6d27ccf341a1e94569d7",
+            "user_data_base64": null
+          },
+          "sensitive_values": {
+            "ebs_block_device": [],
+            "ephemeral_block_device": [],
+            "metadata_options": [],
+            "root_block_device": [],
+            "security_groups": []
+          }
+        },
+        {
+          "address": "aws_security_group.elb",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "elb",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 1,
+          "values": {
+            "description": "Managed by Terraform",
+            "egress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 0,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "-1",
+                "security_groups": [],
+                "self": false,
+                "to_port": 0
+              }
+            ],
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 80,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 80
+              }
+            ],
+            "name": "terraform-example-elb",
+            "revoke_rules_on_delete": false,
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_values": {
+            "egress": [
+              {
+                "cidr_blocks": [
+                  false
+                ],
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "security_groups": []
+              }
+            ],
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  false
+                ],
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "security_groups": []
+              }
+            ],
+            "tags_all": {}
+          }
+        },
+        {
+          "address": "aws_security_group.instance",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "instance",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 1,
+          "values": {
+            "description": "Managed by Terraform",
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 8080,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 8080
+              }
+            ],
+            "name": "terraform-example-instance",
+            "revoke_rules_on_delete": false,
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_values": {
+            "egress": [],
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  false
+                ],
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "security_groups": []
+              }
+            ],
+            "tags_all": {}
+          }
+        }
+      ]
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "aws_autoscaling_group.example",
+      "mode": "managed",
+      "type": "aws_autoscaling_group",
+      "name": "example",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "availability_zones": [
+            "us-west-1a",
+            "us-west-1b"
+          ],
+          "capacity_rebalance": null,
+          "context": null,
+          "default_instance_warmup": null,
+          "desired_capacity_type": null,
+          "enabled_metrics": null,
+          "force_delete": false,
+          "force_delete_warm_pool": false,
+          "health_check_grace_period": 300,
+          "health_check_type": "ELB",
+          "ignore_failed_scaling_activities": false,
+          "initial_lifecycle_hook": [],
+          "instance_maintenance_policy": [],
+          "instance_refresh": [],
+          "load_balancers": [
+            "terraform-asg-example"
+          ],
+          "max_instance_lifetime": null,
+          "max_size": 10,
+          "metrics_granularity": "1Minute",
+          "min_elb_capacity": null,
+          "min_size": 2,
+          "placement_group": null,
+          "protect_from_scale_in": false,
+          "suspended_processes": null,
+          "tag": [
+            {
+              "key": "Name",
+              "propagate_at_launch": true,
+              "value": "terraform-asg-example"
+            }
+          ],
+          "termination_policies": null,
+          "timeouts": null,
+          "wait_for_capacity_timeout": "10m",
+          "wait_for_elb_capacity": null,
+          "warm_pool": []
+        },
+        "after_unknown": {
+          "arn": true,
+          "availability_zones": [
+            false,
+            false
+          ],
+          "default_cooldown": true,
+          "desired_capacity": true,
+          "id": true,
+          "initial_lifecycle_hook": [],
+          "instance_maintenance_policy": [],
+          "instance_refresh": [],
+          "launch_configuration": true,
+          "launch_template": true,
+          "load_balancers": [
+            false
+          ],
+          "mixed_instances_policy": true,
+          "name": true,
+          "name_prefix": true,
+          "predicted_capacity": true,
+          "service_linked_role_arn": true,
+          "tag": [
+            {}
+          ],
+          "target_group_arns": true,
+          "traffic_source": true,
+          "vpc_zone_identifier": true,
+          "warm_pool": [],
+          "warm_pool_size": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "availability_zones": [
+            false,
+            false
+          ],
+          "initial_lifecycle_hook": [],
+          "instance_maintenance_policy": [],
+          "instance_refresh": [],
+          "launch_template": [],
+          "load_balancers": [
+            false
+          ],
+          "mixed_instances_policy": [],
+          "tag": [
+            {}
+          ],
+          "target_group_arns": [],
+          "traffic_source": [],
+          "vpc_zone_identifier": [],
+          "warm_pool": []
+        }
+      }
+    },
+    {
+      "address": "aws_elb.example",
+      "mode": "managed",
+      "type": "aws_elb",
+      "name": "example",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "access_logs": [],
+          "availability_zones": [
+            "us-west-1a",
+            "us-west-1b"
+          ],
+          "connection_draining": false,
+          "connection_draining_timeout": 300,
+          "cross_zone_load_balancing": true,
+          "desync_mitigation_mode": "defensive",
+          "health_check": [
+            {
+              "healthy_threshold": 2,
+              "interval": 30,
+              "target": "HTTP:8080/",
+              "timeout": 3,
+              "unhealthy_threshold": 2
+            }
+          ],
+          "idle_timeout": 60,
+          "listener": [
+            {
+              "instance_port": 8080,
+              "instance_protocol": "http",
+              "lb_port": 80,
+              "lb_protocol": "http",
+              "ssl_certificate_id": ""
+            }
+          ],
+          "name": "terraform-asg-example",
+          "tags": null,
+          "timeouts": null
+        },
+        "after_unknown": {
+          "access_logs": [],
+          "arn": true,
+          "availability_zones": [
+            false,
+            false
+          ],
+          "dns_name": true,
+          "health_check": [
+            {}
+          ],
+          "id": true,
+          "instances": true,
+          "internal": true,
+          "listener": [
+            {}
+          ],
+          "name_prefix": true,
+          "security_groups": true,
+          "source_security_group": true,
+          "source_security_group_id": true,
+          "subnets": true,
+          "tags_all": true,
+          "zone_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "access_logs": [],
+          "availability_zones": [
+            false,
+            false
+          ],
+          "health_check": [
+            {}
+          ],
+          "instances": [],
+          "listener": [
+            {}
+          ],
+          "security_groups": [],
+          "subnets": [],
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "aws_launch_configuration.example",
+      "mode": "managed",
+      "type": "aws_launch_configuration",
+      "name": "example",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "enable_monitoring": true,
+          "ephemeral_block_device": [],
+          "iam_instance_profile": null,
+          "image_id": "ami-785db401",
+          "instance_type": "t2.micro",
+          "placement_tenancy": null,
+          "spot_price": null,
+          "user_data": "4430fd6498339061effa6d27ccf341a1e94569d7",
+          "user_data_base64": null
+        },
+        "after_unknown": {
+          "arn": true,
+          "associate_public_ip_address": true,
+          "ebs_block_device": true,
+          "ebs_optimized": true,
+          "ephemeral_block_device": [],
+          "id": true,
+          "key_name": true,
+          "metadata_options": true,
+          "name": true,
+          "name_prefix": true,
+          "root_block_device": true,
+          "security_groups": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "ebs_block_device": [],
+          "ephemeral_block_device": [],
+          "metadata_options": [],
+          "root_block_device": [],
+          "security_groups": []
+        }
+      }
+    },
+    {
+      "address": "aws_security_group.elb",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "elb",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "description": "Managed by Terraform",
+          "egress": [
+            {
+              "cidr_blocks": [
+                "0.0.0.0/0"
+              ],
+              "description": "",
+              "from_port": 0,
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "protocol": "-1",
+              "security_groups": [],
+              "self": false,
+              "to_port": 0
+            }
+          ],
+          "ingress": [
+            {
+              "cidr_blocks": [
+                "0.0.0.0/0"
+              ],
+              "description": "",
+              "from_port": 80,
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "protocol": "tcp",
+              "security_groups": [],
+              "self": false,
+              "to_port": 80
+            }
+          ],
+          "name": "terraform-example-elb",
+          "revoke_rules_on_delete": false,
+          "tags": null,
+          "timeouts": null
+        },
+        "after_unknown": {
+          "arn": true,
+          "egress": [
+            {
+              "cidr_blocks": [
+                false
+              ],
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "security_groups": []
+            }
+          ],
+          "id": true,
+          "ingress": [
+            {
+              "cidr_blocks": [
+                false
+              ],
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "security_groups": []
+            }
+          ],
+          "name_prefix": true,
+          "owner_id": true,
+          "tags_all": true,
+          "vpc_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "egress": [
+            {
+              "cidr_blocks": [
+                false
+              ],
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "security_groups": []
+            }
+          ],
+          "ingress": [
+            {
+              "cidr_blocks": [
+                false
+              ],
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "security_groups": []
+            }
+          ],
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "aws_security_group.instance",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "instance",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "description": "Managed by Terraform",
+          "ingress": [
+            {
+              "cidr_blocks": [
+                "0.0.0.0/0"
+              ],
+              "description": "",
+              "from_port": 8080,
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "protocol": "tcp",
+              "security_groups": [],
+              "self": false,
+              "to_port": 8080
+            }
+          ],
+          "name": "terraform-example-instance",
+          "revoke_rules_on_delete": false,
+          "tags": null,
+          "timeouts": null
+        },
+        "after_unknown": {
+          "arn": true,
+          "egress": true,
+          "id": true,
+          "ingress": [
+            {
+              "cidr_blocks": [
+                false
+              ],
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "security_groups": []
+            }
+          ],
+          "name_prefix": true,
+          "owner_id": true,
+          "tags_all": true,
+          "vpc_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "egress": [],
+          "ingress": [
+            {
+              "cidr_blocks": [
+                false
+              ],
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "security_groups": []
+            }
+          ],
+          "tags_all": {}
+        }
+      }
+    }
+  ],
+  "output_changes": {
+    "elb_dns_name": {
+      "actions": [
+        "create"
+      ],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": false,
+      "after_sensitive": false
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "full_name": "registry.terraform.io/hashicorp/aws",
+        "expressions": {
+          "region": {
+            "constant_value": "eu-west-1"
+          }
+        }
+      }
+    },
+    "root_module": {
+      "outputs": {
+        "elb_dns_name": {
+          "expression": {
+            "references": [
+              "aws_elb.example.dns_name",
+              "aws_elb.example"
+            ]
+          }
+        }
+      },
+      "resources": [
+        {
+          "address": "aws_autoscaling_group.example",
+          "mode": "managed",
+          "type": "aws_autoscaling_group",
+          "name": "example",
+          "provider_config_key": "aws",
+          "expressions": {
+            "availability_zones": {
+              "constant_value": [
+                "us-west-1a",
+                "us-west-1b"
+              ]
+            },
+            "health_check_type": {
+              "constant_value": "ELB"
+            },
+            "launch_configuration": {
+              "references": [
+                "aws_launch_configuration.example.id",
+                "aws_launch_configuration.example"
+              ]
+            },
+            "load_balancers": {
+              "references": [
+                "aws_elb.example.name",
+                "aws_elb.example"
+              ]
+            },
+            "max_size": {
+              "constant_value": 10
+            },
+            "min_size": {
+              "constant_value": 2
+            },
+            "tag": [
+              {
+                "key": {
+                  "constant_value": "Name"
+                },
+                "propagate_at_launch": {
+                  "constant_value": true
+                },
+                "value": {
+                  "constant_value": "terraform-asg-example"
+                }
+              }
+            ]
+          },
+          "schema_version": 1
+        },
+        {
+          "address": "aws_elb.example",
+          "mode": "managed",
+          "type": "aws_elb",
+          "name": "example",
+          "provider_config_key": "aws",
+          "expressions": {
+            "availability_zones": {
+              "constant_value": [
+                "us-west-1a",
+                "us-west-1b"
+              ]
+            },
+            "health_check": [
+              {
+                "healthy_threshold": {
+                  "constant_value": 2
+                },
+                "interval": {
+                  "constant_value": 30
+                },
+                "target": {
+                  "references": [
+                    "var.server_port"
+                  ]
+                },
+                "timeout": {
+                  "constant_value": 3
+                },
+                "unhealthy_threshold": {
+                  "constant_value": 2
+                }
+              }
+            ],
+            "listener": [
+              {
+                "instance_port": {
+                  "references": [
+                    "var.server_port"
+                  ]
+                },
+                "instance_protocol": {
+                  "constant_value": "http"
+                },
+                "lb_port": {
+                  "constant_value": 80
+                },
+                "lb_protocol": {
+                  "constant_value": "http"
+                }
+              }
+            ],
+            "name": {
+              "constant_value": "terraform-asg-example"
+            },
+            "security_groups": {
+              "references": [
+                "aws_security_group.elb.id",
+                "aws_security_group.elb"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_launch_configuration.example",
+          "mode": "managed",
+          "type": "aws_launch_configuration",
+          "name": "example",
+          "provider_config_key": "aws",
+          "expressions": {
+            "image_id": {
+              "constant_value": "ami-785db401"
+            },
+            "instance_type": {
+              "constant_value": "t2.micro"
+            },
+            "security_groups": {
+              "references": [
+                "aws_security_group.instance.id",
+                "aws_security_group.instance"
+              ]
+            },
+            "user_data": {
+              "references": [
+                "var.server_port"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_security_group.elb",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "elb",
+          "provider_config_key": "aws",
+          "expressions": {
+            "egress": {
+              "constant_value": [
+                {
+                  "cidr_blocks": [
+                    "0.0.0.0/0"
+                  ],
+                  "description": null,
+                  "from_port": 0,
+                  "ipv6_cidr_blocks": null,
+                  "prefix_list_ids": null,
+                  "protocol": "-1",
+                  "security_groups": null,
+                  "self": null,
+                  "to_port": 0
+                }
+              ]
+            },
+            "ingress": {
+              "constant_value": [
+                {
+                  "cidr_blocks": [
+                    "0.0.0.0/0"
+                  ],
+                  "description": null,
+                  "from_port": 80,
+                  "ipv6_cidr_blocks": null,
+                  "prefix_list_ids": null,
+                  "protocol": "tcp",
+                  "security_groups": null,
+                  "self": null,
+                  "to_port": 80
+                }
+              ]
+            },
+            "name": {
+              "constant_value": "terraform-example-elb"
+            }
+          },
+          "schema_version": 1
+        },
+        {
+          "address": "aws_security_group.instance",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "instance",
+          "provider_config_key": "aws",
+          "expressions": {
+            "ingress": {
+              "references": [
+                "var.server_port",
+                "var.server_port"
+              ]
+            },
+            "name": {
+              "constant_value": "terraform-example-instance"
+            }
+          },
+          "schema_version": 1
+        }
+      ],
+      "variables": {
+        "server_port": {
+          "default": "8080",
+          "description": "The port the server will use for HTTP requests"
+        }
+      }
+    }
+  },
+  "relevant_attributes": [
+    {
+      "resource": "aws_security_group.instance",
+      "attribute": [
+        "id"
+      ]
+    },
+    {
+      "resource": "aws_security_group.elb",
+      "attribute": [
+        "id"
+      ]
+    },
+    {
+      "resource": "aws_elb.example",
+      "attribute": [
+        "name"
+      ]
+    },
+    {
+      "resource": "aws_launch_configuration.example",
+      "attribute": [
+        "id"
+      ]
+    },
+    {
+      "resource": "aws_elb.example",
+      "attribute": [
+        "dns_name"
+      ]
+    }
+  ],
+  "timestamp": "2024-02-06T10:23:04Z",
+  "errored": false
+}

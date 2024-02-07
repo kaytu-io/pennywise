@@ -1,0 +1,1442 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.7.1",
+  "variables": {
+    "server_port": {
+      "value": "8080"
+    }
+  },
+  "planned_values": {
+    "outputs": {
+      "public_ip": {
+        "sensitive": false
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "azurerm_lb.tfexample",
+          "mode": "managed",
+          "type": "azurerm_lb",
+          "name": "tfexample",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "edge_zone": null,
+            "frontend_ip_configuration": [
+              {
+                "name": "my-terraform-lb-frontend-ip",
+                "zones": null
+              }
+            ],
+            "location": "westeurope",
+            "name": "my-terraform-lb",
+            "resource_group_name": "my-terraform-rg",
+            "sku": "Basic",
+            "sku_tier": "Regional",
+            "tags": {
+              "environment": "my-terraform-env"
+            },
+            "timeouts": null
+          },
+          "sensitive_values": {
+            "frontend_ip_configuration": [
+              {
+                "inbound_nat_rules": [],
+                "load_balancer_rules": [],
+                "outbound_rules": []
+              }
+            ],
+            "private_ip_addresses": [],
+            "tags": {}
+          }
+        },
+        {
+          "address": "azurerm_lb_backend_address_pool.tfexample",
+          "mode": "managed",
+          "type": "azurerm_lb_backend_address_pool",
+          "name": "tfexample",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "name": "my-terraform-lb-backend-pool",
+            "timeouts": null,
+            "tunnel_interface": []
+          },
+          "sensitive_values": {
+            "backend_ip_configurations": [],
+            "load_balancing_rules": [],
+            "outbound_rules": [],
+            "tunnel_interface": []
+          }
+        },
+        {
+          "address": "azurerm_lb_probe.tfexample",
+          "mode": "managed",
+          "type": "azurerm_lb_probe",
+          "name": "tfexample",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "interval_in_seconds": 15,
+            "name": "my-terraform-lb-probe",
+            "number_of_probes": 2,
+            "port": 8080,
+            "request_path": null,
+            "timeouts": null
+          },
+          "sensitive_values": {
+            "load_balancer_rules": []
+          }
+        },
+        {
+          "address": "azurerm_lb_rule.tfexample",
+          "mode": "managed",
+          "type": "azurerm_lb_rule",
+          "name": "tfexample",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "backend_port": 8080,
+            "disable_outbound_snat": false,
+            "enable_floating_ip": false,
+            "enable_tcp_reset": null,
+            "frontend_ip_configuration_name": "my-terraform-lb-frontend-ip",
+            "frontend_port": 80,
+            "name": "my-terraform-lb-rule",
+            "protocol": "Tcp",
+            "timeouts": null
+          },
+          "sensitive_values": {
+            "backend_address_pool_ids": []
+          }
+        },
+        {
+          "address": "azurerm_linux_virtual_machine_scale_set.tfexample",
+          "mode": "managed",
+          "type": "azurerm_linux_virtual_machine_scale_set",
+          "name": "tfexample",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "additional_capabilities": [],
+            "admin_password": "Password1234!",
+            "admin_ssh_key": [],
+            "admin_username": "azureuser",
+            "automatic_os_upgrade_policy": [],
+            "boot_diagnostics": [],
+            "custom_data": null,
+            "data_disk": [],
+            "disable_password_authentication": false,
+            "do_not_run_extensions_on_overprovisioned_machines": false,
+            "edge_zone": null,
+            "encryption_at_host_enabled": null,
+            "eviction_policy": null,
+            "extension": [
+              {
+                "auto_upgrade_minor_version": true,
+                "automatic_upgrade_enabled": null,
+                "force_update_tag": "",
+                "name": "hostname",
+                "protected_settings": "",
+                "provision_after_extensions": [],
+                "publisher": "Microsoft.Azure.Extensions",
+                "settings": "      {\n        \"commandToExecute\": \"echo 'Hello, World' > index.html ; nohup busybox httpd -f -p 8080 &\"\n      }\n",
+                "type": "CustomScript",
+                "type_handler_version": "2.1"
+              }
+            ],
+            "extensions_time_budget": "PT1H30M",
+            "health_probe_id": null,
+            "identity": [],
+            "instances": 2,
+            "location": "westeurope",
+            "max_bid_price": -1,
+            "name": "my-terraform-vm-scale-set",
+            "network_interface": [
+              {
+                "dns_servers": null,
+                "enable_accelerated_networking": false,
+                "enable_ip_forwarding": false,
+                "ip_configuration": [
+                  {
+                    "application_gateway_backend_address_pool_ids": null,
+                    "application_security_group_ids": null,
+                    "load_balancer_inbound_nat_rules_ids": null,
+                    "name": "my-terraform-vm-ss-nic-ip",
+                    "primary": true,
+                    "public_ip_address": [],
+                    "version": "IPv4"
+                  }
+                ],
+                "name": "my-terraform-vm-ss-nic",
+                "network_security_group_id": null,
+                "primary": true
+              }
+            ],
+            "os_disk": [
+              {
+                "caching": "ReadWrite",
+                "diff_disk_settings": [],
+                "disk_encryption_set_id": null,
+                "storage_account_type": "Standard_LRS",
+                "write_accelerator_enabled": false
+              }
+            ],
+            "overprovision": true,
+            "plan": [],
+            "priority": "Regular",
+            "provision_vm_agent": true,
+            "proximity_placement_group_id": null,
+            "resource_group_name": "my-terraform-rg",
+            "rolling_upgrade_policy": [],
+            "scale_in_policy": "Default",
+            "secret": [],
+            "secure_boot_enabled": null,
+            "single_placement_group": true,
+            "sku": "Standard_DS1_v2",
+            "source_image_id": null,
+            "source_image_reference": [
+              {
+                "offer": "UbuntuServer",
+                "publisher": "Canonical",
+                "sku": "18.04-LTS",
+                "version": "latest"
+              }
+            ],
+            "tags": {
+              "environment": "my-terraform-env"
+            },
+            "timeouts": null,
+            "upgrade_mode": "Manual",
+            "user_data": null,
+            "vtpm_enabled": null,
+            "zone_balance": false,
+            "zones": null
+          },
+          "sensitive_values": {
+            "additional_capabilities": [],
+            "admin_ssh_key": [],
+            "automatic_instance_repair": [],
+            "automatic_os_upgrade_policy": [],
+            "boot_diagnostics": [],
+            "data_disk": [],
+            "extension": [
+              {
+                "provision_after_extensions": []
+              }
+            ],
+            "identity": [],
+            "network_interface": [
+              {
+                "ip_configuration": [
+                  {
+                    "load_balancer_backend_address_pool_ids": [],
+                    "public_ip_address": []
+                  }
+                ]
+              }
+            ],
+            "os_disk": [
+              {
+                "diff_disk_settings": []
+              }
+            ],
+            "plan": [],
+            "rolling_upgrade_policy": [],
+            "secret": [],
+            "source_image_reference": [
+              {}
+            ],
+            "tags": {},
+            "terminate_notification": []
+          }
+        },
+        {
+          "address": "azurerm_public_ip.tfexample",
+          "mode": "managed",
+          "type": "azurerm_public_ip",
+          "name": "tfexample",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "allocation_method": "Static",
+            "domain_name_label": null,
+            "edge_zone": null,
+            "idle_timeout_in_minutes": 4,
+            "ip_tags": null,
+            "ip_version": "IPv4",
+            "location": "westeurope",
+            "name": "my-terraform-public-ip",
+            "public_ip_prefix_id": null,
+            "resource_group_name": "my-terraform-rg",
+            "reverse_fqdn": null,
+            "sku": "Basic",
+            "sku_tier": "Regional",
+            "tags": {
+              "environment": "my-terraform-env"
+            },
+            "timeouts": null,
+            "zones": null
+          },
+          "sensitive_values": {
+            "tags": {}
+          }
+        },
+        {
+          "address": "azurerm_resource_group.tfexample",
+          "mode": "managed",
+          "type": "azurerm_resource_group",
+          "name": "tfexample",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "location": "westeurope",
+            "name": "my-terraform-rg",
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "azurerm_subnet.tfexample",
+          "mode": "managed",
+          "type": "azurerm_subnet",
+          "name": "tfexample",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "address_prefixes": [
+              "10.0.2.0/24"
+            ],
+            "delegation": [],
+            "enforce_private_link_endpoint_network_policies": false,
+            "enforce_private_link_service_network_policies": false,
+            "name": "my-terraform-subnet",
+            "resource_group_name": "my-terraform-rg",
+            "service_endpoint_policy_ids": null,
+            "service_endpoints": null,
+            "timeouts": null,
+            "virtual_network_name": "my-terraform-vnet"
+          },
+          "sensitive_values": {
+            "address_prefixes": [
+              false
+            ],
+            "delegation": []
+          }
+        },
+        {
+          "address": "azurerm_virtual_network.tfexample",
+          "mode": "managed",
+          "type": "azurerm_virtual_network",
+          "name": "tfexample",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "address_space": [
+              "10.0.0.0/16"
+            ],
+            "bgp_community": null,
+            "ddos_protection_plan": [],
+            "edge_zone": null,
+            "flow_timeout_in_minutes": null,
+            "location": "westeurope",
+            "name": "my-terraform-vnet",
+            "resource_group_name": "my-terraform-rg",
+            "tags": {
+              "environment": "my-terraform-env"
+            },
+            "timeouts": null
+          },
+          "sensitive_values": {
+            "address_space": [
+              false
+            ],
+            "ddos_protection_plan": [],
+            "dns_servers": [],
+            "subnet": [],
+            "tags": {}
+          }
+        },
+        {
+          "address": "data.azurerm_public_ip.tfexample",
+          "mode": "data",
+          "type": "azurerm_public_ip",
+          "name": "tfexample",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "name": "my-terraform-public-ip",
+            "resource_group_name": "my-terraform-rg",
+            "timeouts": null
+          },
+          "sensitive_values": {
+            "ip_tags": {},
+            "tags": {},
+            "zones": []
+          }
+        }
+      ]
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "data.azurerm_public_ip.tfexample",
+      "mode": "data",
+      "type": "azurerm_public_ip",
+      "name": "tfexample",
+      "provider_name": "registry.terraform.io/hashicorp/azurerm",
+      "change": {
+        "actions": [
+          "read"
+        ],
+        "before": null,
+        "after": {
+          "name": "my-terraform-public-ip",
+          "resource_group_name": "my-terraform-rg",
+          "timeouts": null
+        },
+        "after_unknown": {
+          "allocation_method": true,
+          "domain_name_label": true,
+          "fqdn": true,
+          "id": true,
+          "idle_timeout_in_minutes": true,
+          "ip_address": true,
+          "ip_tags": true,
+          "ip_version": true,
+          "location": true,
+          "reverse_fqdn": true,
+          "sku": true,
+          "tags": true,
+          "zones": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "ip_tags": {},
+          "tags": {},
+          "zones": []
+        }
+      },
+      "action_reason": "read_because_dependency_pending"
+    },
+    {
+      "address": "azurerm_lb.tfexample",
+      "mode": "managed",
+      "type": "azurerm_lb",
+      "name": "tfexample",
+      "provider_name": "registry.terraform.io/hashicorp/azurerm",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "edge_zone": null,
+          "frontend_ip_configuration": [
+            {
+              "name": "my-terraform-lb-frontend-ip",
+              "zones": null
+            }
+          ],
+          "location": "westeurope",
+          "name": "my-terraform-lb",
+          "resource_group_name": "my-terraform-rg",
+          "sku": "Basic",
+          "sku_tier": "Regional",
+          "tags": {
+            "environment": "my-terraform-env"
+          },
+          "timeouts": null
+        },
+        "after_unknown": {
+          "frontend_ip_configuration": [
+            {
+              "gateway_load_balancer_frontend_ip_configuration_id": true,
+              "id": true,
+              "inbound_nat_rules": true,
+              "load_balancer_rules": true,
+              "outbound_rules": true,
+              "private_ip_address": true,
+              "private_ip_address_allocation": true,
+              "private_ip_address_version": true,
+              "public_ip_address_id": true,
+              "public_ip_prefix_id": true,
+              "subnet_id": true
+            }
+          ],
+          "id": true,
+          "private_ip_address": true,
+          "private_ip_addresses": true,
+          "tags": {}
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "frontend_ip_configuration": [
+            {
+              "inbound_nat_rules": [],
+              "load_balancer_rules": [],
+              "outbound_rules": []
+            }
+          ],
+          "private_ip_addresses": [],
+          "tags": {}
+        }
+      }
+    },
+    {
+      "address": "azurerm_lb_backend_address_pool.tfexample",
+      "mode": "managed",
+      "type": "azurerm_lb_backend_address_pool",
+      "name": "tfexample",
+      "provider_name": "registry.terraform.io/hashicorp/azurerm",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "my-terraform-lb-backend-pool",
+          "timeouts": null,
+          "tunnel_interface": []
+        },
+        "after_unknown": {
+          "backend_ip_configurations": true,
+          "id": true,
+          "load_balancing_rules": true,
+          "loadbalancer_id": true,
+          "outbound_rules": true,
+          "tunnel_interface": []
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "backend_ip_configurations": [],
+          "load_balancing_rules": [],
+          "outbound_rules": [],
+          "tunnel_interface": []
+        }
+      }
+    },
+    {
+      "address": "azurerm_lb_probe.tfexample",
+      "mode": "managed",
+      "type": "azurerm_lb_probe",
+      "name": "tfexample",
+      "provider_name": "registry.terraform.io/hashicorp/azurerm",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "interval_in_seconds": 15,
+          "name": "my-terraform-lb-probe",
+          "number_of_probes": 2,
+          "port": 8080,
+          "request_path": null,
+          "timeouts": null
+        },
+        "after_unknown": {
+          "id": true,
+          "load_balancer_rules": true,
+          "loadbalancer_id": true,
+          "protocol": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "load_balancer_rules": []
+        }
+      }
+    },
+    {
+      "address": "azurerm_lb_rule.tfexample",
+      "mode": "managed",
+      "type": "azurerm_lb_rule",
+      "name": "tfexample",
+      "provider_name": "registry.terraform.io/hashicorp/azurerm",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "backend_port": 8080,
+          "disable_outbound_snat": false,
+          "enable_floating_ip": false,
+          "enable_tcp_reset": null,
+          "frontend_ip_configuration_name": "my-terraform-lb-frontend-ip",
+          "frontend_port": 80,
+          "name": "my-terraform-lb-rule",
+          "protocol": "Tcp",
+          "timeouts": null
+        },
+        "after_unknown": {
+          "backend_address_pool_ids": true,
+          "frontend_ip_configuration_id": true,
+          "id": true,
+          "idle_timeout_in_minutes": true,
+          "load_distribution": true,
+          "loadbalancer_id": true,
+          "probe_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "backend_address_pool_ids": []
+        }
+      }
+    },
+    {
+      "address": "azurerm_linux_virtual_machine_scale_set.tfexample",
+      "mode": "managed",
+      "type": "azurerm_linux_virtual_machine_scale_set",
+      "name": "tfexample",
+      "provider_name": "registry.terraform.io/hashicorp/azurerm",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "additional_capabilities": [],
+          "admin_password": "Password1234!",
+          "admin_ssh_key": [],
+          "admin_username": "azureuser",
+          "automatic_os_upgrade_policy": [],
+          "boot_diagnostics": [],
+          "custom_data": null,
+          "data_disk": [],
+          "disable_password_authentication": false,
+          "do_not_run_extensions_on_overprovisioned_machines": false,
+          "edge_zone": null,
+          "encryption_at_host_enabled": null,
+          "eviction_policy": null,
+          "extension": [
+            {
+              "auto_upgrade_minor_version": true,
+              "automatic_upgrade_enabled": null,
+              "force_update_tag": "",
+              "name": "hostname",
+              "protected_settings": "",
+              "provision_after_extensions": [],
+              "publisher": "Microsoft.Azure.Extensions",
+              "settings": "      {\n        \"commandToExecute\": \"echo 'Hello, World' > index.html ; nohup busybox httpd -f -p 8080 &\"\n      }\n",
+              "type": "CustomScript",
+              "type_handler_version": "2.1"
+            }
+          ],
+          "extensions_time_budget": "PT1H30M",
+          "health_probe_id": null,
+          "identity": [],
+          "instances": 2,
+          "location": "westeurope",
+          "max_bid_price": -1,
+          "name": "my-terraform-vm-scale-set",
+          "network_interface": [
+            {
+              "dns_servers": null,
+              "enable_accelerated_networking": false,
+              "enable_ip_forwarding": false,
+              "ip_configuration": [
+                {
+                  "application_gateway_backend_address_pool_ids": null,
+                  "application_security_group_ids": null,
+                  "load_balancer_inbound_nat_rules_ids": null,
+                  "name": "my-terraform-vm-ss-nic-ip",
+                  "primary": true,
+                  "public_ip_address": [],
+                  "version": "IPv4"
+                }
+              ],
+              "name": "my-terraform-vm-ss-nic",
+              "network_security_group_id": null,
+              "primary": true
+            }
+          ],
+          "os_disk": [
+            {
+              "caching": "ReadWrite",
+              "diff_disk_settings": [],
+              "disk_encryption_set_id": null,
+              "storage_account_type": "Standard_LRS",
+              "write_accelerator_enabled": false
+            }
+          ],
+          "overprovision": true,
+          "plan": [],
+          "priority": "Regular",
+          "provision_vm_agent": true,
+          "proximity_placement_group_id": null,
+          "resource_group_name": "my-terraform-rg",
+          "rolling_upgrade_policy": [],
+          "scale_in_policy": "Default",
+          "secret": [],
+          "secure_boot_enabled": null,
+          "single_placement_group": true,
+          "sku": "Standard_DS1_v2",
+          "source_image_id": null,
+          "source_image_reference": [
+            {
+              "offer": "UbuntuServer",
+              "publisher": "Canonical",
+              "sku": "18.04-LTS",
+              "version": "latest"
+            }
+          ],
+          "tags": {
+            "environment": "my-terraform-env"
+          },
+          "timeouts": null,
+          "upgrade_mode": "Manual",
+          "user_data": null,
+          "vtpm_enabled": null,
+          "zone_balance": false,
+          "zones": null
+        },
+        "after_unknown": {
+          "additional_capabilities": [],
+          "admin_ssh_key": [],
+          "automatic_instance_repair": true,
+          "automatic_os_upgrade_policy": [],
+          "boot_diagnostics": [],
+          "computer_name_prefix": true,
+          "data_disk": [],
+          "extension": [
+            {
+              "provision_after_extensions": []
+            }
+          ],
+          "id": true,
+          "identity": [],
+          "network_interface": [
+            {
+              "ip_configuration": [
+                {
+                  "load_balancer_backend_address_pool_ids": true,
+                  "public_ip_address": [],
+                  "subnet_id": true
+                }
+              ]
+            }
+          ],
+          "os_disk": [
+            {
+              "diff_disk_settings": [],
+              "disk_size_gb": true
+            }
+          ],
+          "plan": [],
+          "platform_fault_domain_count": true,
+          "rolling_upgrade_policy": [],
+          "secret": [],
+          "source_image_reference": [
+            {}
+          ],
+          "tags": {},
+          "terminate_notification": true,
+          "unique_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "additional_capabilities": [],
+          "admin_password": true,
+          "admin_ssh_key": [],
+          "automatic_instance_repair": [],
+          "automatic_os_upgrade_policy": [],
+          "boot_diagnostics": [],
+          "custom_data": true,
+          "data_disk": [],
+          "extension": true,
+          "identity": [],
+          "network_interface": [
+            {
+              "ip_configuration": [
+                {
+                  "load_balancer_backend_address_pool_ids": [],
+                  "public_ip_address": []
+                }
+              ]
+            }
+          ],
+          "os_disk": [
+            {
+              "diff_disk_settings": []
+            }
+          ],
+          "plan": [],
+          "rolling_upgrade_policy": [],
+          "secret": [],
+          "source_image_reference": [
+            {}
+          ],
+          "tags": {},
+          "terminate_notification": []
+        }
+      }
+    },
+    {
+      "address": "azurerm_public_ip.tfexample",
+      "mode": "managed",
+      "type": "azurerm_public_ip",
+      "name": "tfexample",
+      "provider_name": "registry.terraform.io/hashicorp/azurerm",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "allocation_method": "Static",
+          "domain_name_label": null,
+          "edge_zone": null,
+          "idle_timeout_in_minutes": 4,
+          "ip_tags": null,
+          "ip_version": "IPv4",
+          "location": "westeurope",
+          "name": "my-terraform-public-ip",
+          "public_ip_prefix_id": null,
+          "resource_group_name": "my-terraform-rg",
+          "reverse_fqdn": null,
+          "sku": "Basic",
+          "sku_tier": "Regional",
+          "tags": {
+            "environment": "my-terraform-env"
+          },
+          "timeouts": null,
+          "zones": null
+        },
+        "after_unknown": {
+          "fqdn": true,
+          "id": true,
+          "ip_address": true,
+          "tags": {}
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "tags": {}
+        }
+      }
+    },
+    {
+      "address": "azurerm_resource_group.tfexample",
+      "mode": "managed",
+      "type": "azurerm_resource_group",
+      "name": "tfexample",
+      "provider_name": "registry.terraform.io/hashicorp/azurerm",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "location": "westeurope",
+          "name": "my-terraform-rg",
+          "tags": null,
+          "timeouts": null
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "azurerm_subnet.tfexample",
+      "mode": "managed",
+      "type": "azurerm_subnet",
+      "name": "tfexample",
+      "provider_name": "registry.terraform.io/hashicorp/azurerm",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "address_prefixes": [
+            "10.0.2.0/24"
+          ],
+          "delegation": [],
+          "enforce_private_link_endpoint_network_policies": false,
+          "enforce_private_link_service_network_policies": false,
+          "name": "my-terraform-subnet",
+          "resource_group_name": "my-terraform-rg",
+          "service_endpoint_policy_ids": null,
+          "service_endpoints": null,
+          "timeouts": null,
+          "virtual_network_name": "my-terraform-vnet"
+        },
+        "after_unknown": {
+          "address_prefixes": [
+            false
+          ],
+          "delegation": [],
+          "id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "address_prefixes": [
+            false
+          ],
+          "delegation": []
+        }
+      }
+    },
+    {
+      "address": "azurerm_virtual_network.tfexample",
+      "mode": "managed",
+      "type": "azurerm_virtual_network",
+      "name": "tfexample",
+      "provider_name": "registry.terraform.io/hashicorp/azurerm",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "address_space": [
+            "10.0.0.0/16"
+          ],
+          "bgp_community": null,
+          "ddos_protection_plan": [],
+          "edge_zone": null,
+          "flow_timeout_in_minutes": null,
+          "location": "westeurope",
+          "name": "my-terraform-vnet",
+          "resource_group_name": "my-terraform-rg",
+          "tags": {
+            "environment": "my-terraform-env"
+          },
+          "timeouts": null
+        },
+        "after_unknown": {
+          "address_space": [
+            false
+          ],
+          "ddos_protection_plan": [],
+          "dns_servers": true,
+          "guid": true,
+          "id": true,
+          "subnet": true,
+          "tags": {}
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "address_space": [
+            false
+          ],
+          "ddos_protection_plan": [],
+          "dns_servers": [],
+          "subnet": [],
+          "tags": {}
+        }
+      }
+    }
+  ],
+  "output_changes": {
+    "public_ip": {
+      "actions": [
+        "create"
+      ],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": false,
+      "after_sensitive": false
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "azurerm": {
+        "name": "azurerm",
+        "full_name": "registry.terraform.io/hashicorp/azurerm",
+        "version_constraint": "~> 3.1.0",
+        "expressions": {
+          "features": [
+            {}
+          ]
+        }
+      }
+    },
+    "root_module": {
+      "outputs": {
+        "public_ip": {
+          "expression": {
+            "references": [
+              "data.azurerm_public_ip.tfexample.ip_address",
+              "data.azurerm_public_ip.tfexample"
+            ]
+          }
+        }
+      },
+      "resources": [
+        {
+          "address": "azurerm_lb.tfexample",
+          "mode": "managed",
+          "type": "azurerm_lb",
+          "name": "tfexample",
+          "provider_config_key": "azurerm",
+          "expressions": {
+            "frontend_ip_configuration": [
+              {
+                "name": {
+                  "constant_value": "my-terraform-lb-frontend-ip"
+                },
+                "public_ip_address_id": {
+                  "references": [
+                    "azurerm_public_ip.tfexample.id",
+                    "azurerm_public_ip.tfexample"
+                  ]
+                }
+              }
+            ],
+            "location": {
+              "references": [
+                "azurerm_resource_group.tfexample.location",
+                "azurerm_resource_group.tfexample"
+              ]
+            },
+            "name": {
+              "constant_value": "my-terraform-lb"
+            },
+            "resource_group_name": {
+              "references": [
+                "azurerm_resource_group.tfexample.name",
+                "azurerm_resource_group.tfexample"
+              ]
+            },
+            "tags": {
+              "constant_value": {
+                "environment": "my-terraform-env"
+              }
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "azurerm_lb_backend_address_pool.tfexample",
+          "mode": "managed",
+          "type": "azurerm_lb_backend_address_pool",
+          "name": "tfexample",
+          "provider_config_key": "azurerm",
+          "expressions": {
+            "loadbalancer_id": {
+              "references": [
+                "azurerm_lb.tfexample.id",
+                "azurerm_lb.tfexample"
+              ]
+            },
+            "name": {
+              "constant_value": "my-terraform-lb-backend-pool"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "azurerm_lb_probe.tfexample",
+          "mode": "managed",
+          "type": "azurerm_lb_probe",
+          "name": "tfexample",
+          "provider_config_key": "azurerm",
+          "expressions": {
+            "loadbalancer_id": {
+              "references": [
+                "azurerm_lb.tfexample.id",
+                "azurerm_lb.tfexample"
+              ]
+            },
+            "name": {
+              "constant_value": "my-terraform-lb-probe"
+            },
+            "port": {
+              "references": [
+                "var.server_port"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "azurerm_lb_rule.tfexample",
+          "mode": "managed",
+          "type": "azurerm_lb_rule",
+          "name": "tfexample",
+          "provider_config_key": "azurerm",
+          "expressions": {
+            "backend_address_pool_ids": {
+              "references": [
+                "azurerm_lb_backend_address_pool.tfexample.id",
+                "azurerm_lb_backend_address_pool.tfexample"
+              ]
+            },
+            "backend_port": {
+              "references": [
+                "var.server_port"
+              ]
+            },
+            "frontend_ip_configuration_name": {
+              "constant_value": "my-terraform-lb-frontend-ip"
+            },
+            "frontend_port": {
+              "constant_value": 80
+            },
+            "loadbalancer_id": {
+              "references": [
+                "azurerm_lb.tfexample.id",
+                "azurerm_lb.tfexample"
+              ]
+            },
+            "name": {
+              "constant_value": "my-terraform-lb-rule"
+            },
+            "probe_id": {
+              "references": [
+                "azurerm_lb_probe.tfexample.id",
+                "azurerm_lb_probe.tfexample"
+              ]
+            },
+            "protocol": {
+              "constant_value": "Tcp"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "azurerm_linux_virtual_machine_scale_set.tfexample",
+          "mode": "managed",
+          "type": "azurerm_linux_virtual_machine_scale_set",
+          "name": "tfexample",
+          "provider_config_key": "azurerm",
+          "expressions": {
+            "admin_password": {
+              "constant_value": "Password1234!"
+            },
+            "admin_username": {
+              "constant_value": "azureuser"
+            },
+            "disable_password_authentication": {
+              "constant_value": false
+            },
+            "extension": [
+              {
+                "name": {
+                  "constant_value": "hostname"
+                },
+                "publisher": {
+                  "constant_value": "Microsoft.Azure.Extensions"
+                },
+                "settings": {
+                  "references": [
+                    "var.server_port"
+                  ]
+                },
+                "type": {
+                  "constant_value": "CustomScript"
+                },
+                "type_handler_version": {
+                  "constant_value": "2.1"
+                }
+              }
+            ],
+            "instances": {
+              "constant_value": 2
+            },
+            "location": {
+              "references": [
+                "azurerm_resource_group.tfexample.location",
+                "azurerm_resource_group.tfexample"
+              ]
+            },
+            "name": {
+              "constant_value": "my-terraform-vm-scale-set"
+            },
+            "network_interface": [
+              {
+                "ip_configuration": [
+                  {
+                    "load_balancer_backend_address_pool_ids": {
+                      "references": [
+                        "azurerm_lb_backend_address_pool.tfexample.id",
+                        "azurerm_lb_backend_address_pool.tfexample"
+                      ]
+                    },
+                    "name": {
+                      "constant_value": "my-terraform-vm-ss-nic-ip"
+                    },
+                    "primary": {
+                      "constant_value": true
+                    },
+                    "subnet_id": {
+                      "references": [
+                        "azurerm_subnet.tfexample.id",
+                        "azurerm_subnet.tfexample"
+                      ]
+                    }
+                  }
+                ],
+                "name": {
+                  "constant_value": "my-terraform-vm-ss-nic"
+                },
+                "primary": {
+                  "constant_value": true
+                }
+              }
+            ],
+            "os_disk": [
+              {
+                "caching": {
+                  "constant_value": "ReadWrite"
+                },
+                "storage_account_type": {
+                  "constant_value": "Standard_LRS"
+                }
+              }
+            ],
+            "resource_group_name": {
+              "references": [
+                "azurerm_resource_group.tfexample.name",
+                "azurerm_resource_group.tfexample"
+              ]
+            },
+            "sku": {
+              "constant_value": "Standard_DS1_v2"
+            },
+            "source_image_reference": [
+              {
+                "offer": {
+                  "constant_value": "UbuntuServer"
+                },
+                "publisher": {
+                  "constant_value": "Canonical"
+                },
+                "sku": {
+                  "constant_value": "18.04-LTS"
+                },
+                "version": {
+                  "constant_value": "latest"
+                }
+              }
+            ],
+            "tags": {
+              "constant_value": {
+                "environment": "my-terraform-env"
+              }
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "azurerm_public_ip.tfexample",
+          "mode": "managed",
+          "type": "azurerm_public_ip",
+          "name": "tfexample",
+          "provider_config_key": "azurerm",
+          "expressions": {
+            "allocation_method": {
+              "constant_value": "Static"
+            },
+            "location": {
+              "references": [
+                "azurerm_resource_group.tfexample.location",
+                "azurerm_resource_group.tfexample"
+              ]
+            },
+            "name": {
+              "constant_value": "my-terraform-public-ip"
+            },
+            "resource_group_name": {
+              "references": [
+                "azurerm_resource_group.tfexample.name",
+                "azurerm_resource_group.tfexample"
+              ]
+            },
+            "tags": {
+              "constant_value": {
+                "environment": "my-terraform-env"
+              }
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "azurerm_resource_group.tfexample",
+          "mode": "managed",
+          "type": "azurerm_resource_group",
+          "name": "tfexample",
+          "provider_config_key": "azurerm",
+          "expressions": {
+            "location": {
+              "constant_value": "West Europe"
+            },
+            "name": {
+              "constant_value": "my-terraform-rg"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "azurerm_subnet.tfexample",
+          "mode": "managed",
+          "type": "azurerm_subnet",
+          "name": "tfexample",
+          "provider_config_key": "azurerm",
+          "expressions": {
+            "address_prefixes": {
+              "constant_value": [
+                "10.0.2.0/24"
+              ]
+            },
+            "name": {
+              "constant_value": "my-terraform-subnet"
+            },
+            "resource_group_name": {
+              "references": [
+                "azurerm_resource_group.tfexample.name",
+                "azurerm_resource_group.tfexample"
+              ]
+            },
+            "virtual_network_name": {
+              "references": [
+                "azurerm_virtual_network.tfexample.name",
+                "azurerm_virtual_network.tfexample"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "azurerm_virtual_network.tfexample",
+          "mode": "managed",
+          "type": "azurerm_virtual_network",
+          "name": "tfexample",
+          "provider_config_key": "azurerm",
+          "expressions": {
+            "address_space": {
+              "constant_value": [
+                "10.0.0.0/16"
+              ]
+            },
+            "location": {
+              "references": [
+                "azurerm_resource_group.tfexample.location",
+                "azurerm_resource_group.tfexample"
+              ]
+            },
+            "name": {
+              "constant_value": "my-terraform-vnet"
+            },
+            "resource_group_name": {
+              "references": [
+                "azurerm_resource_group.tfexample.name",
+                "azurerm_resource_group.tfexample"
+              ]
+            },
+            "tags": {
+              "constant_value": {
+                "environment": "my-terraform-env"
+              }
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "data.azurerm_public_ip.tfexample",
+          "mode": "data",
+          "type": "azurerm_public_ip",
+          "name": "tfexample",
+          "provider_config_key": "azurerm",
+          "expressions": {
+            "name": {
+              "references": [
+                "azurerm_public_ip.tfexample.name",
+                "azurerm_public_ip.tfexample"
+              ]
+            },
+            "resource_group_name": {
+              "references": [
+                "azurerm_linux_virtual_machine_scale_set.tfexample.resource_group_name",
+                "azurerm_linux_virtual_machine_scale_set.tfexample"
+              ]
+            }
+          },
+          "schema_version": 0
+        }
+      ],
+      "variables": {
+        "server_port": {
+          "default": "8080",
+          "description": "The port the server will use for HTTP requests"
+        }
+      }
+    }
+  },
+  "relevant_attributes": [
+    {
+      "resource": "azurerm_resource_group.tfexample",
+      "attribute": [
+        "location"
+      ]
+    },
+    {
+      "resource": "azurerm_lb_probe.tfexample",
+      "attribute": [
+        "id"
+      ]
+    },
+    {
+      "resource": "azurerm_subnet.tfexample",
+      "attribute": [
+        "id"
+      ]
+    },
+    {
+      "resource": "azurerm_public_ip.tfexample",
+      "attribute": [
+        "name"
+      ]
+    },
+    {
+      "resource": "azurerm_linux_virtual_machine_scale_set.tfexample",
+      "attribute": [
+        "resource_group_name"
+      ]
+    },
+    {
+      "resource": "azurerm_resource_group.tfexample",
+      "attribute": [
+        "name"
+      ]
+    },
+    {
+      "resource": "azurerm_virtual_network.tfexample",
+      "attribute": [
+        "name"
+      ]
+    },
+    {
+      "resource": "azurerm_public_ip.tfexample",
+      "attribute": [
+        "id"
+      ]
+    },
+    {
+      "resource": "azurerm_lb.tfexample",
+      "attribute": [
+        "id"
+      ]
+    },
+    {
+      "resource": "azurerm_lb_backend_address_pool.tfexample",
+      "attribute": [
+        "id"
+      ]
+    },
+    {
+      "resource": "data.azurerm_public_ip.tfexample",
+      "attribute": [
+        "ip_address"
+      ]
+    }
+  ],
+  "timestamp": "2024-02-06T09:37:51Z",
+  "errored": false
+}
