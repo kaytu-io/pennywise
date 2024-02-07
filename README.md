@@ -8,7 +8,7 @@
 </p>
 
 ## Overview
-Pennywise estimates the cost of cloud infrastructure before the actual deployment by analyzing Terraform and OpenTofu plan files. The current version supports commonly used resources in AWS and Azure.
+Pennywise estimates the cost of cloud infrastructure before the actual deployment by analyzing Terraform and OpenTofu plan files. The current version supports commonly used [AWS resources](https://github.com/kaytu-io/pennywise/blob/main/docs/aws-support.md) and [Azure resources](https://github.com/kaytu-io/pennywise/blob/main/docs/azure-support.md).
 
 ![Cost Gif](.github/assets/cost_gif.gif)
 ## Getting Started
