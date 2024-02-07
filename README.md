@@ -21,6 +21,7 @@ wget -qO - https://raw.githubusercontent.com/kaytu-io/pennywise/main/scripts/ins
 ```
 
 **Windows**
+
 Download and install manually from [releases](https://github.com/kaytu-io/pennywise/releases) 
 
 ### 2. Sign-up / Login
