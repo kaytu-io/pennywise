@@ -15,19 +15,22 @@ Pennywise estimates the cost of cloud infrastructure before the actual deploymen
 
 ### 1. Install CLI
 
+**Linux/MacOS**
+```shell
+wget -qO - https://raw.githubusercontent.com/kaytu-io/pennywise/main/scripts/install.sh | sh
+```
 
-- Linux/macOS
-    ```shell
-    wget -qO - https://raw.githubusercontent.com/kaytu-io/pennywise/main/scripts/install.sh | sh
-    ```
-- Windows\
-    Download and install manually from [releases](https://github.com/kaytu-io/pennywise/releases) 
+**Windows**
+Download and install manually from [releases](https://github.com/kaytu-io/pennywise/releases) 
 
 ### 2. Sign-up / Login
+
 Sign-up & Login for free by running using:
+
 ```shell
 pennywise login
 ``` 
+
 this command will give you a link to open in your browser to help you sign-up and login into your kaytu account.
 
 ### 3. Generate Terraform Plan
