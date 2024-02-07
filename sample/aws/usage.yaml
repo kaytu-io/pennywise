@@ -1,0 +1,2 @@
+aws_elb.example:
+  monthly_data_processed_gb: 10000
