@@ -55,7 +55,7 @@ Run the following in the directory containing your terraform plan:
 pennywise cost terraform --json-path tfplan.json
 ```
 
-![Cost Gif](.github/assets/cost.png)
+![Cost Gif](.github/assets/cost-result.png)
 
 You can also specify the usage file which provides additional information for cost estimation.
 The usage file is supported in two types: `json` and `yaml`
