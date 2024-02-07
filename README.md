@@ -26,7 +26,7 @@ Download and install manually from [releases](https://github.com/kaytu-io/pennyw
 
 ### 2. Sign-up / Login
 
-Sign-up & Login for free by running using:
+Sign-up & Login for free using:
 
 ```shell
 pennywise login
