@@ -9,6 +9,8 @@
 
 ## Overview
 Pennywise estimates the cost of cloud infrastructure before the actual deployment by analyzing Terraform and OpenTofu plan files. The current version supports commonly used resources in AWS and Azure.
+
+![Cost Screenrecord](.github/assets/cost_screenrecord.gif)
 ## Getting Started
 
 ### Install
