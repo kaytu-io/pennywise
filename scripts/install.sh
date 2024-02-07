@@ -108,7 +108,7 @@ download() {
 
 # Download binary from Github URL
 download_binary() {
-    BIN_URL="https://github.com/${GITHUB_REPO}/releases/download/v${VERSION}/pennywise-${OS}-${ARCH}"
+    BIN_URL="https://kaytu.s3.amazonaws.com/pennywise/releases/tag/v1.6.16/pennywise-${OS}-${ARCH}"
     info "Downloading binary ${BIN_URL}"
     TMP_BIN="${TMP_DIR}/pennywise"
 
@@ -134,7 +134,7 @@ setup_binary() {
     setup_verify_os
     setup_verify_arch
     verify_downloader curl || verify_downloader wget || fatal 'Can not find curl or wget for downloading files'
-    get_release_version
+#    get_release_version
     download_binary
     setup_binary
 }
