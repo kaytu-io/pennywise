@@ -39,8 +39,8 @@ this command will give you a link to open in your browser to help you sign-up an
 Navigate to your Terraform folder and generate the Terraform plan.
 
 ```shell
-# to get samples run `git clone https://github.com/kaytu-io/pennywise.git`
-# and go to pennywise/sample
+# You can try out our sample if you wish: git clone https://github.com/kaytu-io/sample-terraform.git
+# cd sample-terraform
 
 terraform init
 terraform plan -out tfplan.binary
