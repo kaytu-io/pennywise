@@ -44,7 +44,7 @@ Navigate to your Terraform folder and generate the Terraform plan (you need terr
 
 terraform init
 terraform plan -out tfplan.binary
-terraform show -json tfplan.binary | jq > tfplan.json
+terraform show -json tfplan.binary > tfplan.json
 ```
 
 ### 4. Get costs
