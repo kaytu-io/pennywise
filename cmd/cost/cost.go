@@ -15,7 +15,7 @@ var CostCmd = &cobra.Command{
 func init() {
 	CostCmd.AddCommand(terraformCommand)
 	terraformCommand.Flags().String("json-path", "", "terraform plan json file path")
-	terraformCommand.MarkFlagRequired("json-path")
+	terraformCommand.Flags().String("project-path", ".", "path to terraform project")
 	terraformCommand.Flags().String("usage", "", "usage file path")
 	terraformCommand.Flags().Bool("classic", false, "Show results in classic view (not interactive)")
 }

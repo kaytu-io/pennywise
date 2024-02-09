@@ -7,6 +7,7 @@ import (
 	"github.com/kaytu-io/pennywise/cmd/flags"
 	"github.com/kaytu-io/pennywise/pkg/output"
 	"github.com/kaytu-io/pennywise/pkg/parser/hcl"
+	"github.com/kaytu-io/pennywise/pkg/parser/new_hcl"
 	"github.com/kaytu-io/pennywise/pkg/schema"
 	"github.com/kaytu-io/pennywise/pkg/server"
 	"github.com/kaytu-io/pennywise/pkg/submission"
@@ -56,9 +57,17 @@ var terraformCommand = &cobra.Command{
 		classic := flags.ReadBooleanFlag(cmd, "classic")
 
 		jsonPath := flags.ReadStringOptionalFlag(cmd, "json-path")
-		err := estimateTfPlanJson(classic, *jsonPath, usage, ServerClientAddress)
-		if err != nil {
-			return err
+		projectPath := flags.ReadStringFlag(cmd, "project-path")
+		if jsonPath != nil {
+			err := estimateTfPlanJson(classic, *jsonPath, usage, ServerClientAddress)
+			if err != nil {
+				return err
+			}
+		} else {
+			err := estimateTerraformProject(classic, projectPath, usage, ServerClientAddress)
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	},
@@ -146,4 +155,45 @@ func estimateTfPlanJson(classic bool, jsonPath string, usage usagePackage.Usage,
 		}
 	}
 	return nil
+}
+
+func estimateTerraformProject(classic bool, projectPath string, usage usagePackage.Usage, ServerClientAddress string) error {
+	providerName, parserResources, err := new_hcl.ParseHclResources(projectPath, usage)
+	if err != nil {
+		return err
+	}
+	var resources []schema.ResourceDef
+	for _, r := range parserResources {
+		resources = append(resources, r.ToResource(providerName))
+	}
+	//serverClient, err := server.NewPennywiseServerClient(ServerClientAddress)
+	//if err != nil {
+	//	return err
+	//}
+	sub, err := submission.CreateSubmission(resources)
+	if err != nil {
+		return err
+	}
+	err = sub.StoreAsFile()
+	if err != nil {
+		return err
+	}
+	return nil
+	//state, err := serverClient.GetStateCost(*sub)
+	//if err != nil {
+	//	return err
+	//}
+	//if classic {
+	//	costString, err := state.CostString()
+	//	if err != nil {
+	//		return err
+	//	}
+	//	fmt.Println(costString)
+	//	fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
+	//} else {
+	//	err = output.ShowStateCosts(state)
+	//	if err != nil {
+	//		return err
+	//	}
+	//}
 }
