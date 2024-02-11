@@ -1,9 +1,8 @@
-package submission
+package schema
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/kaytu-io/pennywise/pkg/schema"
 	"github.com/sony/sonyflake"
 	"os"
 	"path/filepath"
@@ -12,13 +11,14 @@ import (
 
 // Submission to store and track resources and usage data for each run
 type Submission struct {
-	ID        string               `json:"id"`
-	CreatedAt time.Time            `json:"created_at"`
-	Resources []schema.ResourceDef `json:"resources"`
+	ID        string        `json:"id"`
+	CreatedAt time.Time     `json:"created_at"`
+	ProjectId string        `json:"project_id"`
+	Resources []ResourceDef `json:"resources"`
 }
 
 // CreateSubmission creates a new submission to store resources and usage data
-func CreateSubmission(resources []schema.ResourceDef) (*Submission, error) {
+func CreateSubmission(resources []ResourceDef) (*Submission, error) {
 	sf := sonyflake.NewSonyflake(sonyflake.Settings{})
 	id, err := sf.NextID()
 	if err != nil {

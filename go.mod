@@ -210,6 +210,4 @@ require (
 
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
 
-replace github.com/kaytu-io/infracost => /home/arta/data/codes/Work/Kaytu/infracost
-
 replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20231103101711-77c5e7d4d795
