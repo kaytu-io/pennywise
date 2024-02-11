@@ -1,34 +1,70 @@
 package hcl
 
 import (
-	"fmt"
+	"encoding/json"
+	"github.com/kaytu-io/infracost/external/config"
+	"github.com/kaytu-io/infracost/external/providers/terraform"
 	"github.com/kaytu-io/pennywise/pkg/schema"
 	usagePackage "github.com/kaytu-io/pennywise/pkg/usage"
+	"golang.org/x/net/context"
 )
 
-// ParseHclResources parses a new terraform project and return provider name and resources
-func ParseHclResources(path string, usage usagePackage.Usage) (schema.ProviderName, []Resource, error) {
-	tp := newTerraformProject(path)
-	err := tp.FindFiles()
+func ParseHclResources(path string, usage usagePackage.Usage) (schema.ProviderName, string, []Resource, error) {
+	var resources []Resource
+	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, err
 	}
-	err = tp.FindProjectBlocks()
-	if err != nil {
-		return "", nil, err
+	ctx := config.ProjectContext{
+		ProjectConfig: &config.Project{
+			Path: path,
+		},
+		RunContext: runCtx,
 	}
-	mapStructure := tp.makeProjectMapStructure()
-	provider, resources, err := extractResourcesFromMapStructure(mapStructure)
-	if err != nil {
-		return "", nil, err
+	h, providerErr := terraform.NewHCLProvider(
+		&ctx,
+		nil,
+	)
+	if providerErr != nil {
+		return "", "", nil, providerErr
 	}
-	if usage != nil {
-		for _, res := range resources {
-			res.addUsage(usage)
+	var provider schema.ProviderName
+	var defaultRegion string
+	jsons := h.LoadPlanJSONs()
+	for _, j := range jsons {
+		var res Project
+		err := json.Unmarshal(j.JSON, &res)
+		if err != nil {
+			return "", "", nil, err
+		}
+		for key, providerConfig := range res.Configuration.ProviderConfig {
+			provider = key
+			defaultRegion = providerConfig.Expressions.Region.ConstantValue
+		}
+		for _, mod := range res.PlannedValues {
+			resources = append(resources, mod.Resources...)
+			for _, childMod := range mod.ChildModules {
+				resources = append(resources, childMod.Resources...)
+			}
 		}
 	}
-	if diagsStr, ok := tp.Diags.Show(); ok {
-		fmt.Println(diagsStr)
+
+	for i, res := range resources {
+		resources[i] = addUsage(res, usage)
 	}
-	return schema.ProviderName(provider), resources, nil
+
+	return provider, defaultRegion, resources, nil
+}
+
+func addUsage(res Resource, usage usagePackage.Usage) Resource {
+	newValues := res.Values
+
+	newValues[usagePackage.Key] = usage.GetUsage(res.Type, res.Address)
+	return Resource{
+		Address: res.Address,
+		Mode:    res.Mode,
+		Name:    res.Name,
+		Type:    res.Type,
+		Values:  newValues,
+	}
 }

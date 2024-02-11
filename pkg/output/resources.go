@@ -96,7 +96,7 @@ func getResourcesModel(totalCost float64, resources map[string]cost.Resource, lo
 		if err != nil {
 			return nil, err
 		}
-		if cost.Decimal.InexactFloat64() == 0 {
+		if resource.Components == nil {
 			freeResources = append(freeResources, name)
 			continue
 		}

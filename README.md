@@ -17,7 +17,7 @@ Pennywise estimates the cost of cloud infrastructure before the actual deploymen
 
 **Linux/MacOS**
 ```shell
-wget -qO - https://raw.githubusercontent.com/kaytu-io/pennywise/main/scripts/install.sh | sh
+curl -fsSL https://kaytu.s3.amazonaws.com/pennywise/install.sh | sh
 ```
 
 **Windows**
@@ -36,7 +36,7 @@ this command will give you a link to open in your browser to help you sign-up an
 
 ### 3. Generate Terraform Plan
 
-Navigate to your Terraform folder and generate the Terraform plan.
+Navigate to your Terraform folder and generate the Terraform plan (you need terraform and jq installed to do this)
 
 ```shell
 # You can try out our sample if you wish: git clone https://github.com/kaytu-io/sample-terraform.git
@@ -44,7 +44,7 @@ Navigate to your Terraform folder and generate the Terraform plan.
 
 terraform init
 terraform plan -out tfplan.binary
-terraform show -json tfplan.binary | jq > tfplan.json
+terraform show -json tfplan.binary > tfplan.json
 ```
 
 ### 4. Get costs
@@ -52,7 +52,7 @@ terraform show -json tfplan.binary | jq > tfplan.json
 Run the following in the directory containing your terraform plan:
 
 ```shell
-pennywise cost terraform --json-path tfplan.json
+pennywise cost --json-path tfplan.json
 ```
 
 ![Cost Gif](.github/assets/cost-result.png)

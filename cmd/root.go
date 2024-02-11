@@ -22,10 +22,15 @@ var rootCmd = &cobra.Command{
 func init() {
 	//rootCmd.AddCommand(ingestion.IngestCmd)
 	rootCmd.AddCommand(cost.CostCmd)
+	cost.CostCmd.Flags().String("json-path", "", "terraform plan json file path")
+	cost.CostCmd.Flags().String("project-path", ".", "path to terraform project")
+	cost.CostCmd.Flags().String("usage", "", "usage file path")
+	cost.CostCmd.Flags().Bool("classic", false, "Show results in classic view (not interactive)")
+
 	rootCmd.AddCommand(predef.VersionCmd)
 	rootCmd.AddCommand(predef.LoginCmd)
 	rootCmd.AddCommand(predef.LogoutCmd)
-	rootCmd.PersistentFlags().String("server-url", "https://pennywise.kaytu.dev/kaytu", "define the server http address")
+	//rootCmd.PersistentFlags().String("server-url", "https://pennywise.kaytu.dev/kaytu", "define the server http address")
 }
 
 func Execute() {

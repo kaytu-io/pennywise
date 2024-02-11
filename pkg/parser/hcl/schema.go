@@ -1,51 +1,22 @@
 package hcl
 
 import (
-	"fmt"
 	"github.com/kaytu-io/pennywise/pkg/parser/azurerm"
 	"github.com/kaytu-io/pennywise/pkg/schema"
-	usagePackage "github.com/kaytu-io/pennywise/pkg/usage"
-	"strings"
 )
 
-// Resource represents a resource in the terraform project
 type Resource struct {
 	Address string                 `mapstructure:"address"`
+	Mode    string                 `mapstructure:"mode"`
 	Name    string                 `mapstructure:"name"`
 	Type    string                 `mapstructure:"type"`
 	Values  map[string]interface{} `mapstructure:"values"`
 }
 
-// extractResourcesFromMapStructure extracts the resources from a terraform project map structure
-func extractResourcesFromMapStructure(mapStructure map[string]interface{}) (string, []Resource, error) {
-	var provider string
-	var resources []Resource
-
-	for key, value := range mapStructure {
-		labels := strings.Split(key, ".")
-		if labels[0] == "provider" {
-			provider = labels[1]
-		} else if labels[0] == "resource" {
-			values, err := value.(map[string]interface{})
-			if !err {
-				return "", nil, fmt.Errorf("resource %s value is not a map", key)
-			}
-			resources = append(resources, Resource{
-				Address: strings.Join(labels[1:], "."),
-				Name:    strings.Split(strings.Join(labels[2:], "."), "[")[0],
-				Type:    labels[1],
-				Values:  values,
-			})
-		}
-	}
-	return provider, resources, nil
-}
-
-// ToResourceDef convert Resource to an acceptable type for pennywise server
-func (r *Resource) ToResourceDef(provider schema.ProviderName, defaultRegion *string) schema.ResourceDef {
-	region := ""
-	if defaultRegion != nil {
-		region = *defaultRegion
+func (r Resource) ToResource(provider schema.ProviderName, defaultRegion string) schema.ResourceDef {
+	var region string
+	if defaultRegion != "" {
+		region = defaultRegion
 	}
 	for key, value := range r.Values {
 		if provider == schema.AzureProvider && key == "location" {
@@ -63,10 +34,34 @@ func (r *Resource) ToResourceDef(provider schema.ProviderName, defaultRegion *st
 	}
 }
 
-// addUsage add usage data to resource
-func (r *Resource) addUsage(usage usagePackage.Usage) {
-	newValues := r.Values
+type ProviderConfig struct {
+	Name        schema.ProviderName `json:"name"`
+	Expressions struct {
+		Region struct {
+			ConstantValue string `json:"constant_value"`
+		} `json:"region"`
+	} `json:"expressions"`
+}
 
-	newValues[usagePackage.Key] = usage.GetUsage(r.Type, r.Address)
-	r.Values = newValues
+type Config struct {
+	ProviderConfig map[schema.ProviderName]ProviderConfig `json:"provider_config"`
+}
+
+type Project struct {
+	TerraformVersion         string                `json:"terraform_version"`
+	FormatVersion            string                `json:"format_version"`
+	InfracostResourceChanges interface{}           `json:"infracost_resource_changes"`
+	Configuration            Config                `json:"configuration"`
+	PlannedValues            map[string]RootModule `json:"planned_values"`
+	PriorState               interface{}           `json:"prior_state"`
+}
+
+type RootModule struct {
+	Resources    []Resource    `json:"resources"`
+	ChildModules []ChildModule `json:"child_modules"`
+}
+
+type ChildModule struct {
+	Address   string     `json:"address"`
+	Resources []Resource `json:"resources"`
 }
