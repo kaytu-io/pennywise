@@ -10,7 +10,6 @@ import (
 	"github.com/kaytu-io/pennywise/pkg/parser/hcl"
 	"github.com/kaytu-io/pennywise/pkg/schema"
 	"github.com/kaytu-io/pennywise/pkg/server"
-	"github.com/kaytu-io/pennywise/pkg/submission"
 	usagePackage "github.com/kaytu-io/pennywise/pkg/usage"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -91,7 +90,7 @@ func estimateTfPlanJson(classic bool, jsonPath string, usage usagePackage.Usage,
 	if err != nil {
 		return err
 	}
-	sub, err := submission.CreateSubmission(resources)
+	sub, err := schema.CreateSubmission(resources)
 	if err != nil {
 		return err
 	}
@@ -120,50 +119,48 @@ func estimateTfPlanJson(classic bool, jsonPath string, usage usagePackage.Usage,
 }
 
 func estimateTerraformProject(classic bool, projectPath string, usage usagePackage.Usage, ServerClientAddress string) error {
-	var providerName schema.ProviderName
-	var defaultRegion string
-	var parserResources []hcl.Resource
+	var projects []hcl.ParsedProject
 	var err error
 	if providers.IsTerragruntNestedDir(projectPath, 5) {
 		fmt.Println("terragrunt project...")
-		providerName, defaultRegion, parserResources, err = hcl.ParseTerragruntProject(projectPath, usage)
+		projects, err = hcl.ParseTerragruntProject(projectPath, usage)
 	} else {
-		providerName, defaultRegion, parserResources, err = hcl.ParseHclResources(projectPath, usage)
+		projects, err = hcl.ParseHclResources(projectPath, usage)
 	}
 	if err != nil {
 		return err
 	}
-	var resources []schema.ResourceDef
-	for _, r := range parserResources {
-		resources = append(resources, r.ToResource(providerName, defaultRegion))
-	}
-	serverClient, err := server.NewPennywiseServerClient(ServerClientAddress)
-	if err != nil {
-		return err
-	}
-	sub, err := submission.CreateSubmission(resources)
-	if err != nil {
-		return err
-	}
-	err = sub.StoreAsFile()
-	if err != nil {
-		return err
-	}
-	state, err := serverClient.GetStateCost(*sub)
-	if err != nil {
-		return err
-	}
-	if classic {
-		costString, err := state.CostString()
+	for _, p := range projects {
+		fmt.Println(p.Directory)
+		fmt.Println("======================")
+		serverClient, err := server.NewPennywiseServerClient(ServerClientAddress)
 		if err != nil {
 			return err
 		}
-		fmt.Println(costString)
-		fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
-	} else {
-		err = output.ShowStateCosts(state)
+		sub, err := schema.CreateSubmission(p.GetResources())
 		if err != nil {
 			return err
+		}
+		err = sub.StoreAsFile()
+		if err != nil {
+			return err
+		}
+		state, err := serverClient.GetStateCost(*sub)
+		if err != nil {
+			return err
+		}
+		if classic {
+			costString, err := state.CostString()
+			if err != nil {
+				return err
+			}
+			fmt.Println(costString)
+			fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
+		} else {
+			err = output.ShowStateCosts(state)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil

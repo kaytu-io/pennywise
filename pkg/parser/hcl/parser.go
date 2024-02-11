@@ -9,11 +9,11 @@ import (
 	"golang.org/x/net/context"
 )
 
-func ParseHclResources(path string, usage usagePackage.Usage) (schema.ProviderName, string, []Resource, error) {
+func ParseHclResources(path string, usage usagePackage.Usage) ([]ParsedProject, error) {
 	var resources []Resource
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
-		return "", "", nil, err
+		return nil, err
 	}
 	ctx := config.ProjectContext{
 		ProjectConfig: &config.Project{
@@ -26,7 +26,7 @@ func ParseHclResources(path string, usage usagePackage.Usage) (schema.ProviderNa
 		nil,
 	)
 	if providerErr != nil {
-		return "", "", nil, providerErr
+		return nil, providerErr
 	}
 	var provider schema.ProviderName
 	var defaultRegion string
@@ -35,7 +35,7 @@ func ParseHclResources(path string, usage usagePackage.Usage) (schema.ProviderNa
 		var res Project
 		err := json.Unmarshal(j.JSON, &res)
 		if err != nil {
-			return "", "", nil, err
+			return nil, err
 		}
 		for key, providerConfig := range res.Configuration.ProviderConfig {
 			provider = key
@@ -53,7 +53,16 @@ func ParseHclResources(path string, usage usagePackage.Usage) (schema.ProviderNa
 		resources[i] = addUsage(res, usage)
 	}
 
-	return provider, defaultRegion, resources, nil
+	parsedProjects := []ParsedProject{
+		{
+			Directory:     path,
+			Provider:      provider,
+			DefaultRegion: defaultRegion,
+			Resources:     resources,
+		},
+	}
+
+	return parsedProjects, nil
 }
 
 func addUsage(res Resource, usage usagePackage.Usage) Resource {

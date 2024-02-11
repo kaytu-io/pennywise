@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/pkg/cost"
 	"github.com/kaytu-io/pennywise/pkg/schema"
-	"github.com/kaytu-io/pennywise/pkg/submission"
 	"github.com/labstack/echo/v4"
 	"io"
 	"net/http"
@@ -19,7 +18,7 @@ type EchoError struct {
 }
 
 type ServerClient interface {
-	GetStateCost(req submission.Submission) (*cost.State, error)
+	GetStateCost(req schema.Submission) (*cost.State, error)
 	AddIngestion(provider, service, region string) (*schema.IngestionJob, error)
 	ListIngestionJobs(provider, service, region, status string) ([]schema.IngestionJob, error)
 	GetIngestionJob(id string) (*schema.IngestionJob, error)
@@ -109,7 +108,7 @@ func (s *serverClient) AddIngestion(provider, service, region string) (*schema.I
 	return &job, nil
 }
 
-func (s *serverClient) GetStateCost(req submission.Submission) (*cost.State, error) {
+func (s *serverClient) GetStateCost(req schema.Submission) (*cost.State, error) {
 	url := fmt.Sprintf("%s/api/v1/cost/submission", s.baseURL)
 
 	payload, err := json.Marshal(req)

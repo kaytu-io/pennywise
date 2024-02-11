@@ -5,12 +5,27 @@ import (
 	"github.com/kaytu-io/pennywise/pkg/schema"
 )
 
+type ParsedProject struct {
+	Directory     string
+	Provider      schema.ProviderName
+	DefaultRegion string
+	Resources     []Resource
+}
+
 type Resource struct {
 	Address string                 `mapstructure:"address"`
 	Mode    string                 `mapstructure:"mode"`
 	Name    string                 `mapstructure:"name"`
 	Type    string                 `mapstructure:"type"`
 	Values  map[string]interface{} `mapstructure:"values"`
+}
+
+func (pp ParsedProject) GetResources() []schema.ResourceDef {
+	var resources []schema.ResourceDef
+	for _, r := range pp.Resources {
+		resources = append(resources, r.ToResource(pp.Provider, pp.DefaultRegion))
+	}
+	return resources
 }
 
 func (r Resource) ToResource(provider schema.ProviderName, defaultRegion string) schema.ResourceDef {
