@@ -23,10 +23,6 @@ var (
 
 var primary = color.New(color.FgHiCyan)
 
-var yellow = color.New(color.FgYellow)
-var red = color.New(color.FgHiRed)
-var green = color.New(color.FgHiGreen)
-
 var bold = color.New(color.Bold)
 var faint = color.New(color.Faint)
 var underline = color.New(color.Underline)

@@ -33,21 +33,7 @@ func (m ResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q", "ctrl+c":
 			return m, tea.Quit
 		case "right", "enter":
-
-			resourceName := m.table.SelectedRow()[0]
-			if resourceName == "Free Resources" {
-				freeResourcesModel, err := getFreeResourcesModel(m)
-				if err != nil {
-					panic(err)
-				}
-				return freeResourcesModel, cmd
-			} else if resourceName == "Unsupported" {
-				unsupportedModel, err := getUnsupportedModel(m)
-				if err != nil {
-					panic(err)
-				}
-				return unsupportedModel, cmd
-			}
+			resourceName := m.table.SelectedRow()[0][11:]
 			resource := m.resources[resourceName]
 			compsModel, err := getComponentsModel(resourceName, m.table.SelectedRow()[1], resource.ComponentDiffs, m)
 			if err != nil {
@@ -67,22 +53,23 @@ func (m ResourcesModel) View() string {
 	return output
 }
 
-func getResourcesModel(totalCost float64, resources map[string]schema.ResourceDiff, longestName int) (tea.Model, error) {
+func getResourcesModel(label string, resources map[string]schema.ResourceDiff, longestName int) (tea.Model, error) {
 	w, _, err := terminal.GetSize(0)
 	if err != nil {
 		return nil, err
 	}
-	if (longestName + 20) > w {
-		return getSmallTerminalModelModel(totalCost, resources, w-23)
+	if (longestName + 26) > w {
+		return getSmallTerminalModelModel(label, resources, w-29)
 	}
 	columns := []table.Column{
-		{Title: "Name", Width: longestName},
-		{Title: "Monthly Cost", Width: 12},
+		{Title: "Name", Width: longestName + 11},
+		{Title: "Monthly Cost", Width: 30},
 	}
 
 	var rows []table.Row
 	var freeResources []string
 	unsupportedServices := make(map[string][]string)
+	ac := accounting.Accounting{Symbol: "$", Precision: 2}
 
 	for name, resource := range resources {
 		if !resource.IsSupported && resource.Type != "" {
@@ -96,16 +83,24 @@ func getResourcesModel(totalCost float64, resources map[string]schema.ResourceDi
 			freeResources = append(freeResources, name)
 			continue
 		}
-		rows = append(rows, []string{name, resource.CostDiff.String()})
+		var costDiff string
+		switch resource.Action {
+		case schema.ActionCreate:
+			name = green.Sprint("+ ") + name
+			costDiff = ac.FormatMoney(resource.NewCost)
+		case schema.ActionModify:
+			name = yellow.Sprint("~ ") + name
+			costDiff = ac.FormatMoney(resource.NewCost.Sub(resource.PriorCost)) +
+				fmt.Sprintf(" (%s -> %s)", ac.FormatMoney(resource.PriorCost), ac.FormatMoney(resource.NewCost))
+			if resource.NewCost.Sub(resource.PriorCost).InexactFloat64() > 0 {
+				costDiff = "+" + costDiff
+			}
+		case schema.ActionRemove:
+			name = red.Sprint("- ") + name
+			costDiff = ac.FormatMoney(resource.PriorCost)
+		}
+		rows = append(rows, []string{name, costDiff})
 	}
-	if len(freeResources) > 0 {
-		rows = append(rows, []string{"Free Resources", "0"})
-	}
-	if len(unsupportedServices) > 0 {
-		rows = append(rows, []string{"Unsupported", "0"})
-	}
-	rows = sortRows(rows)
-	rows = makeNumbersAccounting(rows)
 	columns = append(columns, table.Column{Title: "", Width: 1})
 	for i, _ := range rows {
 		rows[i] = append(rows[i], "→")
@@ -124,13 +119,13 @@ func getResourcesModel(totalCost float64, resources map[string]schema.ResourceDi
 		BorderBottom(true).
 		Bold(false)
 	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
-		Bold(false)
+		Foreground(lipgloss.Color("#808080")).
+		Bold(true).
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderLeft(true).BorderBottom(false).BorderRight(false).BorderTop(false)
 	t.SetStyles(s)
 
-	ac := accounting.Accounting{Symbol: "$", Precision: 2}
-
-	m := ResourcesModel{fmt.Sprintf("Total cost: %s", ac.FormatMoney(totalCost)), t, resources, freeResources, unsupportedServices, longestName}
+	m := ResourcesModel{label, t, resources, freeResources, unsupportedServices, longestName}
 	return m, nil
 }

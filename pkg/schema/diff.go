@@ -15,7 +15,8 @@ const (
 
 type StateDiff struct {
 	Resources map[string]ResourceDiff
-	CostDiff  decimal.Decimal
+	PriorCost decimal.Decimal
+	NewCost   decimal.Decimal
 }
 
 // ResourceDiff type to show diff of a Resource
@@ -27,13 +28,18 @@ type ResourceDiff struct {
 	IsSupported bool
 
 	ComponentDiffs map[string][]ComponentDiff
+	PriorCost      decimal.Decimal
+	NewCost        decimal.Decimal
 	Action         Action
-	CostDiff       decimal.Decimal
 }
 
 // ComponentDiff type to show diff of a Component
 type ComponentDiff struct {
 	Component cost.Component
-	Action    Action
-	CostDiff  decimal.Decimal
+
+	Current   *cost.Component
+	CompareTo *cost.Component
+
+	Action   Action
+	CostDiff decimal.Decimal
 }
