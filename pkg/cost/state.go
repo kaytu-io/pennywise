@@ -5,7 +5,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-	"github.com/kaytu-io/pennywise/pkg/schema"
 	"sort"
 )
 
@@ -23,10 +22,6 @@ var (
 )
 
 var primary = color.New(color.FgHiCyan)
-
-var yellow = color.New(color.FgYellow)
-var red = color.New(color.FgHiRed)
-var green = color.New(color.FgHiGreen)
 
 var bold = color.New(color.Bold)
 var faint = color.New(color.Faint)
@@ -175,7 +170,7 @@ func (s *State) CostString() (string, error) {
 }
 
 // EnsureResource creates Resource at the given address if it doesn't already exist.
-func (s *State) EnsureResource(address, typ string, provider schema.ProviderName, skipped, isSupported bool) {
+func (s *State) EnsureResource(address, typ string, provider string, skipped, isSupported bool) {
 	if _, ok := s.Resources[address]; !ok {
 		res := Resource{
 			Address:     address,

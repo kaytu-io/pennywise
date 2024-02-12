@@ -23,6 +23,7 @@ type ServerClient interface {
 	ListIngestionJobs(provider, service, region, status string) ([]schema.IngestionJob, error)
 	GetIngestionJob(id string) (*schema.IngestionJob, error)
 	ListServices(provider string) ([]string, error)
+	GetSubmissionsDiff(req schema.SubmissionsDiff) (*schema.StateDiff, error)
 }
 
 type serverClient struct {
@@ -116,6 +117,26 @@ func (s *serverClient) GetStateCost(req schema.Submission) (*cost.State, error) 
 		return nil, err
 	}
 	var cost cost.State
+	if statusCode, err := s.doRequest(http.MethodGet, url, payload, &cost); err != nil {
+		if 400 <= statusCode && statusCode < 500 {
+			return nil, echo.NewHTTPError(statusCode, err.Error())
+		}
+		if strings.Contains(err.Error(), "connect: connection refused") {
+			return nil, fmt.Errorf("Can't connect to the server. Please ensure that your server is running or that you have entered the --server-url flag currectly ")
+		}
+		return nil, err
+	}
+	return &cost, nil
+}
+
+func (s *serverClient) GetSubmissionsDiff(req schema.SubmissionsDiff) (*schema.StateDiff, error) {
+	url := fmt.Sprintf("%s/api/v1/cost/diff", s.baseURL)
+
+	payload, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	var cost schema.StateDiff
 	if statusCode, err := s.doRequest(http.MethodGet, url, payload, &cost); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return nil, echo.NewHTTPError(statusCode, err.Error())

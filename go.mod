@@ -10,7 +10,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jedib0t/go-pretty/v6 v6.5.4
-	github.com/kaytu-io/infracost v0.0.0-00010101000000-000000000000
+	github.com/kaytu-io/infracost v0.0.0-20240211123247-55ed90ba2893
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/leekchan/accounting v1.0.0
 	github.com/shopspring/decimal v1.3.1

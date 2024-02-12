@@ -1,4 +1,4 @@
-package output
+package cost
 
 import (
 	"github.com/charmbracelet/bubbles/table"

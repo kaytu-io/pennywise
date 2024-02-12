@@ -1,4 +1,4 @@
-package output
+package cost
 
 import (
 	"fmt"
@@ -90,9 +90,11 @@ func getComponentsModel(resourceName, resourceCost string, components map[string
 		BorderBottom(true).
 		Bold(false)
 	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
-		Bold(false)
+		Foreground(lipgloss.Color("#808080")).
+		Bold(true).
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderLeft(true).BorderBottom(false).BorderRight(false).BorderTop(false)
 	t.SetStyles(s)
 	m := ComponentsModel{fmt.Sprintf("%s, Resource Total Cost: %s", resourceName, resourceCost), t, resModel}
 	return m, nil

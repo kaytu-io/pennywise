@@ -1,32 +1,45 @@
-package diff
+package schema
 
 import (
 	"github.com/kaytu-io/pennywise/pkg/cost"
-	"github.com/kaytu-io/pennywise/pkg/schema"
+	"github.com/shopspring/decimal"
 )
 
 type Action string
 
 const (
 	ActionCreate Action = "CREATE"
-	ActionChange Action = "CHANGE"
+	ActionModify Action = "MODIFY"
 	ActionRemove Action = "REMOVE"
 )
+
+type StateDiff struct {
+	Resources map[string]ResourceDiff
+	PriorCost decimal.Decimal
+	NewCost   decimal.Decimal
+}
 
 // ResourceDiff type to show diff of a Resource
 type ResourceDiff struct {
 	Address     string
-	Provider    schema.ProviderName
+	Provider    ProviderName
 	Type        string
 	Skipped     bool
 	IsSupported bool
 
-	ComponentDiffs []ComponentDiff
+	ComponentDiffs map[string][]ComponentDiff
+	PriorCost      decimal.Decimal
+	NewCost        decimal.Decimal
 	Action         Action
 }
 
 // ComponentDiff type to show diff of a Component
 type ComponentDiff struct {
 	Component cost.Component
-	Action    Action
+
+	Current   *cost.Component
+	CompareTo *cost.Component
+
+	Action   Action
+	CostDiff decimal.Decimal
 }

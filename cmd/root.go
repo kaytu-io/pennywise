@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"github.com/kaytu-io/pennywise/cmd/cost"
+	"github.com/kaytu-io/pennywise/cmd/diff"
 	"github.com/kaytu-io/pennywise/cmd/predef"
 	"github.com/spf13/cobra"
 	"os"
@@ -22,10 +23,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	//rootCmd.AddCommand(ingestion.IngestCmd)
 	rootCmd.AddCommand(cost.CostCmd)
-	cost.CostCmd.Flags().String("json-path", "", "terraform plan json file path")
-	cost.CostCmd.Flags().String("project-path", ".", "path to terraform project")
-	cost.CostCmd.Flags().String("usage", "", "usage file path")
-	cost.CostCmd.Flags().Bool("classic", false, "Show results in classic view (not interactive)")
+	rootCmd.AddCommand(diff.DiffCmd)
 
 	rootCmd.AddCommand(predef.VersionCmd)
 	rootCmd.AddCommand(predef.LoginCmd)
