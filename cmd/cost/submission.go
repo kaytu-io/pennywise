@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/cmd/flags"
 	"github.com/kaytu-io/pennywise/pkg"
-	outputCost "github.com/kaytu-io/pennywise/pkg/output/cost"
 	"github.com/kaytu-io/pennywise/pkg/schema"
 	"github.com/kaytu-io/pennywise/pkg/server"
 	"github.com/spf13/cobra"
@@ -48,10 +47,10 @@ func estimateSubmission(classic bool, submissionId string, ServerClientAddress s
 		fmt.Println(costString)
 		fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
 	} else {
-		err = outputCost.ShowStateCosts(state)
-		if err != nil {
-			return err
-		}
+		//err = outputCost.ShowStateCosts(state)
+		//if err != nil {
+		//	return err
+		//}
 	}
 
 	return nil

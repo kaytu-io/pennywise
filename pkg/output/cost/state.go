@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func ShowStateCosts(s *cost.State) error {
+func ShowStateCosts(s *cost.ModularState) error {
 	totalCost, err := s.Cost()
 	if err != nil {
 		return err
@@ -18,8 +18,13 @@ func ShowStateCosts(s *cost.State) error {
 			longestName = len(name)
 		}
 	}
+	for name, _ := range s.ChildModules {
+		if len(name) > longestName {
+			longestName = len(name)
+		}
+	}
 
-	model, err := getResourcesModel(totalCost.Decimal.InexactFloat64(), s.Resources, longestName)
+	model, err := getResourcesModel(totalCost.Decimal.InexactFloat64(), s, longestName, nil)
 	if err != nil {
 		return err
 	}

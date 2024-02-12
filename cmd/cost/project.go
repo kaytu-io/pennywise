@@ -101,10 +101,10 @@ func estimateTfPlanJson(classic bool, jsonPath string, usage usagePackage.Usage,
 		fmt.Println(costString)
 		fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
 	} else {
-		err = outputCost.ShowStateCosts(state)
-		if err != nil {
-			return err
-		}
+		//err = outputCost.ShowStateCosts(state)
+		//if err != nil {
+		//	return err
+		//}
 	}
 	return nil
 }
@@ -140,20 +140,19 @@ func estimateTerraformProject(classic bool, projectPath string, usage usagePacka
 		if err != nil {
 			return err
 		}
-		//if classic {
-		//	costString, err := state.CostString()
-		//	if err != nil {
-		//		return err
-		//	}
-		//	fmt.Println(costString)
-		//	fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
-		//} else {
-		//	err = outputCost.ShowStateCosts(state)
-		//	if err != nil {
-		//		return err
-		//	}
-		//}
-		fmt.Println(state)
+		if classic {
+			//costString, err := state.CostString()
+			//if err != nil {
+			//	return err
+			//}
+			//fmt.Println(costString)
+			//fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
+		} else {
+			err = outputCost.ShowStateCosts(state)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }
