@@ -28,6 +28,21 @@ type ModularStateDiff struct {
 	Action    Action
 }
 
+func (s *ModularStateDiff) TotalResourcesCount() int {
+	return resourcesCount(*s)
+}
+
+func resourcesCount(state ModularStateDiff) int {
+	var count int
+
+	count += len(state.Resources)
+	for _, child := range state.ChildModules {
+		count += resourcesCount(child)
+	}
+
+	return count
+}
+
 // ResourceDiff type to show diff of a Resource
 type ResourceDiff struct {
 	Address     string

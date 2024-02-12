@@ -113,8 +113,12 @@ func tfPlanJsonDiff(classic bool, jsonPath string, compareToId string, usage usa
 	if err != nil {
 		return err
 	}
-
-	err = outputDiff.ShowStateCosts(stateDiff)
+	modularShowDiff := schema.ModularStateDiff{
+		Resources: stateDiff.Resources,
+		PriorCost: stateDiff.PriorCost,
+		NewCost:   stateDiff.NewCost,
+	}
+	err = outputDiff.ShowStateCosts(&modularShowDiff)
 	if err != nil {
 		return err
 	}
@@ -141,20 +145,20 @@ func terraformProjectDiff(classic bool, projectPath string, compareToId string, 
 			return err
 		}
 
-		var compareTo *schema.Submission
+		var compareTo *schema.SubmissionV2
 		if compareToId == "" {
-			compareTo, err = schema.GetLatestSubmission()
+			compareTo, err = schema.GetLatestSubmissionV2()
 			if err != nil {
 				return err
 			}
 		} else {
-			compareTo, err = schema.ReadSubmissionFile(compareToId)
+			compareTo, err = schema.ReadSubmissionFileV2(compareToId)
 			if err != nil {
 				return err
 			}
 		}
 
-		sub, err := schema.CreateSubmission(p.GetResources())
+		sub, err := schema.CreateSubmissionV2(p.GetModule())
 		if err != nil {
 			return err
 		}
@@ -163,12 +167,12 @@ func terraformProjectDiff(classic bool, projectPath string, compareToId string, 
 			return err
 		}
 
-		req := schema.SubmissionsDiff{
+		req := schema.SubmissionsDiffV2{
 			Current:   *sub,
 			CompareTo: *compareTo,
 		}
 
-		stateDiff, err := serverClient.GetSubmissionsDiff(req)
+		stateDiff, err := serverClient.GetSubmissionsDiffV2(req)
 		if err != nil {
 			return err
 		}

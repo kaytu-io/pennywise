@@ -33,20 +33,20 @@ func submissionsDiff(classic bool, submissionId, compareToId string, ServerClien
 	if err != nil {
 		return err
 	}
-	sub, err := schema.ReadSubmissionFile(submissionId)
+	sub, err := schema.ReadSubmissionFileV2(submissionId)
 	if err != nil {
 		return err
 	}
-	compareTo, err := schema.ReadSubmissionFile(compareToId)
+	compareTo, err := schema.ReadSubmissionFileV2(compareToId)
 	if err != nil {
 		return err
 	}
 
-	req := schema.SubmissionsDiff{
+	req := schema.SubmissionsDiffV2{
 		Current:   *sub,
 		CompareTo: *compareTo,
 	}
-	stateDiff, err := serverClient.GetSubmissionsDiff(req)
+	stateDiff, err := serverClient.GetSubmissionsDiffV2(req)
 	if err != nil {
 		return err
 	}

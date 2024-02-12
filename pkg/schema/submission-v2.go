@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/pkg"
 	"github.com/sony/sonyflake"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 )
 
@@ -75,4 +77,85 @@ func (s *SubmissionV2) StoreAsFile() error {
 		return err
 	}
 	return nil
+}
+
+// ReadSubmissionFileV2 Reads a submission from a file
+func ReadSubmissionFileV2(id string) (*SubmissionV2, error) {
+	submissionsDir := filepath.Join(pkg.PennywiseDir, "submissions")
+
+	jsonFilePath := filepath.Join(submissionsDir, id+".json")
+
+	fileInfo, err := os.Stat(jsonFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("rrror checking JSON file: %v", err)
+	}
+
+	if !fileInfo.Mode().IsRegular() {
+		return nil, fmt.Errorf("file %s is not a regular file", jsonFilePath)
+	}
+
+	jsonData, err := os.ReadFile(jsonFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading JSON file: %v", err)
+	}
+
+	var submission SubmissionV2
+	err = json.Unmarshal(jsonData, &submission)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshalling JSON: %v", err)
+	}
+
+	return &submission, nil
+}
+
+func getAllSubmissionsV2() ([]SubmissionV2, error) {
+	submissionsDir := filepath.Join(pkg.PennywiseDir, "submissions")
+
+	files, err := ioutil.ReadDir(submissionsDir)
+	if err != nil {
+		return nil, fmt.Errorf("error reading submissions directory: %v", err)
+	}
+
+	var submissions []SubmissionV2
+
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		jsonFilePath := filepath.Join(submissionsDir, file.Name())
+
+		jsonData, err := os.ReadFile(jsonFilePath)
+		if err != nil {
+			return nil, fmt.Errorf("error reading JSON file %s: %v", jsonFilePath, err)
+		}
+
+		var submission SubmissionV2
+		err = json.Unmarshal(jsonData, &submission)
+		if err != nil {
+			return nil, fmt.Errorf("error unmarshalling JSON file %s: %v", jsonFilePath, err)
+		}
+
+		submissions = append(submissions, submission)
+	}
+
+	// Sort submissions by CreatedAt in descending order
+	sort.Slice(submissions, func(i, j int) bool {
+		return submissions[i].CreatedAt.After(submissions[j].CreatedAt)
+	})
+
+	return submissions, nil
+}
+
+func GetLatestSubmissionV2() (*SubmissionV2, error) {
+	submissions, err := getAllSubmissionsV2()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(submissions) == 0 {
+		return nil, fmt.Errorf("no submissions found")
+	}
+
+	return &submissions[0], nil
 }

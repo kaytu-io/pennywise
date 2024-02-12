@@ -20,6 +20,25 @@ type ModularState struct {
 	Resources    map[string]Resource
 }
 
+func (s *ModularState) ToClassicState() *State {
+	return &State{
+		Resources: getModuleResources(*s),
+	}
+}
+
+func getModuleResources(state ModularState) map[string]Resource {
+	resources := make(map[string]Resource)
+	for name, res := range state.Resources {
+		resources[name] = res
+	}
+	for _, mod := range state.ChildModules {
+		for name, res := range getModuleResources(mod) {
+			resources[name] = res
+		}
+	}
+	return resources
+}
+
 func (s *ModularState) TotalResourcesCount() int {
 	return resourcesCount(*s)
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/kaytu-io/pennywise/cmd/cost/terraform"
 	"github.com/kaytu-io/pennywise/cmd/flags"
 	"github.com/kaytu-io/pennywise/pkg"
+	"github.com/kaytu-io/pennywise/pkg/cost"
 	outputCost "github.com/kaytu-io/pennywise/pkg/output/cost"
 	"github.com/kaytu-io/pennywise/pkg/parser/hcl"
 	"github.com/kaytu-io/pennywise/pkg/schema"
@@ -101,10 +102,13 @@ func estimateTfPlanJson(classic bool, jsonPath string, usage usagePackage.Usage,
 		fmt.Println(costString)
 		fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
 	} else {
-		//err = outputCost.ShowStateCosts(state)
-		//if err != nil {
-		//	return err
-		//}
+		modularState := cost.ModularState{
+			Resources: state.Resources,
+		}
+		err = outputCost.ShowStateCosts(&modularState)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -141,12 +145,12 @@ func estimateTerraformProject(classic bool, projectPath string, usage usagePacka
 			return err
 		}
 		if classic {
-			//costString, err := state.CostString()
-			//if err != nil {
-			//	return err
-			//}
-			//fmt.Println(costString)
-			//fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
+			costString, err := state.ToClassicState().CostString()
+			if err != nil {
+				return err
+			}
+			fmt.Println(costString)
+			fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
 		} else {
 			err = outputCost.ShowStateCosts(state)
 			if err != nil {
