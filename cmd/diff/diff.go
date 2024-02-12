@@ -17,6 +17,13 @@ var DiffCmd = &cobra.Command{
 }
 
 func init() {
+	DiffCmd.AddCommand(projectCommand)
+	projectCommand.Flags().String("json-path", "", "terraform plan json file path")
+	projectCommand.Flags().String("project-path", ".", "path to terraform project")
+	projectCommand.Flags().String("usage", "", "usage file path")
+	projectCommand.Flags().Bool("classic", false, "Show results in classic view (not interactive)")
+	projectCommand.Flags().String("compare-to", "", "submission id to compare other submission with (latest submission by default)")
+
 	DiffCmd.AddCommand(submissionCommand)
 	submissionCommand.Flags().String("submission-id", "", "submission id")
 	submissionCommand.MarkFlagRequired("submission-id")
