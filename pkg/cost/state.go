@@ -15,6 +15,11 @@ type State struct {
 	Resources map[string]Resource
 }
 
+type ModularState struct {
+	ChildModules map[string]ModularState
+	Resources    map[string]Resource
+}
+
 // Errors that might be returned from NewState if either a product or a price are not found.
 var (
 	ErrProductNotFound = fmt.Errorf("product not found")

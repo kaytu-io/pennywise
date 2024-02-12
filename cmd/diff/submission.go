@@ -2,6 +2,7 @@ package diff
 
 import (
 	"github.com/kaytu-io/pennywise/cmd/flags"
+	"github.com/kaytu-io/pennywise/pkg"
 	outputDiff "github.com/kaytu-io/pennywise/pkg/output/diff"
 	"github.com/kaytu-io/pennywise/pkg/schema"
 	"github.com/kaytu-io/pennywise/pkg/server"
@@ -18,7 +19,7 @@ var submissionCommand = &cobra.Command{
 		submissionId := flags.ReadStringFlag(cmd, "submission-id")
 		compareTo := flags.ReadStringFlag(cmd, "compare-to")
 
-		err := submissionsDiff(classic, submissionId, compareTo, DefaultServerAddress)
+		err := submissionsDiff(classic, submissionId, compareTo, pkg.DefaultServerAddress)
 		if err != nil {
 			return err
 		}

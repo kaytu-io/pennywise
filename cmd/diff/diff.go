@@ -2,10 +2,6 @@ package diff
 
 import "github.com/spf13/cobra"
 
-const (
-	DefaultServerAddress string = "http://localhost:8080"
-)
-
 // DiffCmd diff commands
 var DiffCmd = &cobra.Command{
 	Use:   "diff",

@@ -3,6 +3,7 @@ package cost
 import (
 	"fmt"
 	"github.com/kaytu-io/pennywise/cmd/flags"
+	"github.com/kaytu-io/pennywise/pkg"
 	outputCost "github.com/kaytu-io/pennywise/pkg/output/cost"
 	"github.com/kaytu-io/pennywise/pkg/schema"
 	"github.com/kaytu-io/pennywise/pkg/server"
@@ -17,7 +18,7 @@ var submissionCommand = &cobra.Command{
 		classic := flags.ReadBooleanFlag(cmd, "classic")
 
 		submissionId := flags.ReadStringFlag(cmd, "submission-id")
-		err := estimateSubmission(classic, submissionId, DefaultServerAddress)
+		err := estimateSubmission(classic, submissionId, pkg.DefaultServerAddress)
 		if err != nil {
 			return err
 		}

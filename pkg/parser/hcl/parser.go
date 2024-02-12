@@ -10,7 +10,7 @@ import (
 )
 
 func ParseHclResources(path string, usage usagePackage.Usage) ([]ParsedProject, error) {
-	var resources []Resource
+	var rootModule Module
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
 		return nil, err
@@ -42,23 +42,18 @@ func ParseHclResources(path string, usage usagePackage.Usage) ([]ParsedProject, 
 			defaultRegion = providerConfig.Expressions.Region.ConstantValue
 		}
 		for _, mod := range res.PlannedValues {
-			resources = append(resources, mod.Resources...)
-			for _, childMod := range mod.ChildModules {
-				resources = append(resources, childMod.Resources...)
-			}
+			rootModule = mod
 		}
 	}
 
-	for i, res := range resources {
-		resources[i] = addUsage(res, usage)
-	}
+	addUsageToModule(usage, &rootModule)
 
 	parsedProjects := []ParsedProject{
 		{
 			Directory:     path,
 			Provider:      provider,
 			DefaultRegion: defaultRegion,
-			Resources:     resources,
+			RootModule:    rootModule,
 		},
 	}
 

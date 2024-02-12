@@ -2,10 +2,6 @@ package cost
 
 import "github.com/spf13/cobra"
 
-const (
-	DefaultServerAddress string = "https://pennywise.kaytu.dev/kaytu"
-)
-
 // CostCmd cost commands
 var CostCmd = &cobra.Command{
 	Use:   "cost",

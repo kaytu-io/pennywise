@@ -6,6 +6,7 @@ import (
 	"github.com/kaytu-io/infracost/external/providers"
 	"github.com/kaytu-io/pennywise/cmd/cost/terraform"
 	"github.com/kaytu-io/pennywise/cmd/flags"
+	"github.com/kaytu-io/pennywise/pkg"
 	outputDiff "github.com/kaytu-io/pennywise/pkg/output/diff"
 	"github.com/kaytu-io/pennywise/pkg/parser/hcl"
 	"github.com/kaytu-io/pennywise/pkg/schema"
@@ -54,12 +55,12 @@ var projectCommand = &cobra.Command{
 		jsonPath := flags.ReadStringOptionalFlag(cmd, "json-path")
 		projectPath := flags.ReadStringFlag(cmd, "project-path")
 		if jsonPath != nil {
-			err := tfPlanJsonDiff(classic, *jsonPath, compareTo, usage, DefaultServerAddress)
+			err := tfPlanJsonDiff(classic, *jsonPath, compareTo, usage, pkg.DefaultServerAddress)
 			if err != nil {
 				return err
 			}
 		} else {
-			err := terraformProjectDiff(classic, projectPath, compareTo, usage, DefaultServerAddress)
+			err := terraformProjectDiff(classic, projectPath, compareTo, usage, pkg.DefaultServerAddress)
 			if err != nil {
 				return err
 			}

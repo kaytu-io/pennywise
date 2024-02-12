@@ -17,6 +17,11 @@ type SubmissionsDiff struct {
 	CompareTo Submission `json:"compare_to"`
 }
 
+type SubmissionsDiffV2 struct {
+	Current   SubmissionV2 `json:"current"`
+	CompareTo SubmissionV2 `json:"compare_to"`
+}
+
 // Submission to store and track resources and usage data for each run
 type Submission struct {
 	ID        string        `json:"id"`

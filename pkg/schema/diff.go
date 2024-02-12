@@ -19,6 +19,13 @@ type StateDiff struct {
 	NewCost   decimal.Decimal
 }
 
+type ModularStateDiff struct {
+	Resources    map[string]ResourceDiff
+	PriorCost    decimal.Decimal
+	NewCost      decimal.Decimal
+	ChildModules map[string]ModularStateDiff
+}
+
 // ResourceDiff type to show diff of a Resource
 type ResourceDiff struct {
 	Address     string
