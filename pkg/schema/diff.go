@@ -21,9 +21,11 @@ type StateDiff struct {
 
 type ModularStateDiff struct {
 	Resources    map[string]ResourceDiff
-	PriorCost    decimal.Decimal
-	NewCost      decimal.Decimal
 	ChildModules map[string]ModularStateDiff
+
+	PriorCost decimal.Decimal
+	NewCost   decimal.Decimal
+	Action    Action
 }
 
 // ResourceDiff type to show diff of a Resource
