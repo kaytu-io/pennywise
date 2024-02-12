@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/kaytu-io/infracost/external/config"
 	"github.com/kaytu-io/infracost/external/providers/terraform"
 	"github.com/kaytu-io/pennywise/pkg/schema"
@@ -31,6 +32,9 @@ func ParseHclResources(path string, usage usagePackage.Usage) ([]ParsedProject, 
 	var provider schema.ProviderName
 	var defaultRegion string
 	jsons := h.LoadPlanJSONs()
+	if len(jsons) > 1 {
+		return nil, fmt.Errorf("multiple projects found, please provide one project")
+	}
 	for _, j := range jsons {
 		var res Project
 		err := json.Unmarshal(j.JSON, &res)
