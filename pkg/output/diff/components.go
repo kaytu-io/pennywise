@@ -1,11 +1,11 @@
-package output
+package diff
 
 import (
 	"fmt"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/kaytu-io/pennywise/pkg/cost"
+	"github.com/kaytu-io/pennywise/pkg/schema"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -39,12 +39,12 @@ func (m ComponentsModel) View() string {
 	return output
 }
 
-func getComponentsModel(resourceName, resourceCost string, components map[string][]cost.Component, resModel ResourcesModel) (tea.Model, error) {
+func getComponentsModel(resourceName, resourceCost string, components map[string][]schema.ComponentDiff, resModel ResourcesModel) (tea.Model, error) {
 	var longestName int
 	for _, comps := range components {
 		for _, c := range comps {
-			if len(c.Name) > longestName {
-				longestName = len(c.Name)
+			if len(c.Component.Name) > longestName {
+				longestName = len(c.Component.Name)
 			}
 		}
 	}
@@ -69,7 +69,8 @@ func getComponentsModel(resourceName, resourceCost string, components map[string
 	for _, comps := range components {
 		for _, c := range comps {
 			var row table.Row
-			row = append(row, c.Name, c.Rate.Decimal.String(), c.HourlyQuantity.String(), c.MonthlyQuantity.String(), c.Unit, c.Cost().Decimal.String())
+			row = append(row, c.Component.Name, c.Component.Rate.Decimal.String(), c.Component.HourlyQuantity.String(),
+				c.Component.MonthlyQuantity.String(), c.Component.Unit, c.CostDiff.String())
 			rows = append(rows, row)
 		}
 	}

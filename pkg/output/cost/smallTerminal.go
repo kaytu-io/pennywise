@@ -1,4 +1,4 @@
-package output
+package cost
 
 import (
 	tea "github.com/charmbracelet/bubbletea"

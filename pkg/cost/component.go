@@ -43,13 +43,3 @@ func (c Component) Cost() Cost {
 		return Zero
 	}
 }
-
-// ComponentDiff is a difference between the Prior and Planned Component.
-type ComponentDiff struct {
-	Prior, Planned *Component
-}
-
-// Valid returns true if there are no errors in both the Planned and Prior components.
-func (cd ComponentDiff) Valid() bool {
-	return !((cd.Prior != nil && cd.Prior.Error != nil) || (cd.Planned != nil && cd.Planned.Error != nil))
-}

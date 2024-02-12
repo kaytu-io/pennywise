@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+type SubmissionsDiff struct {
+	Current   Submission `json:"current"`
+	CompareTo Submission `json:"compare_to"`
+}
+
 // Submission to store and track resources and usage data for each run
 type Submission struct {
 	ID        string        `json:"id"`
@@ -57,4 +62,34 @@ func (s *Submission) StoreAsFile() error {
 		return err
 	}
 	return nil
+}
+
+// ReadSubmissionFile Reads a submission from a file
+func ReadSubmissionFile(id string) (*Submission, error) {
+	pennywiseDir := ".pennywise"
+	submissionsDir := filepath.Join(pennywiseDir, "submissions")
+
+	jsonFilePath := filepath.Join(submissionsDir, id+".json")
+
+	fileInfo, err := os.Stat(jsonFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("rrror checking JSON file: %v", err)
+	}
+
+	if !fileInfo.Mode().IsRegular() {
+		return nil, fmt.Errorf("file %s is not a regular file", jsonFilePath)
+	}
+
+	jsonData, err := os.ReadFile(jsonFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading JSON file: %v", err)
+	}
+
+	var submission Submission
+	err = json.Unmarshal(jsonData, &submission)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshalling JSON: %v", err)
+	}
+
+	return &submission, nil
 }

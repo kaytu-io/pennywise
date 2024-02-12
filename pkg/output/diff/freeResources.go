@@ -1,4 +1,4 @@
-package output
+package diff
 
 import (
 	"github.com/charmbracelet/bubbles/table"
