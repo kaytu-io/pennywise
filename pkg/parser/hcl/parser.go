@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func ParseHclResources(path string, usage usagePackage.Usage) ([]ParsedProject, error) {
+func ParseHclResources(path string, usage usagePackage.Usage, tfVarFiles []string) ([]ParsedProject, error) {
 	var rootModule Module
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
@@ -18,7 +18,8 @@ func ParseHclResources(path string, usage usagePackage.Usage) ([]ParsedProject, 
 	}
 	ctx := config.ProjectContext{
 		ProjectConfig: &config.Project{
-			Path: path,
+			Path:              path,
+			TerraformVarFiles: tfVarFiles,
 		},
 		RunContext: runCtx,
 	}
@@ -42,8 +43,15 @@ func ParseHclResources(path string, usage usagePackage.Usage) ([]ParsedProject, 
 			return nil, err
 		}
 		for key, providerConfig := range res.Configuration.ProviderConfig {
-			provider = key
-			defaultRegion = providerConfig.Expressions.Region.ConstantValue
+			if _, ok := map[string]bool{
+				"aws":     true,
+				"azure":   true,
+				"azurerm": true,
+			}[string(key)]; ok {
+				provider = key
+				defaultRegion = providerConfig.Expressions.Region.ConstantValue
+				break
+			}
 		}
 		for _, mod := range res.PlannedValues {
 			rootModule = mod

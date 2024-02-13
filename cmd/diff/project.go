@@ -54,13 +54,14 @@ var projectCommand = &cobra.Command{
 
 		jsonPath := flags.ReadStringOptionalFlag(cmd, "json-path")
 		projectPath := flags.ReadStringFlag(cmd, "project-path")
+		tfVarFiles := flags.ReadStringArrayFlag(cmd, "terraform-var-file")
 		if jsonPath != nil {
 			err := tfPlanJsonDiff(classic, *jsonPath, compareTo, usage, pkg.DefaultServerAddress)
 			if err != nil {
 				return err
 			}
 		} else {
-			err := terraformProjectDiff(classic, projectPath, compareTo, usage, pkg.DefaultServerAddress)
+			err := terraformProjectDiff(classic, projectPath, compareTo, usage, pkg.DefaultServerAddress, tfVarFiles)
 			if err != nil {
 				return err
 			}
@@ -128,7 +129,7 @@ func tfPlanJsonDiff(classic bool, jsonPath string, compareToId string, usage usa
 	return nil
 }
 
-func terraformProjectDiff(classic bool, projectPath string, compareToId string, usage usagePackage.Usage, ServerClientAddress string) error {
+func terraformProjectDiff(classic bool, projectPath string, compareToId string, usage usagePackage.Usage, ServerClientAddress string, tfVarFiles []string) error {
 	if classic {
 		return fmt.Errorf("classic view not available for diff")
 	}
@@ -138,7 +139,7 @@ func terraformProjectDiff(classic bool, projectPath string, compareToId string, 
 		fmt.Println("terragrunt project...")
 		projects, err = hcl.ParseTerragruntProject(projectPath, usage)
 	} else {
-		projects, err = hcl.ParseHclResources(projectPath, usage)
+		projects, err = hcl.ParseHclResources(projectPath, usage, tfVarFiles)
 	}
 	if err != nil {
 		return err

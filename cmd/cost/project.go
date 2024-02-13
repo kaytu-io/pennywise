@@ -54,13 +54,14 @@ var projectCommand = &cobra.Command{
 
 		jsonPath := flags.ReadStringOptionalFlag(cmd, "json-path")
 		projectPath := flags.ReadStringFlag(cmd, "project-path")
+		tfVarFiles := flags.ReadStringArrayFlag(cmd, "terraform-var-file")
 		if jsonPath != nil {
 			err := estimateTfPlanJson(classic, *jsonPath, usage, pkg.DefaultServerAddress)
 			if err != nil {
 				return err
 			}
 		} else {
-			err := estimateTerraformProject(classic, projectPath, usage, pkg.DefaultServerAddress)
+			err := estimateTerraformProject(classic, projectPath, usage, pkg.DefaultServerAddress, tfVarFiles)
 			if err != nil {
 				return err
 			}
@@ -113,14 +114,14 @@ func estimateTfPlanJson(classic bool, jsonPath string, usage usagePackage.Usage,
 	return nil
 }
 
-func estimateTerraformProject(classic bool, projectPath string, usage usagePackage.Usage, ServerClientAddress string) error {
+func estimateTerraformProject(classic bool, projectPath string, usage usagePackage.Usage, ServerClientAddress string, tfVarFiles []string) error {
 	var projects []hcl.ParsedProject
 	var err error
 	if providers.IsTerragruntNestedDir(projectPath, 5) {
 		fmt.Println("terragrunt project...")
 		projects, err = hcl.ParseTerragruntProject(projectPath, usage)
 	} else {
-		projects, err = hcl.ParseHclResources(projectPath, usage)
+		projects, err = hcl.ParseHclResources(projectPath, usage, tfVarFiles)
 	}
 	if err != nil {
 		return err
