@@ -1,6 +1,7 @@
 package diff
 
 import (
+	"fmt"
 	"github.com/kaytu-io/pennywise/cmd/flags"
 	"github.com/kaytu-io/pennywise/pkg"
 	outputDiff "github.com/kaytu-io/pennywise/pkg/output/diff"
@@ -50,22 +51,13 @@ func submissionsDiff(classic bool, submissionId, compareToId string, ServerClien
 	if err != nil {
 		return err
 	}
-	//if classic {
-	//	costString, err := state.CostString()
-	//	if err != nil {
-	//		return err
-	//	}
-	//	fmt.Println(costString)
-	//	fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
-	//} else {
-	//	err = output.ShowStateCosts(state)
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
-	err = outputDiff.ShowStateCosts(stateDiff)
-	if err != nil {
-		return err
+	if classic {
+		return fmt.Errorf("classic view not available for diff")
+	} else {
+		err = outputDiff.ShowStateCosts(stateDiff)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

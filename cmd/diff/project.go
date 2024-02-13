@@ -70,6 +70,9 @@ var projectCommand = &cobra.Command{
 }
 
 func tfPlanJsonDiff(classic bool, jsonPath string, compareToId string, usage usagePackage.Usage, ServerClientAddress string) error {
+	if classic {
+		return fmt.Errorf("classic view not available for diff")
+	}
 	file, err := os.Open(jsonPath)
 	if err != nil {
 		return err
@@ -126,6 +129,9 @@ func tfPlanJsonDiff(classic bool, jsonPath string, compareToId string, usage usa
 }
 
 func terraformProjectDiff(classic bool, projectPath string, compareToId string, usage usagePackage.Usage, ServerClientAddress string) error {
+	if classic {
+		return fmt.Errorf("classic view not available for diff")
+	}
 	var projects []hcl.ParsedProject
 	var err error
 	if providers.IsTerragruntNestedDir(projectPath, 5) {
