@@ -6,55 +6,25 @@ on:
       - main
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
-    environment: golang
-    permissions: write-all
+    needs:
+      - tag
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.5.2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false
-
+          token: ${{ secrets.GH_TOKEN }}
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version-file: './go.mod'
-          cache: false
-
-      - name: GitHub Tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.1
+          go-version: stable
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
         with:
-          github_token: ${{ secrets.GH_TOKEN }}
-
-      - name: Get Latest Tag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
-        id: previousTag
-
-      - name: Build
+          distribution: goreleaser
+          version: latest
+          args: release --clean
         env:
-          GITHUBCI_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          echo -e "machine github.com login api password ${{ secrets.GH_TOKEN }}" >> ~/.netrc
-          git config --global url.https://${{ secrets.GH_TOKEN }}@github.com/kaytu-io.insteadOf https://github.com/kaytu-io
-
-          sed -i 's+'NEW_VERSION_CLI'+${{ steps.tag_version.outputs.new_tag }}+g' cmd/predef/version.go
-          export GOPRIVATE=github.com/kaytu-io
-          export CGO_ENABLED=0
-          GOOS=linux GOARCH=amd64 go build -o ./build/pennywise-linux-amd64 ./main.go
-          GOOS=linux GOARCH=arm64 go build -o ./build/pennywise-linux-arm64 ./main.go
-          GOOS=windows GOARCH=amd64 go build -o ./build/pennywise-windows-amd64 ./main.go
-          GOOS=darwin GOARCH=amd64 go build -o ./build/pennywise-macos-amd64 ./main.go
-          GOOS=darwin GOARCH=arm64 go build -o ./build/pennywise-macos-arm64 ./main.go
-
-      - name: Create Release
-        uses: ncipollo/release-action@v1.12.0
-        with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          artifacts: "release.tar.gz,foo/*.txt,./build/pennywise-linux-amd64,./build/pennywise-linux-arm64,./build/pennywise-windows-amd64,./build/pennywise-macos-amd64,./build/pennywise-macos-arm64"
-          draft: false
-          prerelease: false
-          makeLatest: true
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
