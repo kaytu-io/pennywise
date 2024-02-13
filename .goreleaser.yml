@@ -32,7 +32,7 @@ signs:
     stdin: "{{ .Env.COSIGN_PWD }}"
     args:
       - "sign-blob"
-      - "--key env://{{ .Env.COSIGN_SECRET }}"
+      - "--key=env://COSIGN_SECRET"
       - "--output-signature=${signature}"
       - "${artifact}"
       - "--yes"
