@@ -53,7 +53,7 @@ func (m ResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return unsupportedModel, cmd
 			}
 			if resource, ok := m.state.Resources[name]; ok {
-				compsModel, err := getComponentsModel(name, m.table.SelectedRow()[1], resource.Components, m)
+				compsModel, err := getComponentsModel(name, m.table.SelectedRow()[2], resource.Components, m)
 				if err != nil {
 					panic(err)
 				}
@@ -75,7 +75,9 @@ func (m ResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						longestName = len(n)
 					}
 				}
-				resModel, err := getResourcesModel(moduleCost.Decimal.InexactFloat64(), &module, longestName, &m)
+				ac := accounting.Accounting{Symbol: "$", Precision: 2}
+				label := fmt.Sprintf("Module total Cost: %s", ac.FormatMoney(moduleCost.Decimal))
+				resModel, err := getResourcesModel(label, &module, longestName, &m)
 				if err != nil {
 					panic(err)
 				}
@@ -94,13 +96,13 @@ func (m ResourcesModel) View() string {
 	return output
 }
 
-func getResourcesModel(totalCost float64, state *cost.ModularState, longestName int, parentModel *ResourcesModel) (tea.Model, error) {
+func getResourcesModel(label string, state *cost.ModularState, longestName int, parentModel *ResourcesModel) (tea.Model, error) {
 	w, _, err := terminal.GetSize(0)
 	if err != nil {
 		return nil, err
 	}
 	if (longestName + 33) > w {
-		return getSmallTerminalModelModel(totalCost, state, w-36, parentModel)
+		return getSmallTerminalModelModel(label, state, w-36, parentModel)
 	}
 	columns := []table.Column{
 		{Title: "Name", Width: longestName},
@@ -171,8 +173,6 @@ func getResourcesModel(totalCost float64, state *cost.ModularState, longestName 
 		BorderLeft(true).BorderBottom(false).BorderRight(false).BorderTop(false)
 	t.SetStyles(s)
 
-	ac := accounting.Accounting{Symbol: "$", Precision: 2}
-
-	m := ResourcesModel{fmt.Sprintf("Total cost: %s", ac.FormatMoney(totalCost)), t, state, parentModel, freeResources, unsupportedServices, longestName}
+	m := ResourcesModel{label, t, state, parentModel, freeResources, unsupportedServices, longestName}
 	return m, nil
 }

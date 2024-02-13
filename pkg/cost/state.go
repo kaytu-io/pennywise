@@ -87,28 +87,7 @@ func (s *State) Cost() (Cost, error) {
 }
 
 func (s *ModularState) Cost() (Cost, error) {
-	var total Cost
-	for name, re := range s.Resources {
-		rCost, err := re.Cost()
-		if err != nil {
-			return Zero, fmt.Errorf("failed to get cost of resource %s: %w", name, err)
-		}
-		total, err = total.Add(rCost)
-		if err != nil {
-			return Zero, fmt.Errorf("failed to add cost of resource %s: %w", name, err)
-		}
-	}
-	for name, childModule := range s.ChildModules {
-		childModuleCost, err := moduleCost(childModule)
-		if err != nil {
-			return Zero, fmt.Errorf("failed to get cost of module %s: %w", name, err)
-		}
-		total, err = total.Add(childModuleCost)
-		if err != nil {
-			return Zero, fmt.Errorf("failed to add cost of module %s: %w", name, err)
-		}
-	}
-	return Cost{Currency: total.Currency, Decimal: total.Decimal.Round(3)}, nil
+	return moduleCost(*s)
 }
 
 func moduleCost(state ModularState) (Cost, error) {

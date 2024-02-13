@@ -8,7 +8,7 @@ import (
 type SmallTerminalModel struct {
 	state       *cost.ModularState
 	parentModel *ResourcesModel
-	totalCost   float64
+	label       string
 	wSize       int
 }
 
@@ -22,7 +22,7 @@ func (m SmallTerminalModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "esc", "q", "ctrl+c":
 			return m, tea.Quit
 		case "enter":
-			model, err := getResourcesModel(m.totalCost, m.state, m.wSize, m.parentModel)
+			model, err := getResourcesModel(m.label, m.state, m.wSize, m.parentModel)
 			if err != nil {
 				panic(err)
 			}
@@ -37,8 +37,8 @@ func (m SmallTerminalModel) View() string {
 		"Exit by pressing [ESC], q or [CTRL+C]"
 }
 
-func getSmallTerminalModelModel(totalCost float64, state *cost.ModularState, wSize int, parentModel *ResourcesModel) (tea.Model, error) {
+func getSmallTerminalModelModel(label string, state *cost.ModularState, wSize int, parentModel *ResourcesModel) (tea.Model, error) {
 
-	m := SmallTerminalModel{state, parentModel, totalCost, wSize}
+	m := SmallTerminalModel{state, parentModel, label, wSize}
 	return m, nil
 }
