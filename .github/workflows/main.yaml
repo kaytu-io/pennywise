@@ -49,6 +49,9 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: stable
+      - name: update cli version
+        run: |
+          sed -i 's+'NEW_VERSION_CLI'+${{ needs.tag.outputs.latest_tag }}+g' cmd/predef/version.go
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
