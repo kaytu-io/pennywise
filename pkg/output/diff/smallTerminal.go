@@ -1,14 +1,15 @@
-package output
+package diff
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/kaytu-io/pennywise/pkg/cost"
+	"github.com/kaytu-io/pennywise/pkg/schema"
 )
 
 type SmallTerminalModel struct {
-	resources map[string]cost.Resource
-	totalCost float64
-	wSize     int
+	stateDiff   *schema.ModularStateDiff
+	parentModel *ResourcesModel
+	label       string
+	wSize       int
 }
 
 func (m SmallTerminalModel) Init() tea.Cmd { return nil }
@@ -21,7 +22,7 @@ func (m SmallTerminalModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "esc", "q", "ctrl+c":
 			return m, tea.Quit
 		case "enter":
-			model, err := getResourcesModel(m.totalCost, m.resources, m.wSize)
+			model, err := getResourcesModel(m.label, m.stateDiff, m.wSize, m.parentModel)
 			if err != nil {
 				panic(err)
 			}
@@ -36,8 +37,8 @@ func (m SmallTerminalModel) View() string {
 		"Exit by pressing [ESC], q or [CTRL+C]"
 }
 
-func getSmallTerminalModelModel(totalCost float64, resources map[string]cost.Resource, wSize int) (tea.Model, error) {
+func getSmallTerminalModelModel(label string, stateDiff *schema.ModularStateDiff, wSize int, parentModel *ResourcesModel) (tea.Model, error) {
 
-	m := SmallTerminalModel{resources, totalCost, wSize}
+	m := SmallTerminalModel{stateDiff, parentModel, label, wSize}
 	return m, nil
 }

@@ -1,27 +1,30 @@
-package cost
+package diff
 
 import "github.com/spf13/cobra"
 
-// CostCmd cost commands
-var CostCmd = &cobra.Command{
-	Use:   "cost",
-	Short: `Shows the costs for the resources with the defined usages.`,
-	Long:  `Breaks down the costs for the resources with the defined usages within the next month.`,
+// DiffCmd diff commands
+var DiffCmd = &cobra.Command{
+	Use:   "diff",
+	Short: `Shows the diff between two submissions.`,
+	Long:  `Shows the diff between two submissions.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return cmd.Help()
 	},
 }
 
 func init() {
-	CostCmd.AddCommand(projectCommand)
+	DiffCmd.AddCommand(projectCommand)
 	projectCommand.Flags().String("json-path", "", "terraform plan json file path")
 	projectCommand.Flags().String("project-path", ".", "path to terraform project")
 	projectCommand.Flags().StringSlice("terraform-var-file", []string{}, "path to terraform variables file")
 	projectCommand.Flags().String("usage", "", "usage file path")
 	projectCommand.Flags().Bool("classic", false, "Show results in classic view (not interactive)")
+	projectCommand.Flags().String("compare-to", "", "submission id to compare other submission with (latest submission by default)")
 
-	CostCmd.AddCommand(submissionCommand)
+	DiffCmd.AddCommand(submissionCommand)
 	submissionCommand.Flags().String("submission-id", "", "submission id")
 	submissionCommand.MarkFlagRequired("submission-id")
+	submissionCommand.Flags().String("compare-to", "", "submission id to compare other submission with")
+	submissionCommand.MarkFlagRequired("compare-to")
 	submissionCommand.Flags().Bool("classic", false, "Show results in classic view (not interactive)")
 }

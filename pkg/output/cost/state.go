@@ -1,13 +1,14 @@
-package output
+package cost
 
 import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/kaytu-io/pennywise/pkg/cost"
+	"github.com/leekchan/accounting"
 	"os"
 )
 
-func ShowStateCosts(s *cost.State) error {
+func ShowStateCosts(s *cost.ModularState) error {
 	totalCost, err := s.Cost()
 	if err != nil {
 		return err
@@ -18,8 +19,14 @@ func ShowStateCosts(s *cost.State) error {
 			longestName = len(name)
 		}
 	}
-
-	model, err := getResourcesModel(totalCost.Decimal.InexactFloat64(), s.Resources, longestName)
+	for name, _ := range s.ChildModules {
+		if len(name) > longestName {
+			longestName = len(name)
+		}
+	}
+	ac := accounting.Accounting{Symbol: "$", Precision: 2}
+	label := fmt.Sprintf("Total Cost: %s", ac.FormatMoney(totalCost.Decimal))
+	model, err := getResourcesModel(label, s, longestName, nil)
 	if err != nil {
 		return err
 	}

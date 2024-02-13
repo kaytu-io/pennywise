@@ -1,34 +1,86 @@
 package hcl
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/kaytu-io/infracost/external/config"
+	"github.com/kaytu-io/infracost/external/providers/terraform"
 	"github.com/kaytu-io/pennywise/pkg/schema"
 	usagePackage "github.com/kaytu-io/pennywise/pkg/usage"
+	"golang.org/x/net/context"
 )
 
-// ParseHclResources parses a new terraform project and return provider name and resources
-func ParseHclResources(path string, usage usagePackage.Usage) (schema.ProviderName, []Resource, error) {
-	tp := newTerraformProject(path)
-	err := tp.FindFiles()
+func ParseHclResources(path string, usage usagePackage.Usage, tfVarFiles []string) ([]ParsedProject, error) {
+	var rootModule Module
+	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
-	err = tp.FindProjectBlocks()
-	if err != nil {
-		return "", nil, err
+	ctx := config.ProjectContext{
+		ProjectConfig: &config.Project{
+			Path:              path,
+			TerraformVarFiles: tfVarFiles,
+		},
+		RunContext: runCtx,
 	}
-	mapStructure := tp.makeProjectMapStructure()
-	provider, resources, err := extractResourcesFromMapStructure(mapStructure)
-	if err != nil {
-		return "", nil, err
+	h, providerErr := terraform.NewHCLProvider(
+		&ctx,
+		nil,
+	)
+	if providerErr != nil {
+		return nil, providerErr
 	}
-	if usage != nil {
-		for _, res := range resources {
-			res.addUsage(usage)
+	var provider schema.ProviderName
+	var defaultRegion string
+	jsons := h.LoadPlanJSONs()
+	if len(jsons) > 1 {
+		return nil, fmt.Errorf("multiple projects found, please provide one project")
+	}
+	for _, j := range jsons {
+		var res Project
+		err := json.Unmarshal(j.JSON, &res)
+		if err != nil {
+			return nil, err
+		}
+		for key, providerConfig := range res.Configuration.ProviderConfig {
+			if _, ok := map[string]bool{
+				"aws":     true,
+				"azure":   true,
+				"azurerm": true,
+			}[string(key)]; ok {
+				provider = key
+				defaultRegion = providerConfig.Expressions.Region.ConstantValue
+				break
+			}
+		}
+		for _, mod := range res.PlannedValues {
+			rootModule = mod
 		}
 	}
-	if diagsStr, ok := tp.Diags.Show(); ok {
-		fmt.Println(diagsStr)
+
+	addUsageToModule(usage, &rootModule)
+
+	parsedProjects := []ParsedProject{
+		{
+			Directory:     path,
+			Provider:      provider,
+			DefaultRegion: defaultRegion,
+			RootModule:    rootModule,
+		},
 	}
-	return schema.ProviderName(provider), resources, nil
+
+	return parsedProjects, nil
+}
+
+func addUsage(res Resource, usage usagePackage.Usage) Resource {
+	newValues := res.Values
+
+	newValues[usagePackage.Key] = usage.GetUsage(res.Type, res.Address)
+	return Resource{
+		Address: res.Address,
+		Mode:    res.Mode,
+		Name:    res.Name,
+		Type:    res.Type,
+		Values:  newValues,
+	}
 }

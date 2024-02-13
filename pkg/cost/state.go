@@ -5,7 +5,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-	"github.com/kaytu-io/pennywise/pkg/schema"
 	"sort"
 )
 
@@ -16,6 +15,45 @@ type State struct {
 	Resources map[string]Resource
 }
 
+type ModularState struct {
+	ChildModules map[string]ModularState
+	Resources    map[string]Resource
+}
+
+func (s *ModularState) ToClassicState() *State {
+	return &State{
+		Resources: getModuleResources(*s),
+	}
+}
+
+func getModuleResources(state ModularState) map[string]Resource {
+	resources := make(map[string]Resource)
+	for name, res := range state.Resources {
+		resources[name] = res
+	}
+	for _, mod := range state.ChildModules {
+		for name, res := range getModuleResources(mod) {
+			resources[name] = res
+		}
+	}
+	return resources
+}
+
+func (s *ModularState) TotalResourcesCount() int {
+	return resourcesCount(*s)
+}
+
+func resourcesCount(state ModularState) int {
+	var count int
+
+	count += len(state.Resources)
+	for _, child := range state.ChildModules {
+		count += resourcesCount(child)
+	}
+
+	return count
+}
+
 // Errors that might be returned from NewState if either a product or a price are not found.
 var (
 	ErrProductNotFound = fmt.Errorf("product not found")
@@ -23,10 +61,6 @@ var (
 )
 
 var primary = color.New(color.FgHiCyan)
-
-var yellow = color.New(color.FgYellow)
-var red = color.New(color.FgHiRed)
-var green = color.New(color.FgHiGreen)
 
 var bold = color.New(color.Bold)
 var faint = color.New(color.Faint)
@@ -50,6 +84,35 @@ func (s *State) Cost() (Cost, error) {
 	}
 
 	return Cost{Currency: total.Currency, Decimal: total.Decimal.Round(3)}, nil
+}
+
+func (s *ModularState) Cost() (Cost, error) {
+	return moduleCost(*s)
+}
+
+func moduleCost(state ModularState) (Cost, error) {
+	var total Cost
+	for name, re := range state.Resources {
+		rCost, err := re.Cost()
+		if err != nil {
+			return Zero, fmt.Errorf("failed to get cost of resource %s: %w", name, err)
+		}
+		total, err = total.Add(rCost)
+		if err != nil {
+			return Zero, fmt.Errorf("failed to add cost of resource %s: %w", name, err)
+		}
+	}
+	for name, childModule := range state.ChildModules {
+		childModuleCost, err := moduleCost(childModule)
+		if err != nil {
+			return Zero, fmt.Errorf("failed to get cost of module %s: %w", name, err)
+		}
+		total, err = total.Add(childModuleCost)
+		if err != nil {
+			return Zero, fmt.Errorf("failed to add cost of module %s: %w", name, err)
+		}
+	}
+	return Cost{Currency: total.Currency, Decimal: total.Decimal}, nil
 }
 
 func (s *State) GetCostComponents() []Component {
@@ -175,7 +238,7 @@ func (s *State) CostString() (string, error) {
 }
 
 // EnsureResource creates Resource at the given address if it doesn't already exist.
-func (s *State) EnsureResource(address, typ string, provider schema.ProviderName, skipped, isSupported bool) {
+func (s *State) EnsureResource(address, typ string, provider string, skipped, isSupported bool) {
 	if _, ok := s.Resources[address]; !ok {
 		res := Resource{
 			Address:     address,

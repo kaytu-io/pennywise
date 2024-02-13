@@ -52,7 +52,7 @@ terraform show -json tfplan.binary > tfplan.json
 Run the following in the directory containing your terraform plan:
 
 ```shell
-pennywise cost terraform --json-path tfplan.json
+pennywise cost --json-path tfplan.json
 ```
 
 ![Cost Gif](.github/assets/cost-result.png)

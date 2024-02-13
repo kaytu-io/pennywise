@@ -3,14 +3,13 @@ package cost
 import (
 	"fmt"
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/kaytu-io/pennywise/pkg/schema"
 )
 
 // Resource represents costs of a single cloud resource. Each Resource includes a Component map, keyed
 // by the label.
 type Resource struct {
 	Address     string
-	Provider    schema.ProviderName
+	Provider    string
 	Type        string
 	Components  map[string][]Component
 	Skipped     bool
@@ -47,36 +46,4 @@ func (re Resource) CostRows() ([]table.Row, error) {
 		}
 	}
 	return rows, nil
-}
-
-// ResourceDiff is the difference in costs between prior and planned Resource. It contains a ComponentDiff
-// map, keyed by the label.
-type ResourceDiff struct {
-	Address        string
-	Provider       schema.ProviderName
-	Type           string
-	ComponentDiffs map[string]*ComponentDiff
-}
-
-// Errors returns a map of Component errors keyed by the Component label.
-func (rd ResourceDiff) Errors() map[string]error {
-	errs := make(map[string]error)
-	for label, cd := range rd.ComponentDiffs {
-		if cd.Prior != nil && cd.Prior.Error != nil {
-			errs[label] = cd.Prior.Error
-		} else if cd.Planned != nil && cd.Planned.Error != nil {
-			errs[label] = cd.Planned.Error
-		}
-	}
-	return errs
-}
-
-// Valid returns true if there are no errors in all of the ResourceDiff components.
-func (rd ResourceDiff) Valid() bool {
-	for _, cd := range rd.ComponentDiffs {
-		if (cd.Prior != nil && cd.Prior.Error != nil) || (cd.Planned != nil && cd.Planned.Error != nil) {
-			return false
-		}
-	}
-	return true
 }
