@@ -115,7 +115,7 @@ func estimateTfPlanJson(classic bool, jsonPath string, usage usagePackage.Usage,
 }
 
 func estimateTerraformProject(classic bool, projectPath string, usage usagePackage.Usage, ServerClientAddress string, tfVarFiles []string) error {
-	var projects []hcl.ParsedProject
+	var projects *schema.ModuleDef
 	var err error
 	if providers.IsTerragruntNestedDir(projectPath, 5) {
 		fmt.Println("terragrunt project...")
@@ -126,38 +126,35 @@ func estimateTerraformProject(classic bool, projectPath string, usage usagePacka
 	if err != nil {
 		return err
 	}
-	for _, p := range projects {
-		fmt.Println(p.Directory)
-		fmt.Println("======================")
-		serverClient, err := server.NewPennywiseServerClient(ServerClientAddress)
+	serverClient, err := server.NewPennywiseServerClient(ServerClientAddress)
+	if err != nil {
+		return err
+	}
+	sub, err := schema.CreateSubmissionV2(*projects)
+	if err != nil {
+		return err
+	}
+	err = sub.StoreAsFile()
+	if err != nil {
+		return err
+	}
+	state, err := serverClient.GetStateCostV2(*sub)
+	if err != nil {
+		return err
+	}
+	if classic {
+		costString, err := state.ToClassicState().CostString()
 		if err != nil {
 			return err
 		}
-		sub, err := schema.CreateSubmissionV2(p.GetModule())
+		fmt.Println(costString)
+		fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
+	} else {
+		err = outputCost.ShowStateCosts(state)
 		if err != nil {
 			return err
-		}
-		err = sub.StoreAsFile()
-		if err != nil {
-			return err
-		}
-		state, err := serverClient.GetStateCostV2(*sub)
-		if err != nil {
-			return err
-		}
-		if classic {
-			costString, err := state.ToClassicState().CostString()
-			if err != nil {
-				return err
-			}
-			fmt.Println(costString)
-			fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
-		} else {
-			err = outputCost.ShowStateCosts(state)
-			if err != nil {
-				return err
-			}
 		}
 	}
+
 	return nil
 }

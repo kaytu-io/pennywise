@@ -133,60 +133,57 @@ func terraformProjectDiff(classic bool, projectPath string, compareToId string, 
 	if classic {
 		return fmt.Errorf("classic view not available for diff")
 	}
-	var projects []hcl.ParsedProject
+	var project *schema.ModuleDef
 	var err error
 	if providers.IsTerragruntNestedDir(projectPath, 5) {
 		fmt.Println("terragrunt project...")
-		projects, err = hcl.ParseTerragruntProject(projectPath, usage)
+		project, err = hcl.ParseTerragruntProject(projectPath, usage)
 	} else {
-		projects, err = hcl.ParseHclResources(projectPath, usage, tfVarFiles)
+		project, err = hcl.ParseHclResources(projectPath, usage, tfVarFiles)
 	}
 	if err != nil {
 		return err
 	}
-	for _, p := range projects {
-		fmt.Println(p.Directory)
-		fmt.Println("======================")
-		serverClient, err := server.NewPennywiseServerClient(ServerClientAddress)
+	serverClient, err := server.NewPennywiseServerClient(ServerClientAddress)
+	if err != nil {
+		return err
+	}
+
+	var compareTo *schema.SubmissionV2
+	if compareToId == "" {
+		compareTo, err = schema.GetLatestSubmissionV2()
 		if err != nil {
 			return err
 		}
-
-		var compareTo *schema.SubmissionV2
-		if compareToId == "" {
-			compareTo, err = schema.GetLatestSubmissionV2()
-			if err != nil {
-				return err
-			}
-		} else {
-			compareTo, err = schema.ReadSubmissionFileV2(compareToId)
-			if err != nil {
-				return err
-			}
-		}
-
-		sub, err := schema.CreateSubmissionV2(p.GetModule())
-		if err != nil {
-			return err
-		}
-		err = sub.StoreAsFile()
-		if err != nil {
-			return err
-		}
-
-		req := schema.SubmissionsDiffV2{
-			Current:   *sub,
-			CompareTo: *compareTo,
-		}
-
-		stateDiff, err := serverClient.GetSubmissionsDiffV2(req)
-		if err != nil {
-			return err
-		}
-		err = outputDiff.ShowStateCosts(stateDiff)
+	} else {
+		compareTo, err = schema.ReadSubmissionFileV2(compareToId)
 		if err != nil {
 			return err
 		}
 	}
+
+	sub, err := schema.CreateSubmissionV2(*project)
+	if err != nil {
+		return err
+	}
+	err = sub.StoreAsFile()
+	if err != nil {
+		return err
+	}
+
+	req := schema.SubmissionsDiffV2{
+		Current:   *sub,
+		CompareTo: *compareTo,
+	}
+
+	stateDiff, err := serverClient.GetSubmissionsDiffV2(req)
+	if err != nil {
+		return err
+	}
+	err = outputDiff.ShowStateCosts(stateDiff)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

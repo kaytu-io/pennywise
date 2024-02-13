@@ -57,4 +57,3 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          PENNYWISE_VERSION: ${{ needs.tag.outputs.latest_tag }}

@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 )
 
-func ParseTerragruntProject(path string, usage usagePackage.Usage) ([]ParsedProject, error) {
+func ParseTerragruntProject(path string, usage usagePackage.Usage) (*schema.ModuleDef, error) {
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func ParseTerragruntProject(path string, usage usagePackage.Usage) ([]ParsedProj
 	if err != nil {
 		return nil, err
 	}
-	var parsedProjects []ParsedProject
+	var projectsModule schema.ModuleDef
 	for _, dir := range dirs {
 		var rootModule Module
 		var provider schema.ProviderName
@@ -39,8 +39,15 @@ func ParseTerragruntProject(path string, usage usagePackage.Usage) ([]ParsedProj
 				return nil, err
 			}
 			for key, providerConfig := range res.Configuration.ProviderConfig {
-				provider = key
-				defaultRegion = providerConfig.Expressions.Region.ConstantValue
+				if _, ok := map[string]bool{
+					"aws":     true,
+					"azure":   true,
+					"azurerm": true,
+				}[string(key)]; ok {
+					provider = key
+					defaultRegion = providerConfig.Expressions.Region.ConstantValue
+					break
+				}
 			}
 			for _, mod := range res.PlannedValues {
 				rootModule = mod
@@ -48,22 +55,38 @@ func ParseTerragruntProject(path string, usage usagePackage.Usage) ([]ParsedProj
 		}
 
 		addUsageToModule(usage, &rootModule)
-		currentDir, err := filepath.Abs(".")
+		currentDir, err := filepath.Abs(path)
 		if err != nil {
 			return nil, err
 		}
 
-		relativePath, err := filepath.Rel(currentDir, dir.ConfigDir)
+		projectName, err := filepath.Rel(currentDir, dir.ConfigDir)
 		if err != nil {
 			return nil, err
 		}
 
-		parsedProjects = append(parsedProjects, ParsedProject{
-			Directory:     relativePath,
+		parsedProject := ParsedProject{
+			Directory:     projectName,
 			Provider:      provider,
 			DefaultRegion: defaultRegion,
 			RootModule:    rootModule,
+		}
+		projectModule := parsedProject.GetModule()
+		changeResourcesId(projectName, &projectModule)
+		projectsModule.ChildModules = append(projectsModule.ChildModules, schema.ModuleDef{
+			Address:      projectName,
+			ChildModules: projectModule.ChildModules,
+			Resources:    projectModule.Resources,
 		})
 	}
-	return parsedProjects, nil
+	return &projectsModule, nil
+}
+
+func changeResourcesId(project string, mod *schema.ModuleDef) {
+	for i, res := range mod.Resources {
+		mod.Resources[i].Address = project + "." + res.Address
+	}
+	for _, childMod := range mod.ChildModules {
+		changeResourcesId(project, &childMod)
+	}
 }

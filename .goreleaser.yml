@@ -11,10 +11,26 @@ checksum: {}
 builds:
   - binary: pennywise
     ldflags:
-      - -s -w -X "cmd/predef/version.version={{.Env.PENNYWISE_VERSION}}"
+      - -s -w -X cmd/predef/version.VERSION={{ .Version }}
     goos:
       - linux
+    goarch:
+      - amd64
+      - arm64
+    main: ./main.go
+  - binary: pennywise
+    ldflags:
+      - -s -w -X cmd/predef/version.VERSION={{ .Version }}
+    goos:
       - darwin
+    goarch:
+      - amd64
+      - arm64
+    main: ./main.go
+  - binary: pennywise
+    ldflags:
+      - -s -w -X cmd/predef/version.VERSION={{ .Version }}
+    goos:
       - windows
     goarch:
       - amd64
@@ -25,4 +41,8 @@ archives:
   - id: binary
     format: binary
   - id: default
+    builds: [linux, darwin]
     format: tar.gz
+  - id: windows
+    builds: [windows]
+    format: zip

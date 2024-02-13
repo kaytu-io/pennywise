@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func ParseHclResources(path string, usage usagePackage.Usage, tfVarFiles []string) ([]ParsedProject, error) {
+func ParseHclResources(path string, usage usagePackage.Usage, tfVarFiles []string) (*schema.ModuleDef, error) {
 	var rootModule Module
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
@@ -60,16 +60,16 @@ func ParseHclResources(path string, usage usagePackage.Usage, tfVarFiles []strin
 
 	addUsageToModule(usage, &rootModule)
 
-	parsedProjects := []ParsedProject{
-		{
-			Directory:     path,
-			Provider:      provider,
-			DefaultRegion: defaultRegion,
-			RootModule:    rootModule,
-		},
+	parsedProjects := &ParsedProject{
+		Directory:     path,
+		Provider:      provider,
+		DefaultRegion: defaultRegion,
+		RootModule:    rootModule,
 	}
 
-	return parsedProjects, nil
+	projectModule := parsedProjects.GetModule()
+
+	return &projectModule, nil
 }
 
 func addUsage(res Resource, usage usagePackage.Usage) Resource {
