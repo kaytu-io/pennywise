@@ -49,9 +49,6 @@ setup_verify_arch() {
         x86_64)
             ARCH=amd64
             ;;
-        i386|i686)
-            ARCH=386
-            ;;
         *)
             fatal "Unsupported architecture ${ARCH}"
     esac

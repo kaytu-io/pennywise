@@ -1,0 +1,28 @@
+---
+project_name: pennywise
+
+release:
+  github:
+    owner: kaytu-io
+    name: pennywise
+
+checksum: {}
+
+builds:
+  - binary: pennywise
+    ldflags:
+      - -s -w -X "cmd/predef/version.version={{.Env.PENNYWISE_VERSION}}"
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    main: ./main.go
+
+archives:
+  - id: binary
+    format: binary
+  - id: default
+    format: tar.gz
