@@ -14,23 +14,7 @@ builds:
       - -s -w -X cmd/predef/version.VERSION={{ .Version }}
     goos:
       - linux
-    goarch:
-      - amd64
-      - arm64
-    main: ./main.go
-  - binary: pennywise
-    ldflags:
-      - -s -w -X cmd/predef/version.VERSION={{ .Version }}
-    goos:
       - darwin
-    goarch:
-      - amd64
-      - arm64
-    main: ./main.go
-  - binary: pennywise
-    ldflags:
-      - -s -w -X cmd/predef/version.VERSION={{ .Version }}
-    goos:
       - windows
     goarch:
       - amd64
