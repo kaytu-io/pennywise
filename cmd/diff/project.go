@@ -6,6 +6,7 @@ import (
 	"github.com/kaytu-io/infracost/external/providers"
 	"github.com/kaytu-io/pennywise/cmd/cost/terraform"
 	"github.com/kaytu-io/pennywise/cmd/flags"
+	"github.com/kaytu-io/pennywise/pkg"
 	outputDiff "github.com/kaytu-io/pennywise/pkg/output/diff"
 	"github.com/kaytu-io/pennywise/pkg/parser/hcl"
 	"github.com/kaytu-io/pennywise/pkg/schema"
@@ -53,13 +54,14 @@ var projectCommand = &cobra.Command{
 
 		jsonPath := flags.ReadStringOptionalFlag(cmd, "json-path")
 		projectPath := flags.ReadStringFlag(cmd, "project-path")
+		tfVarFiles := flags.ReadStringArrayFlag(cmd, "terraform-var-file")
 		if jsonPath != nil {
-			err := tfPlanJsonDiff(classic, *jsonPath, compareTo, usage, DefaultServerAddress)
+			err := tfPlanJsonDiff(classic, *jsonPath, compareTo, usage, pkg.DefaultServerAddress)
 			if err != nil {
 				return err
 			}
 		} else {
-			err := terraformProjectDiff(classic, projectPath, compareTo, usage, DefaultServerAddress)
+			err := terraformProjectDiff(classic, projectPath, compareTo, usage, pkg.DefaultServerAddress, tfVarFiles)
 			if err != nil {
 				return err
 			}
@@ -69,6 +71,9 @@ var projectCommand = &cobra.Command{
 }
 
 func tfPlanJsonDiff(classic bool, jsonPath string, compareToId string, usage usagePackage.Usage, ServerClientAddress string) error {
+	if classic {
+		return fmt.Errorf("classic view not available for diff")
+	}
 	file, err := os.Open(jsonPath)
 	if err != nil {
 		return err
@@ -112,22 +117,29 @@ func tfPlanJsonDiff(classic bool, jsonPath string, compareToId string, usage usa
 	if err != nil {
 		return err
 	}
-
-	err = outputDiff.ShowStateCosts(stateDiff)
+	modularShowDiff := schema.ModularStateDiff{
+		Resources: stateDiff.Resources,
+		PriorCost: stateDiff.PriorCost,
+		NewCost:   stateDiff.NewCost,
+	}
+	err = outputDiff.ShowStateCosts(&modularShowDiff)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func terraformProjectDiff(classic bool, projectPath string, compareToId string, usage usagePackage.Usage, ServerClientAddress string) error {
+func terraformProjectDiff(classic bool, projectPath string, compareToId string, usage usagePackage.Usage, ServerClientAddress string, tfVarFiles []string) error {
+	if classic {
+		return fmt.Errorf("classic view not available for diff")
+	}
 	var projects []hcl.ParsedProject
 	var err error
 	if providers.IsTerragruntNestedDir(projectPath, 5) {
 		fmt.Println("terragrunt project...")
 		projects, err = hcl.ParseTerragruntProject(projectPath, usage)
 	} else {
-		projects, err = hcl.ParseHclResources(projectPath, usage)
+		projects, err = hcl.ParseHclResources(projectPath, usage, tfVarFiles)
 	}
 	if err != nil {
 		return err
@@ -140,20 +152,20 @@ func terraformProjectDiff(classic bool, projectPath string, compareToId string, 
 			return err
 		}
 
-		var compareTo *schema.Submission
+		var compareTo *schema.SubmissionV2
 		if compareToId == "" {
-			compareTo, err = schema.GetLatestSubmission()
+			compareTo, err = schema.GetLatestSubmissionV2()
 			if err != nil {
 				return err
 			}
 		} else {
-			compareTo, err = schema.ReadSubmissionFile(compareToId)
+			compareTo, err = schema.ReadSubmissionFileV2(compareToId)
 			if err != nil {
 				return err
 			}
 		}
 
-		sub, err := schema.CreateSubmission(p.GetResources())
+		sub, err := schema.CreateSubmissionV2(p.GetModule())
 		if err != nil {
 			return err
 		}
@@ -162,12 +174,12 @@ func terraformProjectDiff(classic bool, projectPath string, compareToId string, 
 			return err
 		}
 
-		req := schema.SubmissionsDiff{
+		req := schema.SubmissionsDiffV2{
 			Current:   *sub,
 			CompareTo: *compareTo,
 		}
 
-		stateDiff, err := serverClient.GetSubmissionsDiff(req)
+		stateDiff, err := serverClient.GetSubmissionsDiffV2(req)
 		if err != nil {
 			return err
 		}

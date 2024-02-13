@@ -28,7 +28,7 @@ func ParseTerragruntProject(path string, usage usagePackage.Usage) ([]ParsedProj
 	}
 	var parsedProjects []ParsedProject
 	for _, dir := range dirs {
-		var resources []Resource
+		var rootModule Module
 		var provider schema.ProviderName
 		var defaultRegion string
 		jsons := dir.Provider.LoadPlanJSONs()
@@ -43,16 +43,11 @@ func ParseTerragruntProject(path string, usage usagePackage.Usage) ([]ParsedProj
 				defaultRegion = providerConfig.Expressions.Region.ConstantValue
 			}
 			for _, mod := range res.PlannedValues {
-				resources = append(resources, mod.Resources...)
-				for _, childMod := range mod.ChildModules {
-					resources = append(resources, childMod.Resources...)
-				}
+				rootModule = mod
 			}
 		}
 
-		for i, res := range resources {
-			resources[i] = addUsage(res, usage)
-		}
+		addUsageToModule(usage, &rootModule)
 		currentDir, err := filepath.Abs(".")
 		if err != nil {
 			return nil, err
@@ -67,7 +62,7 @@ func ParseTerragruntProject(path string, usage usagePackage.Usage) ([]ParsedProj
 			Directory:     relativePath,
 			Provider:      provider,
 			DefaultRegion: defaultRegion,
-			Resources:     resources,
+			RootModule:    rootModule,
 		})
 	}
 	return parsedProjects, nil

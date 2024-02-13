@@ -19,11 +19,13 @@ type EchoError struct {
 
 type ServerClient interface {
 	GetStateCost(req schema.Submission) (*cost.State, error)
+	GetStateCostV2(req schema.SubmissionV2) (*cost.ModularState, error)
 	AddIngestion(provider, service, region string) (*schema.IngestionJob, error)
 	ListIngestionJobs(provider, service, region, status string) ([]schema.IngestionJob, error)
 	GetIngestionJob(id string) (*schema.IngestionJob, error)
 	ListServices(provider string) ([]string, error)
 	GetSubmissionsDiff(req schema.SubmissionsDiff) (*schema.StateDiff, error)
+	GetSubmissionsDiffV2(req schema.SubmissionsDiffV2) (*schema.ModularStateDiff, error)
 }
 
 type serverClient struct {
@@ -129,6 +131,26 @@ func (s *serverClient) GetStateCost(req schema.Submission) (*cost.State, error) 
 	return &cost, nil
 }
 
+func (s *serverClient) GetStateCostV2(req schema.SubmissionV2) (*cost.ModularState, error) {
+	url := fmt.Sprintf("%s/api/v2/cost/submission", s.baseURL)
+
+	payload, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	var cost cost.ModularState
+	if statusCode, err := s.doRequest(http.MethodGet, url, payload, &cost); err != nil {
+		if 400 <= statusCode && statusCode < 500 {
+			return nil, echo.NewHTTPError(statusCode, err.Error())
+		}
+		if strings.Contains(err.Error(), "connect: connection refused") {
+			return nil, fmt.Errorf("Can't connect to the server. Please ensure that your server is running or that you have entered the --server-url flag currectly ")
+		}
+		return nil, err
+	}
+	return &cost, nil
+}
+
 func (s *serverClient) GetSubmissionsDiff(req schema.SubmissionsDiff) (*schema.StateDiff, error) {
 	url := fmt.Sprintf("%s/api/v1/cost/diff", s.baseURL)
 
@@ -137,6 +159,26 @@ func (s *serverClient) GetSubmissionsDiff(req schema.SubmissionsDiff) (*schema.S
 		return nil, err
 	}
 	var cost schema.StateDiff
+	if statusCode, err := s.doRequest(http.MethodGet, url, payload, &cost); err != nil {
+		if 400 <= statusCode && statusCode < 500 {
+			return nil, echo.NewHTTPError(statusCode, err.Error())
+		}
+		if strings.Contains(err.Error(), "connect: connection refused") {
+			return nil, fmt.Errorf("Can't connect to the server. Please ensure that your server is running or that you have entered the --server-url flag currectly ")
+		}
+		return nil, err
+	}
+	return &cost, nil
+}
+
+func (s *serverClient) GetSubmissionsDiffV2(req schema.SubmissionsDiffV2) (*schema.ModularStateDiff, error) {
+	url := fmt.Sprintf("%s/api/v2/cost/diff", s.baseURL)
+
+	payload, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	var cost schema.ModularStateDiff
 	if statusCode, err := s.doRequest(http.MethodGet, url, payload, &cost); err != nil {
 		if 400 <= statusCode && statusCode < 500 {
 			return nil, echo.NewHTTPError(statusCode, err.Error())

@@ -17,7 +17,8 @@ var baseStyle = lipgloss.NewStyle().
 type ResourcesModel struct {
 	label                string
 	table                table.Model
-	resources            map[string]schema.ResourceDiff
+	state                *schema.ModularStateDiff
+	parentModel          *ResourcesModel
 	freeResources        []string
 	unsupportedResources map[string][]string
 	longestName          int
@@ -32,14 +33,40 @@ func (m ResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q", "ctrl+c":
 			return m, tea.Quit
-		case "right", "enter":
-			resourceName := m.table.SelectedRow()[0][11:]
-			resource := m.resources[resourceName]
-			compsModel, err := getComponentsModel(resourceName, m.table.SelectedRow()[1], resource.ComponentDiffs, m)
-			if err != nil {
-				panic(err)
+		case "left":
+			if m.parentModel != nil {
+				return *m.parentModel, cmd
 			}
-			return compsModel, cmd
+		case "right", "enter":
+			name := m.table.SelectedRow()[0][11:]
+			if resource, ok := m.state.Resources[name]; ok {
+				compsModel, err := getComponentsModel(name, m.table.SelectedRow()[1], resource.ComponentDiffs, m)
+				if err != nil {
+					panic(err)
+				}
+				return compsModel, cmd
+			} else {
+				module := m.state.ChildModules[name]
+				ac := accounting.Accounting{Symbol: "$", Precision: 2}
+				label := fmt.Sprintf("Total Diff: %s (%s -> %s)", ac.FormatMoney(module.NewCost.Sub(module.PriorCost)),
+					ac.FormatMoney(module.PriorCost), ac.FormatMoney(module.NewCost))
+				var longestName int
+				for n, _ := range module.Resources {
+					if len(n) > longestName {
+						longestName = len(n)
+					}
+				}
+				for n, _ := range module.ChildModules {
+					if len(n) > longestName {
+						longestName = len(n)
+					}
+				}
+				resModel, err := getResourcesModel(label, &module, longestName, &m)
+				if err != nil {
+					panic(err)
+				}
+				return resModel, cmd
+			}
 		}
 	}
 	m.table, cmd = m.table.Update(msg)
@@ -53,16 +80,17 @@ func (m ResourcesModel) View() string {
 	return output
 }
 
-func getResourcesModel(label string, resources map[string]schema.ResourceDiff, longestName int) (tea.Model, error) {
+func getResourcesModel(label string, stateDiff *schema.ModularStateDiff, longestName int, parentModel *ResourcesModel) (tea.Model, error) {
 	w, _, err := terminal.GetSize(0)
 	if err != nil {
 		return nil, err
 	}
 	if (longestName + 26) > w {
-		return getSmallTerminalModelModel(label, resources, w-29)
+		return getSmallTerminalModelModel(label, stateDiff, w-29, parentModel)
 	}
 	columns := []table.Column{
 		{Title: "Name", Width: longestName + 11},
+		{Title: "Resources", Width: 10},
 		{Title: "Monthly Cost", Width: 30},
 	}
 
@@ -71,7 +99,27 @@ func getResourcesModel(label string, resources map[string]schema.ResourceDiff, l
 	unsupportedServices := make(map[string][]string)
 	ac := accounting.Accounting{Symbol: "$", Precision: 2}
 
-	for name, resource := range resources {
+	for name, module := range stateDiff.ChildModules {
+		var costDiff string
+		switch module.Action {
+		case schema.ActionCreate:
+			name = green.Sprint("+ ") + name
+			costDiff = ac.FormatMoney(module.NewCost)
+		case schema.ActionModify:
+			name = yellow.Sprint("~ ") + name
+			costDiff = ac.FormatMoney(module.NewCost.Sub(module.PriorCost)) +
+				fmt.Sprintf(" (%s -> %s)", ac.FormatMoney(module.PriorCost), ac.FormatMoney(module.NewCost))
+			if module.NewCost.Sub(module.PriorCost).InexactFloat64() > 0 {
+				costDiff = "+" + costDiff
+			}
+		case schema.ActionRemove:
+			name = red.Sprint("- ") + name
+			costDiff = ac.FormatMoney(module.PriorCost)
+		}
+		rows = append(rows, []string{name, fmt.Sprintf("%d", module.TotalResourcesCount()), costDiff})
+	}
+
+	for name, resource := range stateDiff.Resources {
 		if !resource.IsSupported && resource.Type != "" {
 			if _, ok := unsupportedServices[resource.Type]; !ok {
 				unsupportedServices[resource.Type] = []string{}
@@ -99,7 +147,7 @@ func getResourcesModel(label string, resources map[string]schema.ResourceDiff, l
 			name = red.Sprint("- ") + name
 			costDiff = ac.FormatMoney(resource.PriorCost)
 		}
-		rows = append(rows, []string{name, costDiff})
+		rows = append(rows, []string{name, "", costDiff})
 	}
 	columns = append(columns, table.Column{Title: "", Width: 1})
 	for i, _ := range rows {
@@ -126,6 +174,6 @@ func getResourcesModel(label string, resources map[string]schema.ResourceDiff, l
 		BorderLeft(true).BorderBottom(false).BorderRight(false).BorderTop(false)
 	t.SetStyles(s)
 
-	m := ResourcesModel{label, t, resources, freeResources, unsupportedServices, longestName}
+	m := ResourcesModel{label, t, stateDiff, parentModel, freeResources, unsupportedServices, longestName}
 	return m, nil
 }

@@ -12,40 +12,48 @@ import (
 	"time"
 )
 
-type SubmissionsDiff struct {
-	Current   Submission `json:"current"`
-	CompareTo Submission `json:"compare_to"`
+// SubmissionV2 to store and track resources and usage data for each run
+type SubmissionV2 struct {
+	ID         string    `json:"id"`
+	Version    string    `json:"version"`
+	CreatedAt  time.Time `json:"created_at"`
+	ProjectId  string    `json:"project_id"`
+	RootModule ModuleDef `json:"root_modules"`
 }
 
-type SubmissionsDiffV2 struct {
-	Current   SubmissionV2 `json:"current"`
-	CompareTo SubmissionV2 `json:"compare_to"`
+func (s *SubmissionV2) GetResources() []ResourceDef {
+	var resources []ResourceDef
+	resources = append(resources, getModuleResources(s.RootModule)...)
+
+	return resources
 }
 
-// Submission to store and track resources and usage data for each run
-type Submission struct {
-	ID        string        `json:"id"`
-	CreatedAt time.Time     `json:"created_at"`
-	ProjectId string        `json:"project_id"`
-	Resources []ResourceDef `json:"resources"`
+func getModuleResources(module ModuleDef) []ResourceDef {
+	var resources []ResourceDef
+	resources = append(resources, module.Resources...)
+	for _, childModule := range module.ChildModules {
+		resources = append(resources, getModuleResources(childModule)...)
+	}
+	return resources
 }
 
-// CreateSubmission creates a new submission to store resources and usage data
-func CreateSubmission(resources []ResourceDef) (*Submission, error) {
+// CreateSubmissionV2 creates a new version2 submission to store resources and usage data
+func CreateSubmissionV2(module ModuleDef) (*SubmissionV2, error) {
 	sf := sonyflake.NewSonyflake(sonyflake.Settings{})
 	id, err := sf.NextID()
 	if err != nil {
 		return nil, err
 	}
-	return &Submission{
-		ID:        fmt.Sprintf("submission-%d", id),
-		CreatedAt: time.Now(),
-		Resources: resources,
+	return &SubmissionV2{
+		ID:         fmt.Sprintf("submission-%d", id),
+		Version:    "2.0.0",
+		CreatedAt:  time.Now(),
+		RootModule: module,
 	}, nil
 }
 
 // StoreAsFile stores the submission as a file in .pennywise/submissions directory
-func (s *Submission) StoreAsFile() error {
+func (s *SubmissionV2) StoreAsFile() error {
 	jsonData, err := json.MarshalIndent(*s, "", "  ")
 	if err != nil {
 		return err
@@ -71,8 +79,8 @@ func (s *Submission) StoreAsFile() error {
 	return nil
 }
 
-// ReadSubmissionFile Reads a submission from a file
-func ReadSubmissionFile(id string) (*Submission, error) {
+// ReadSubmissionFileV2 Reads a submission from a file
+func ReadSubmissionFileV2(id string) (*SubmissionV2, error) {
 	submissionsDir := filepath.Join(pkg.PennywiseDir, "submissions")
 
 	jsonFilePath := filepath.Join(submissionsDir, id+".json")
@@ -91,7 +99,7 @@ func ReadSubmissionFile(id string) (*Submission, error) {
 		return nil, fmt.Errorf("error reading JSON file: %v", err)
 	}
 
-	var submission Submission
+	var submission SubmissionV2
 	err = json.Unmarshal(jsonData, &submission)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling JSON: %v", err)
@@ -100,7 +108,7 @@ func ReadSubmissionFile(id string) (*Submission, error) {
 	return &submission, nil
 }
 
-func getAllSubmissions() ([]Submission, error) {
+func getAllSubmissionsV2() ([]SubmissionV2, error) {
 	submissionsDir := filepath.Join(pkg.PennywiseDir, "submissions")
 
 	files, err := ioutil.ReadDir(submissionsDir)
@@ -108,7 +116,7 @@ func getAllSubmissions() ([]Submission, error) {
 		return nil, fmt.Errorf("error reading submissions directory: %v", err)
 	}
 
-	var submissions []Submission
+	var submissions []SubmissionV2
 
 	for _, file := range files {
 		if file.IsDir() {
@@ -122,7 +130,7 @@ func getAllSubmissions() ([]Submission, error) {
 			return nil, fmt.Errorf("error reading JSON file %s: %v", jsonFilePath, err)
 		}
 
-		var submission Submission
+		var submission SubmissionV2
 		err = json.Unmarshal(jsonData, &submission)
 		if err != nil {
 			return nil, fmt.Errorf("error unmarshalling JSON file %s: %v", jsonFilePath, err)
@@ -139,8 +147,8 @@ func getAllSubmissions() ([]Submission, error) {
 	return submissions, nil
 }
 
-func GetLatestSubmission() (*Submission, error) {
-	submissions, err := getAllSubmissions()
+func GetLatestSubmissionV2() (*SubmissionV2, error) {
+	submissions, err := getAllSubmissionsV2()
 	if err != nil {
 		return nil, err
 	}

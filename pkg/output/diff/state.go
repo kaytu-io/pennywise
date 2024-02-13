@@ -13,9 +13,14 @@ var yellow = color.New(color.FgYellow)
 var red = color.New(color.FgHiRed)
 var green = color.New(color.FgHiGreen)
 
-func ShowStateCosts(s *schema.StateDiff) error {
+func ShowStateCosts(s *schema.ModularStateDiff) error {
 	var longestName int
 	for name, _ := range s.Resources {
+		if len(name) > longestName {
+			longestName = len(name)
+		}
+	}
+	for name, _ := range s.ChildModules {
 		if len(name) > longestName {
 			longestName = len(name)
 		}
@@ -24,7 +29,7 @@ func ShowStateCosts(s *schema.StateDiff) error {
 	ac := accounting.Accounting{Symbol: "$", Precision: 2}
 	label := fmt.Sprintf("Total Diff: %s (%s -> %s)", ac.FormatMoney(s.NewCost.Sub(s.PriorCost)),
 		ac.FormatMoney(s.PriorCost), ac.FormatMoney(s.NewCost))
-	model, err := getResourcesModel(label, s.Resources, longestName)
+	model, err := getResourcesModel(label, s, longestName, nil)
 	if err != nil {
 		return err
 	}

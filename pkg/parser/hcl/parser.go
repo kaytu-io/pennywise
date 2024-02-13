@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/kaytu-io/infracost/external/config"
 	"github.com/kaytu-io/infracost/external/providers/terraform"
 	"github.com/kaytu-io/pennywise/pkg/schema"
@@ -9,15 +10,16 @@ import (
 	"golang.org/x/net/context"
 )
 
-func ParseHclResources(path string, usage usagePackage.Usage) ([]ParsedProject, error) {
-	var resources []Resource
+func ParseHclResources(path string, usage usagePackage.Usage, tfVarFiles []string) ([]ParsedProject, error) {
+	var rootModule Module
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
 		return nil, err
 	}
 	ctx := config.ProjectContext{
 		ProjectConfig: &config.Project{
-			Path: path,
+			Path:              path,
+			TerraformVarFiles: tfVarFiles,
 		},
 		RunContext: runCtx,
 	}
@@ -31,6 +33,9 @@ func ParseHclResources(path string, usage usagePackage.Usage) ([]ParsedProject, 
 	var provider schema.ProviderName
 	var defaultRegion string
 	jsons := h.LoadPlanJSONs()
+	if len(jsons) > 1 {
+		return nil, fmt.Errorf("multiple projects found, please provide one project")
+	}
 	for _, j := range jsons {
 		var res Project
 		err := json.Unmarshal(j.JSON, &res)
@@ -38,27 +43,29 @@ func ParseHclResources(path string, usage usagePackage.Usage) ([]ParsedProject, 
 			return nil, err
 		}
 		for key, providerConfig := range res.Configuration.ProviderConfig {
-			provider = key
-			defaultRegion = providerConfig.Expressions.Region.ConstantValue
+			if _, ok := map[string]bool{
+				"aws":     true,
+				"azure":   true,
+				"azurerm": true,
+			}[string(key)]; ok {
+				provider = key
+				defaultRegion = providerConfig.Expressions.Region.ConstantValue
+				break
+			}
 		}
 		for _, mod := range res.PlannedValues {
-			resources = append(resources, mod.Resources...)
-			for _, childMod := range mod.ChildModules {
-				resources = append(resources, childMod.Resources...)
-			}
+			rootModule = mod
 		}
 	}
 
-	for i, res := range resources {
-		resources[i] = addUsage(res, usage)
-	}
+	addUsageToModule(usage, &rootModule)
 
 	parsedProjects := []ParsedProject{
 		{
 			Directory:     path,
 			Provider:      provider,
 			DefaultRegion: defaultRegion,
-			Resources:     resources,
+			RootModule:    rootModule,
 		},
 	}
 

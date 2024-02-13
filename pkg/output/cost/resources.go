@@ -17,7 +17,8 @@ var baseStyle = lipgloss.NewStyle().
 type ResourcesModel struct {
 	label                string
 	table                table.Model
-	resources            map[string]cost.Resource
+	state                *cost.ModularState
+	parentModel          *ResourcesModel
 	freeResources        []string
 	unsupportedResources map[string][]string
 	longestName          int
@@ -32,28 +33,56 @@ func (m ResourcesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q", "ctrl+c":
 			return m, tea.Quit
+		case "left":
+			if m.parentModel != nil {
+				return *m.parentModel, cmd
+			}
 		case "right", "enter":
-
-			resourceName := m.table.SelectedRow()[0]
-			if resourceName == "Free Resources" {
+			name := m.table.SelectedRow()[0]
+			if name == "Free Resources" {
 				freeResourcesModel, err := getFreeResourcesModel(m)
 				if err != nil {
 					panic(err)
 				}
 				return freeResourcesModel, cmd
-			} else if resourceName == "Unsupported" {
+			} else if name == "Unsupported" {
 				unsupportedModel, err := getUnsupportedModel(m)
 				if err != nil {
 					panic(err)
 				}
 				return unsupportedModel, cmd
 			}
-			resource := m.resources[resourceName]
-			compsModel, err := getComponentsModel(resourceName, m.table.SelectedRow()[1], resource.Components, m)
-			if err != nil {
-				panic(err)
+			if resource, ok := m.state.Resources[name]; ok {
+				compsModel, err := getComponentsModel(name, m.table.SelectedRow()[2], resource.Components, m)
+				if err != nil {
+					panic(err)
+				}
+				return compsModel, cmd
+			} else {
+				module := m.state.ChildModules[name]
+				moduleCost, err := module.Cost()
+				if err != nil {
+					panic(err)
+				}
+				var longestName int
+				for n, _ := range module.Resources {
+					if len(n) > longestName {
+						longestName = len(n)
+					}
+				}
+				for n, _ := range module.ChildModules {
+					if len(n) > longestName {
+						longestName = len(n)
+					}
+				}
+				ac := accounting.Accounting{Symbol: "$", Precision: 2}
+				label := fmt.Sprintf("Module total Cost: %s", ac.FormatMoney(moduleCost.Decimal))
+				resModel, err := getResourcesModel(label, &module, longestName, &m)
+				if err != nil {
+					panic(err)
+				}
+				return resModel, cmd
 			}
-			return compsModel, cmd
 		}
 	}
 	m.table, cmd = m.table.Update(msg)
@@ -67,16 +96,17 @@ func (m ResourcesModel) View() string {
 	return output
 }
 
-func getResourcesModel(totalCost float64, resources map[string]cost.Resource, longestName int) (tea.Model, error) {
+func getResourcesModel(label string, state *cost.ModularState, longestName int, parentModel *ResourcesModel) (tea.Model, error) {
 	w, _, err := terminal.GetSize(0)
 	if err != nil {
 		return nil, err
 	}
-	if (longestName + 20) > w {
-		return getSmallTerminalModelModel(totalCost, resources, w-23)
+	if (longestName + 33) > w {
+		return getSmallTerminalModelModel(label, state, w-36, parentModel)
 	}
 	columns := []table.Column{
 		{Title: "Name", Width: longestName},
+		{Title: "Resources", Width: 10},
 		{Title: "Monthly Cost", Width: 12},
 	}
 
@@ -84,7 +114,15 @@ func getResourcesModel(totalCost float64, resources map[string]cost.Resource, lo
 	var freeResources []string
 	unsupportedServices := make(map[string][]string)
 
-	for name, resource := range resources {
+	for name, module := range state.ChildModules {
+		cost, err := module.Cost()
+		if err != nil {
+			return nil, err
+		}
+		rows = append(rows, []string{name, fmt.Sprintf("%d", module.TotalResourcesCount()), cost.Decimal.String()})
+	}
+
+	for name, resource := range state.Resources {
 		if !resource.IsSupported && resource.Type != "" {
 			if _, ok := unsupportedServices[resource.Type]; !ok {
 				unsupportedServices[resource.Type] = []string{}
@@ -100,13 +138,13 @@ func getResourcesModel(totalCost float64, resources map[string]cost.Resource, lo
 			freeResources = append(freeResources, name)
 			continue
 		}
-		rows = append(rows, []string{name, cost.Decimal.String()})
+		rows = append(rows, []string{name, "", cost.Decimal.String()})
 	}
 	if len(freeResources) > 0 {
-		rows = append(rows, []string{"Free Resources", "0"})
+		rows = append(rows, []string{"Free Resources", fmt.Sprintf("%d", len(freeResources)), "0"})
 	}
 	if len(unsupportedServices) > 0 {
-		rows = append(rows, []string{"Unsupported", "0"})
+		rows = append(rows, []string{"Unsupported", fmt.Sprintf("%d", len(unsupportedServices)), "0"})
 	}
 	rows = sortRows(rows)
 	rows = makeNumbersAccounting(rows)
@@ -135,8 +173,6 @@ func getResourcesModel(totalCost float64, resources map[string]cost.Resource, lo
 		BorderLeft(true).BorderBottom(false).BorderRight(false).BorderTop(false)
 	t.SetStyles(s)
 
-	ac := accounting.Accounting{Symbol: "$", Precision: 2}
-
-	m := ResourcesModel{fmt.Sprintf("Total cost: %s", ac.FormatMoney(totalCost)), t, resources, freeResources, unsupportedServices, longestName}
+	m := ResourcesModel{label, t, state, parentModel, freeResources, unsupportedServices, longestName}
 	return m, nil
 }

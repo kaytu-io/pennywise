@@ -6,6 +6,8 @@ import (
 	"github.com/kaytu-io/infracost/external/providers"
 	"github.com/kaytu-io/pennywise/cmd/cost/terraform"
 	"github.com/kaytu-io/pennywise/cmd/flags"
+	"github.com/kaytu-io/pennywise/pkg"
+	"github.com/kaytu-io/pennywise/pkg/cost"
 	outputCost "github.com/kaytu-io/pennywise/pkg/output/cost"
 	"github.com/kaytu-io/pennywise/pkg/parser/hcl"
 	"github.com/kaytu-io/pennywise/pkg/schema"
@@ -52,13 +54,14 @@ var projectCommand = &cobra.Command{
 
 		jsonPath := flags.ReadStringOptionalFlag(cmd, "json-path")
 		projectPath := flags.ReadStringFlag(cmd, "project-path")
+		tfVarFiles := flags.ReadStringArrayFlag(cmd, "terraform-var-file")
 		if jsonPath != nil {
-			err := estimateTfPlanJson(classic, *jsonPath, usage, DefaultServerAddress)
+			err := estimateTfPlanJson(classic, *jsonPath, usage, pkg.DefaultServerAddress)
 			if err != nil {
 				return err
 			}
 		} else {
-			err := estimateTerraformProject(classic, projectPath, usage, DefaultServerAddress)
+			err := estimateTerraformProject(classic, projectPath, usage, pkg.DefaultServerAddress, tfVarFiles)
 			if err != nil {
 				return err
 			}
@@ -100,7 +103,10 @@ func estimateTfPlanJson(classic bool, jsonPath string, usage usagePackage.Usage,
 		fmt.Println(costString)
 		fmt.Println("To learn how to use usage open:\nhttps://github.com/kaytu-io/pennywise/blob/main/docs/usage.md")
 	} else {
-		err = outputCost.ShowStateCosts(state)
+		modularState := cost.ModularState{
+			Resources: state.Resources,
+		}
+		err = outputCost.ShowStateCosts(&modularState)
 		if err != nil {
 			return err
 		}
@@ -108,14 +114,14 @@ func estimateTfPlanJson(classic bool, jsonPath string, usage usagePackage.Usage,
 	return nil
 }
 
-func estimateTerraformProject(classic bool, projectPath string, usage usagePackage.Usage, ServerClientAddress string) error {
+func estimateTerraformProject(classic bool, projectPath string, usage usagePackage.Usage, ServerClientAddress string, tfVarFiles []string) error {
 	var projects []hcl.ParsedProject
 	var err error
 	if providers.IsTerragruntNestedDir(projectPath, 5) {
 		fmt.Println("terragrunt project...")
 		projects, err = hcl.ParseTerragruntProject(projectPath, usage)
 	} else {
-		projects, err = hcl.ParseHclResources(projectPath, usage)
+		projects, err = hcl.ParseHclResources(projectPath, usage, tfVarFiles)
 	}
 	if err != nil {
 		return err
@@ -127,7 +133,7 @@ func estimateTerraformProject(classic bool, projectPath string, usage usagePacka
 		if err != nil {
 			return err
 		}
-		sub, err := schema.CreateSubmission(p.GetResources())
+		sub, err := schema.CreateSubmissionV2(p.GetModule())
 		if err != nil {
 			return err
 		}
@@ -135,12 +141,12 @@ func estimateTerraformProject(classic bool, projectPath string, usage usagePacka
 		if err != nil {
 			return err
 		}
-		state, err := serverClient.GetStateCost(*sub)
+		state, err := serverClient.GetStateCostV2(*sub)
 		if err != nil {
 			return err
 		}
 		if classic {
-			costString, err := state.CostString()
+			costString, err := state.ToClassicState().CostString()
 			if err != nil {
 				return err
 			}

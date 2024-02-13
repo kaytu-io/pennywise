@@ -2,10 +2,6 @@ package cost
 
 import "github.com/spf13/cobra"
 
-const (
-	DefaultServerAddress string = "https://pennywise.kaytu.dev/kaytu"
-)
-
 // CostCmd cost commands
 var CostCmd = &cobra.Command{
 	Use:   "cost",
@@ -20,6 +16,7 @@ func init() {
 	CostCmd.AddCommand(projectCommand)
 	projectCommand.Flags().String("json-path", "", "terraform plan json file path")
 	projectCommand.Flags().String("project-path", ".", "path to terraform project")
+	projectCommand.Flags().StringSlice("terraform-var-file", []string{}, "path to terraform variables file")
 	projectCommand.Flags().String("usage", "", "usage file path")
 	projectCommand.Flags().Bool("classic", false, "Show results in classic view (not interactive)")
 
