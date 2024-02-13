@@ -54,6 +54,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean -ldflags="-X cmd/predef/version.version=${{ needs.tag.outputs.latest_tag }}"
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          PENNYWISE_VERSION: ${{ needs.tag.outputs.latest_tag }}

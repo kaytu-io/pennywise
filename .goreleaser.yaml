@@ -1,0 +1,3 @@
+builds:
+  ldflags:
+    - -s -w -X "cmd/predef/version.version={{.Env.PENNYWISE_VERSION}}"
