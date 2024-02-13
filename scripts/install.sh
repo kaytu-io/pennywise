@@ -121,12 +121,27 @@ download_binary() {
     download "${TMP_BIN}" "${BIN_URL}"
 }
 
+compute_sha256sum() {
+  cmd=$(which sha256sum shasum | head -n 1)
+  case $(basename "$cmd") in
+    sha256sum)
+      sha256sum "$1" | cut -f 1 -d ' '
+      ;;
+    shasum)
+      shasum -a 256 "$1" | cut -f 1 -d ' '
+      ;;
+    *)
+      fatal "Can not find sha256sum or shasum to compute checksum"
+      ;;
+  esac
+}
+
 # Verify downloaded binary hash
 verify_binary() {
     info "Verifying binary download"
     HASH_BIN=$(compute_sha256sum "${TMP_BIN}")
     HASH_BIN=${HASH_BIN%%[[:blank:]]*}
-    if [[ "${HASH_EXPECTED}" != "${HASH_BIN}" ]]; then
+    if [ "${HASH_EXPECTED}" != "${HASH_BIN}" ]; then
         fatal "Download sha256 does not match ${HASH_EXPECTED}, got ${HASH_BIN}"
     fi
 }
@@ -143,6 +158,7 @@ setup_binary() {
     else
         eval "sudo ${CMD_MOVE}"
     fi
+    info "Installed successfully"
 }
 
 # Run the install process
@@ -153,5 +169,6 @@ setup_binary() {
     get_release_version
     download_hash
     download_binary
+    verify_binary
     setup_binary
 }
