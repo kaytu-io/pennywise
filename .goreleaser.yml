@@ -11,7 +11,7 @@ checksum: {}
 builds:
   - binary: pennywise
     ldflags:
-      - -s -w -X cmd/predef/version.VERSION={{ .Version }}
+      - -s -w -X cmd/predef.VERSION={{ .Version }}
     goos:
       - linux
       - darwin
@@ -25,8 +25,4 @@ archives:
   - id: binary
     format: binary
   - id: default
-    builds: [linux, darwin]
     format: tar.gz
-  - id: windows
-    builds: [windows]
-    format: zip
