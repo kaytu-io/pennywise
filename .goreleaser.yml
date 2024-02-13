@@ -26,3 +26,14 @@ archives:
     format: binary
   - id: default
     format: tar.gz
+
+signs:
+  - cmd: cosign
+    stdin: "{{ .Env.COSIGN_PWD }}"
+    args:
+      - "sign-blob"
+      - "--key env://{{ .Env.COSIGN_SECRET }}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - "--yes"
+    artifacts: all
