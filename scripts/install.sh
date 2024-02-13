@@ -25,7 +25,7 @@ setup_verify_os() {
     OS=$(uname -s)
     case ${OS} in
         Darwin)
-            OS=macos
+            OS=darwin
             ;;
         Linux)
             OS=linux
@@ -49,6 +49,9 @@ setup_verify_arch() {
         x86_64)
             ARCH=amd64
             ;;
+        i386|i686)
+            ARCH=386
+            ;;
         *)
             fatal "Unsupported architecture ${ARCH}"
     esac
@@ -67,11 +70,7 @@ verify_downloader() {
 
 # Find version from Github metadata
 get_release_version() {
-    if [ -n "${FLUX_VERSION}" ]; then
-      SUFFIX_URL="tags/v${FLUX_VERSION}"
-    else
-      SUFFIX_URL="latest"
-    fi
+    SUFFIX_URL="latest"
 
     METADATA_URL="https://api.github.com/repos/${GITHUB_REPO}/releases/${SUFFIX_URL}"
     TMP_METADATA="${TMP_DIR}/pennywise.json"
@@ -105,21 +104,41 @@ download() {
     [ $? -eq 0 ] || fatal 'Download failed'
 }
 
+# Download hash from Github URL
+download_hash() {
+    HASH_URL="https://github.com/${GITHUB_REPO}/releases/download/v${VERSION}/pennywise_${VERSION}_checksums.txt"
+    TMP_HASH="${TMP_DIR}/pennywise.hash"
+    info "Downloading hash ${HASH_URL}"
+    download "${TMP_HASH}" "${HASH_URL}"
+    HASH_EXPECTED=$(grep " pennywise_${VERSION}_${OS}_${ARCH}.tar.gz$" "${TMP_HASH}")
+    HASH_EXPECTED=${HASH_EXPECTED%%[[:blank:]]*}
+}
+
 
 # Download binary from Github URL
 download_binary() {
-    BIN_URL="https://kaytu.s3.amazonaws.com/pennywise/releases/tag/v1.6.16/pennywise-${OS}-${ARCH}"
+    BIN_URL="https://github.com/${GITHUB_REPO}/releases/download/v${VERSION}/pennywise_${VERSION}_${OS}_${ARCH}.tar.gz"
     info "Downloading binary ${BIN_URL}"
-    TMP_BIN="${TMP_DIR}/pennywise"
+    TMP_BIN="${TMP_DIR}/pennywise.tar.gz"
 
     download "${TMP_BIN}" "${BIN_URL}"
 }
 
+# Verify downloaded binary hash
+verify_binary() {
+    info "Verifying binary download"
+    HASH_BIN=$(compute_sha256sum "${TMP_BIN}")
+    HASH_BIN=${HASH_BIN%%[[:blank:]]*}
+    if [[ "${HASH_EXPECTED}" != "${HASH_BIN}" ]]; then
+        fatal "Download sha256 does not match ${HASH_EXPECTED}, got ${HASH_BIN}"
+    fi
+}
 
 # Setup permissions and move binary
 setup_binary() {
-    chmod +x "${TMP_BIN}"
+    chmod 755 "${TMP_BIN}"
     info "Installing pennywise to ${BIN_DIR}/pennywise"
+    tar -xzof "${TMP_BIN}" -C "${TMP_DIR}"
 
     local CMD_MOVE="mv -f \"${TMP_DIR}/pennywise\" \"${BIN_DIR}\""
     if [ -w "${BIN_DIR}" ]; then
@@ -134,7 +153,8 @@ setup_binary() {
     setup_verify_os
     setup_verify_arch
     verify_downloader curl || verify_downloader wget || fatal 'Can not find curl or wget for downloading files'
-#    get_release_version
+    get_release_version
+    download_hash
     download_binary
     setup_binary
 }
